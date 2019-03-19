@@ -1,0 +1,76 @@
+﻿@using WebMatrix.Data
+@using Microsoft.VisualBasic
+
+@{  
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+    string urlcode = "";
+
+    if (!IsPost)
+    {
+
+        //if (Request.Form["adminLogin"] != "true")
+        //{
+        //    Response.Redirect("~/Default.cshtml");
+        //}
+
+
+    }
+
+    string name = Request["name"];
+    int code = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", urlcode);
+    int number = 0;         //later
+
+    if(IsPost && Validation.IsValid())
+    {
+
+        if (Request["AddName"] == "Add")
+        {
+            db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr) VALUES (@0, @1, @2)", name, code, number);
+        }
+    }
+
+}
+
+<html>
+<head>
+    <title>Admin Page</title>
+</head>
+
+<body>
+    @*<form method="post">
+        <input type="text" name="Nr_Of_Players" value="@code"/>
+        <input type="submit" name="settings" value="Save" />
+    </form>*@
+
+
+    <form method="post">
+        <input type="text" name="name" placeholder="Input name here..." />
+        <input type="submit" name="AddName" value="Add" />
+    </form>
+
+    <table>
+        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", code))
+        {
+            if (Request["delete"] == "delete")
+            {
+                db.Execute("DELETE ALL FROM Players WHERE Name = @0 AND Room_Code = @1", row.Name, code); 
+            }
+            <tr>
+                <td>
+                    @row.Name
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button formmethod="post" name="delete" value="delete">X</button>
+                </td>
+            </tr>
+        }
+    </table>
+</body>
+
+</html>
