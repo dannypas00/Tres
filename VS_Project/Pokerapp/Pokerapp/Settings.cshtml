@@ -1,0 +1,122 @@
+﻿@using WebMatrix.Data
+
+@{
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+    Validation.Add("nr_players", Validator.StringLength(2, 1, "MESSAGE"));
+    Validation.Add("round_time", Validator.StringLength(8, 8, "MESSAGE"));
+    Validation.Add("pause_time", Validator.StringLength(8, 0, "MESSAGE"));
+    Validation.Add("min_table", Validator.StringLength(2, 1, "MESSAGE"));
+    Validation.Add("max_table", Validator.StringLength(2, 1, "MESSAGE"));
+    Validation.Add("start_value", Validator.StringLength(3, 1, "MESSAGE"));
+    Validation.Add("table_amount", Validator.StringLength(2, 1, "MESSAGE"));
+    Validation.Add("rebuy", Validator.StringLength(1, 1, "MESSAGE"));
+    Validation.Add("chip1", Validator.StringLength(3, 1, "MESSAGE"));
+    Validation.Add("chip2", Validator.StringLength(3, 1, "MESSAGE"));
+    Validation.Add("chip3", Validator.StringLength(3, 1, "MESSAGE"));
+    Validation.Add("chip4", Validator.StringLength(3, 1, "MESSAGE"));
+    Validation.Add("chip5", Validator.StringLength(3, 1, "MESSAGE"));
+
+    int code = 1234567;
+
+    int nr_players = Convert.ToInt32(db.QueryValue("SELECT Nr_Of_Players FROM Room WHERE Room_Code = @0", code));
+    var round_time = db.QueryValue("SELECT Round_Time FROM Room WHERE Room_Code = @0", code);
+    var pause_time = db.QueryValue("SELECT Pause_Time FROM Room WHERE Room_Code = @0", code);
+    int min_table = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", code));
+    int max_table_amount = Convert.ToInt32(db.QueryValue("SELECT Tbl_Max_Size FROM Room WHERE Room_Code = @0", code));
+    int start_value = Convert.ToInt32(db.QueryValue("SELECT Start_Value FROM Room WHERE Room_Code = @0", code));
+    int table_amount = Convert.ToInt32(db.QueryValue("SELECT Tbl_Amount FROM Room WHERE Room_Code = @0", code));
+    int rebuy = Convert.ToInt32(db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", code));
+    int chip_worth1 = Convert.ToInt32(db.QueryValue("SELECT Chip_1_Worth FROM Room WHERE Room_Code = @0", code));
+    int chip_worth2 = Convert.ToInt32(db.QueryValue("SELECT Chip_2_Worth FROM Room WHERE Room_Code = @0", code));
+    int chip_worth3 = Convert.ToInt32(db.QueryValue("SELECT Chip_3_Worth FROM Room WHERE Room_Code = @0", code));
+    int chip_worth4 = Convert.ToInt32(db.QueryValue("SELECT Chip_4_Worth FROM Room WHERE Room_Code = @0", code));
+    int chip_worth5 = Convert.ToInt32(db.QueryValue("SELECT Chip_5_Worth FROM Room WHERE Room_Code = @0", code));
+
+    if (IsPost && Validation.IsValid() && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
+    {
+        if (Request.Form["startButton"] == "started")
+        {
+            Response.Redirect("~/Default.cshtml");
+        }
+        else
+        {
+            int new_code = 4444445;
+            int players = Convert.ToInt32(Request["nr_players"]);
+            var time = Request["round_time"];
+            int min_table_size = Convert.ToInt32(Request["min_table"]);
+            int max_table_size = Convert.ToInt32(Request["max_table"]);
+            int allow_rebuy = Convert.ToInt32(Request["rebuy"]);
+            var pause = Request["pause_time"];
+            int value = Convert.ToInt32(Request["start_value"]);
+            int tbl_amount = Convert.ToInt32(Request["tbl_amount"]);
+            int chip1 = Convert.ToInt32(Request["chip1"]);
+            int chip2 = Convert.ToInt32(Request["chip2"]);
+            int chip3 = Convert.ToInt32(Request["chip3"]);
+            int chip4 = Convert.ToInt32(Request["chip4"]);
+            int chip5 = Convert.ToInt32(Request["chip5"]);
+            char started = Convert.ToChar(0);
+
+            db.Execute("INSERT INTO Room (Room_Code, Nr_Of_Players, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size)" +
+            "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14)", new_code, players, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, allow_rebuy, value, tbl_amount, max_table_size);
+        }
+    }
+}
+
+<html>
+<head>
+    <title>Settings</title>
+</head>
+<body>
+    <form name="Settings" method="post">
+        <p>Number of players</p>
+        <input type="number" name="nr_players" placeholder="@nr_players" /><br />
+        @Html.ValidationMessage("nr_players")<br />
+        <p>Start value</p>
+        <input type="number" name="start_value" placeholder="@start_value" /><br />
+        @Html.ValidationMessage("start_value")<br />
+        <p>Time per round</p>
+        <input type="text" name="round_time" placeholder="@round_time" /><br />
+        @Html.ValidationMessage("round_time")<br />
+        <p>Time for pause</p>
+        <input type="text" name="pause_time" placeholder="@pause_time" /><br />
+        @Html.ValidationMessage("pause_time")<br />
+        <p>Minimum players per table</p>
+        <input type="number" name="min_table" placeholder="@min_table" /><br />
+        @Html.ValidationMessage("min_table")<br />
+        <p>Maximum players per table</p>
+        <input type="number" name="max_table" placeholder="@max_table_amount" /><br />
+        @Html.ValidationMessage("max_table")<br />
+        <p>Amount of tables</p>
+        <input type="number" name="tbl_amount" placeholder="@table_amount" /><br />
+        @Html.ValidationMessage("table_amount")<br />
+        <p>Allow rebuy</p>
+        <input type="text" name="rebuy" placeholder="@rebuy" /><br />
+        @Html.ValidationMessage("rebuy")<br />
+        <p>Chipworth chip 1</p>
+        <input type="number" name="chip1" placeholder="@chip_worth1" /><br />
+        @Html.ValidationMessage("chip1")<br />
+        <p>Chipworth chip 2</p>
+        <input type="number" name="chip2" placeholder="@chip_worth2" /><br />
+        @Html.ValidationMessage("chip2")<br />
+        <p>Chipworth chip 3</p>
+        <input type="number" name="chip3" placeholder="@chip_worth3" /><br />
+        @Html.ValidationMessage("chip3")<br />
+        <p>Chipworth chip 4</p>
+        <input type="number" name="chip4" placeholder="@chip_worth4" /><br />
+        @Html.ValidationMessage("chip4")<br />
+        <p>Chipworth chip 5</p>
+        <input type="number" name="chip5" placeholder="@chip_worth5" /><br />
+        @Html.ValidationMessage("chip5")<br /><br />
+        <input type="submit" name="save" value="Save Settings" />
+    </form>
+    <br />
+    <div id="startButton">
+        <form name="starter" method="post">
+            <button type="submit" value="started" name="startButton">Start the tournament</button>
+        </form>
+    </div>
+</body>
+</html>
