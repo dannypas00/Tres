@@ -1,7 +1,4 @@
-﻿DELETE FROM Players;	
-DELETE FROM Room;
-
-DROP TABLE Players;
+﻿DROP TABLE Players;
 CREATE TABLE Players
 (
 	[Name] NVARCHAR(50) NOT NULL , 
@@ -23,6 +20,7 @@ CREATE TABLE Room
 	[Chip_3_Worth] INT NOT NULL,
 	[Chip_4_Worth] INT NOT NULL,
 	[Chip_5_Worth] INT NOT NULL,
-	[Round_Time] TIME NOT NULL
+	[Round_Time] TIME NOT NULl,
+	[Tbl_Max_Amount] INT NOT NULL, 
 );
 
