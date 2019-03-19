@@ -37,31 +37,26 @@
 
     if (IsPost && Validation.IsValid() && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {
-        if (Request.Form["startButton"] == "started")
-        {
-            Response.Redirect("~/Default.cshtml");
-        }
-        else
-        {
-            int new_code = 4444445;
-            int players = Convert.ToInt32(Request["nr_players"]);
-            var time = Request["round_time"];
-            int min_table_size = Convert.ToInt32(Request["min_table"]);
-            int max_table_size = Convert.ToInt32(Request["max_table"]);
-            int allow_rebuy = Convert.ToInt32(Request["rebuy"]);
-            var pause = Request["pause_time"];
-            int value = Convert.ToInt32(Request["start_value"]);
-            int tbl_amount = Convert.ToInt32(Request["tbl_amount"]);
-            int chip1 = Convert.ToInt32(Request["chip1"]);
-            int chip2 = Convert.ToInt32(Request["chip2"]);
-            int chip3 = Convert.ToInt32(Request["chip3"]);
-            int chip4 = Convert.ToInt32(Request["chip4"]);
-            int chip5 = Convert.ToInt32(Request["chip5"]);
-            char started = Convert.ToChar(0);
+        int new_code = 4444446;
+        int players = Convert.ToInt32(Request["nr_players"]);
+        var time = Request["round_time"];
+        int min_table_size = Convert.ToInt32(Request["min_table"]);
+        int max_table_size = Convert.ToInt32(Request["max_table"]);
+        int allow_rebuy = Convert.ToInt32(Request["rebuy"]);
+        var pause = Request["pause_time"];
+        int value = Convert.ToInt32(Request["start_value"]);
+        int tbl_amount = Convert.ToInt32(Request["tbl_amount"]);
+        int chip1 = Convert.ToInt32(Request["chip1"]);
+        int chip2 = Convert.ToInt32(Request["chip2"]);
+        int chip3 = Convert.ToInt32(Request["chip3"]);
+        int chip4 = Convert.ToInt32(Request["chip4"]);
+        int chip5 = Convert.ToInt32(Request["chip5"]);
+        char started = Convert.ToChar(0);
 
-            db.Execute("INSERT INTO Room (Room_Code, Nr_Of_Players, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size)" +
-            "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14)", new_code, players, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, allow_rebuy, value, tbl_amount, max_table_size);
-        }
+        db.Execute("INSERT INTO Room (Room_Code, Nr_Of_Players, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size)" +
+        "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14)", new_code, players, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, allow_rebuy, value, tbl_amount, max_table_size);
+
+        Response.Redirect("~/AdminPage.cshtml");
     }
 }
 
@@ -70,6 +65,8 @@
     <title>Settings</title>
 </head>
 <body>
+    <h1>Settings</h1>
+    <br />
     <form name="Settings" method="post">
         <p>Number of players</p>
         <input type="number" name="nr_players" placeholder="@nr_players" /><br />
@@ -110,13 +107,7 @@
         <p>Chipworth chip 5</p>
         <input type="number" name="chip5" placeholder="@chip_worth5" /><br />
         @Html.ValidationMessage("chip5")<br /><br />
-        <input type="submit" name="save" value="Save Settings" />
+        <input type="submit" name="save" value="Start game" />
     </form>
-    <br />
-    <div id="startButton">
-        <form name="starter" method="post">
-            <button type="submit" value="started" name="startButton">Start the tournament</button>
-        </form>
-    </div>
 </body>
 </html>
