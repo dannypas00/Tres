@@ -1,0 +1,44 @@
+﻿@using WebMatrix.Data
+
+@{
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+    string Username = "Nick";
+    string Password = "Wachtwoord";
+    string UsernameCheck = "";                  //fillen met Username van vorige pagina
+    string PasswordCheck = "";                  //fillen met Password van vorige pagina
+    
+
+    if(!IsPost)
+    {
+        //if (Username != UsernameCheck || Password != PasswordCheck)
+        //{
+        //    Response.Redirect("Login.cshtml");
+        //}
+    }
+}
+
+<html>
+<head>
+    <title>Game Select</title>
+</head>
+<body>
+    <table>
+        @foreach (var row in db.Query("SELECT Room_Code FROM Room"))
+        {
+            string code = Convert.ToString((int)row.Room_Code);
+            string Url = "Settings.cshtml/" + code;
+            <tr>
+                <td>
+                    <a href="@Url">@row.Room_Code</a>
+                </td>
+            </tr>
+        }
+    </table>
+
+
+</body>
+
+</html>

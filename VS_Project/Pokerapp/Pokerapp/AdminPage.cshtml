@@ -1,34 +1,45 @@
 ﻿@using WebMatrix.Data
 @using Microsoft.VisualBasic
 
-@{  
+@{
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-    string urlcode = "";
+    //request the last 7 digits of the urgl (roomcode)
+    string url = Request.Url.AbsolutePath;
+    string urlcode = url.Substring(url.Length - 7);
+
+
+
+    int code = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", urlcode);
+    int number = 0;         //later toevoegen table number
+    int rebuy = 0;          //aantal rebuys standaard op 0
 
     if (!IsPost)
     {
-
         //if (Request.Form["adminLogin"] != "true")
         //{
-        //    Response.Redirect("~/Default.cshtml");
+        //    Response.Redirect("~/Login.cshtml");
         //}
-
-
     }
 
-    string name = Request["name"];
-    int code = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", urlcode);
-    int number = 0;         //later
-
-    if(IsPost && Validation.IsValid())
+    if (IsPost && Validation.IsValid())
     {
+        string name = Request["name"];
 
         if (Request["AddName"] == "Add")
         {
-            db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr) VALUES (@0, @1, @2)", name, code, number);
+            if (db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1", name, code) is null)
+            {
+                db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr, Rebuy) VALUES (@0, @1, @2, @3)", name, code, number, rebuy);
+                name = null;
+            }
+        }
+        if (Request["delete"] == "delete")
+        {
+            string rowname = Request.Form["rownameform"];
+            db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", rowname, code);
         }
     }
 
@@ -41,9 +52,9 @@
 
 <body>
     @*<form method="post">
-        <input type="text" name="Nr_Of_Players" value="@code"/>
-        <input type="submit" name="settings" value="Save" />
-    </form>*@
+            <input type="text" name="Nr_Of_Players" value="@code"/>
+            <input type="submit" name="settings" value="Save" />
+        </form>*@
 
 
     <form method="post">
@@ -54,10 +65,7 @@
     <table>
         @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", code))
         {
-            if (Request["delete"] == "delete")
-            {
-                db.Execute("DELETE ALL FROM Players WHERE Name = @0 AND Room_Code = @1", row.Name, code); 
-            }
+            string rownameform = (string)row.Name;
             <tr>
                 <td>
                     @row.Name
@@ -66,7 +74,11 @@
             </tr>
             <tr>
                 <td>
-                    <button formmethod="post" name="delete" value="delete">X</button>
+                    <form method="post">
+                        <button type="submit" name="delete" value="delete">X</button>
+                        @Html.Hidden("rownameform", rownameform)
+                    </form>
+
                 </td>
             </tr>
         }
