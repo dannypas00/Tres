@@ -10,8 +10,13 @@
     string UsernameCheck = "";                  //fillen met Username van vorige pagina
     string PasswordCheck = "";                  //fillen met Password van vorige pagina
 
+    Random r = new Random();
+    var linkcode = r.Next(1000000, 9999999);
 
-    if(!IsPost)
+    var selectQuery = "SELECT * FROM Room WHERE Room_Code = @0";
+    var selectRoomcodes = db.QuerySingle(selectQuery, linkcode);
+
+    if (!IsPost)
     {
         //if (Username != UsernameCheck || Password != PasswordCheck)
         //{
@@ -19,13 +24,17 @@
         //}
     }
 
-    Random r = new Random();
-    var linkcode = r.Next(1000000, 9999999);
-
-    if (IsPost)
+    if (selectRoomcodes == null)
     {
-        string Url = "Settings.cshtml/" + linkcode;
-        Response.Redirect("~/" + Url);
+        if (IsPost && linkcode != selectRoomcodes)
+        {
+            string Url = "Settings.cshtml/" + linkcode;
+            Response.Redirect("~/" + Url);
+        }
+        else if (IsPost)
+        {
+            Response.Write("Probeer het nog eens...");
+        }
     }
 }
 
