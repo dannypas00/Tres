@@ -1,0 +1,93 @@
+﻿@using WebMatrix.Data
+
+@{
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+    //Insert Nick into Players
+    string name = "Nick";
+    int room_code = 1234567;
+    int tbl_nr = 2;
+    //int rebuy = 1;
+    //string insert = "INSERT INTO Players (Name, Room_Code, Tbl_nr, Rebuy) VALUES (@0, @1, @2, @3)";
+    //db.Execute(insert, name, room_code, tbl_nr, rebuy);
+
+    int maxrebuy = 3;
+    string player = (string)db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", name, room_code, tbl_nr);
+    int rebuyvalue = (int) db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1", name, room_code);
+
+    if (IsPost && !Request.Form["rebuy"].IsEmpty() && rebuyvalue < maxrebuy)
+    {
+        var rebuyplayer = db.Execute("UPDATE Players SET Rebuy = @0, Tbl_nr = @1 WHERE Name = @2 AND Room_Code = @3", rebuyvalue + 1, tbl_nr, name, room_code);
+    }
+
+    if (IsPost && !Request.Form["rebuy"].IsEmpty() && rebuyvalue == maxrebuy - 1 || rebuyvalue == maxrebuy)
+    {
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Player @player has reached the maximum amount of @maxrebuy rebuys</h5>
+                </div>
+                <div class="modal-body">
+                    <form method="post" name="optionsform" class="optionsform">
+                        <div>
+                            <button value="delete" name="delete" type="submit">Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    }
+
+    if (IsPost && !Request.Form["delete"].IsEmpty())
+    {
+        var deleteplayer = db.Execute("UPDATE Players SET Tbl_nr = NULL WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", name, room_code, tbl_nr);
+    }
+    int rebuyvalueafterform = (int) db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1", name, room_code);
+    }
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Options</button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Options for: @player Rebuys: @rebuyvalueafterform / 3</h5>
+                </div>
+
+                <div class="modal-body">
+                    <form method="post" name="optionsform" class="optionsform">
+                        <div class="options-form-popup" id="player-options">
+                            <button value="rebuy" name="rebuy" type="submit">Rebuy</button>
+                        </div>
+                        <div>
+                            <button value="delete" name="delete" type="submit">Delete</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>
