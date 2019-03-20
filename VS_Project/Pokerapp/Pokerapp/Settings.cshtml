@@ -21,16 +21,16 @@
 
     string url = Request.Url.AbsolutePath;
     string urlcode = url.Substring(url.Length - 7);
-    int control = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", urlcode);
+    //int control = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", urlcode);
     int code = Convert.ToInt32(urlcode);
-    if (control == code)
-    {
-        code = Convert.ToInt32(urlcode);
-    }
-    else
-    {
-        Response.Redirect("~/Gameselect.cshtml");
-    }
+    //if (control == code)
+    //{
+    //    code = Convert.ToInt32(urlcode);
+    //}
+    //else
+    //{
+    //    Response.Redirect("~/Gameselect.cshtml");
+    //}
 
     int nr_players = Convert.ToInt32(db.QueryValue("SELECT Nr_Of_Players FROM Room WHERE Room_Code = @0", code));
     var round_time = db.QueryValue("SELECT Round_Time FROM Room WHERE Room_Code = @0", code);
@@ -68,9 +68,9 @@
             int chip3 = Convert.ToInt32(Request["chip3"]);
             int chip4 = Convert.ToInt32(Request["chip4"]);
             int chip5 = Convert.ToInt32(Request["chip5"]);
-            char started = Convert.ToChar(0);
+            var started = 0;
 
-            int check = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
+            var check = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
             if (check == code)
             {
                 db.Execute("UPDATE Room SET Room_Code = @0, Nr_Of_Players = @1, Tbl_Min_Size = @2, Started = @3, Chip_1_Worth = @4, Chip_2_Worth = @5, Chip_3_Worth = @6, Chip_4_Worth = @7, Chip_5_Worth = @8, Round_Time = @9, Pause_Time = @10, Allow_Rebuy = @11, Start_Value = @12, Tbl_Amount = @13, Tbl_Max_Size = @14 WHERE Room_Code = @0"

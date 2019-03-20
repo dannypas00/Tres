@@ -9,7 +9,7 @@
     string Password = "Wachtwoord";
     string UsernameCheck = "";                  //fillen met Username van vorige pagina
     string PasswordCheck = "";                  //fillen met Password van vorige pagina
-    
+
 
     if(!IsPost)
     {
@@ -17,6 +17,15 @@
         //{
         //    Response.Redirect("Login.cshtml");
         //}
+    }
+
+    Random r = new Random();
+    var linkcode = r.Next(1000000, 9999999);
+
+    if (IsPost)
+    {
+        string Url = "Settings.cshtml/" + linkcode;
+        Response.Redirect("~/" + Url);
     }
 }
 
@@ -38,7 +47,10 @@
         }
     </table>
 
-
+    <form method="post">
+        <input type="hidden" name="linkcode" value="@linkcode" />
+        <button type="submit">Generate Linkcode</button>
+    </form>
 </body>
 
 </html>
