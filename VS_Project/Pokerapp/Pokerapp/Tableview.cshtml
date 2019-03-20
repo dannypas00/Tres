@@ -1,0 +1,13 @@
+﻿@using WebMatrix.Data
+
+@{
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+    string url = Request.Url.AbsolutePath;
+    string urlcode = url.Substring(url.Length - 7);
+
+    int table = Convert.ToInt32(Request["tablenumber"]);
+    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, table);
+}
