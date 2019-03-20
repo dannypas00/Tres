@@ -32,19 +32,37 @@
     //    Response.Redirect("~/Gameselect.cshtml");
     //}
 
-    int nr_players = Convert.ToInt32(db.QueryValue("SELECT Nr_Of_Players FROM Room WHERE Room_Code = @0", code));
-    var round_time = db.QueryValue("SELECT Round_Time FROM Room WHERE Room_Code = @0", code);
-    var pause_time = db.QueryValue("SELECT Pause_Time FROM Room WHERE Room_Code = @0", code);
-    int min_table = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", code));
-    int max_table_amount = Convert.ToInt32(db.QueryValue("SELECT Tbl_Max_Size FROM Room WHERE Room_Code = @0", code));
-    int start_value = Convert.ToInt32(db.QueryValue("SELECT Start_Value FROM Room WHERE Room_Code = @0", code));
-    int table_amount = Convert.ToInt32(db.QueryValue("SELECT Tbl_Amount FROM Room WHERE Room_Code = @0", code));
-    int rebuy = Convert.ToInt32(db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", code));
-    int chip_worth1 = Convert.ToInt32(db.QueryValue("SELECT Chip_1_Worth FROM Room WHERE Room_Code = @0", code));
-    int chip_worth2 = Convert.ToInt32(db.QueryValue("SELECT Chip_2_Worth FROM Room WHERE Room_Code = @0", code));
-    int chip_worth3 = Convert.ToInt32(db.QueryValue("SELECT Chip_3_Worth FROM Room WHERE Room_Code = @0", code));
-    int chip_worth4 = Convert.ToInt32(db.QueryValue("SELECT Chip_4_Worth FROM Room WHERE Room_Code = @0", code));
-    int chip_worth5 = Convert.ToInt32(db.QueryValue("SELECT Chip_5_Worth FROM Room WHERE Room_Code = @0", code));
+    int nr_players = 6;
+    var round_time = "00:30:00";
+    var pause_time = "00:00:00";
+    int min_table = 4;
+    int max_table_amount = 6;
+    int start_value = 10;
+    int table_amount = 1;
+    int rebuy = 0;
+    int chip_worth1 = 1;
+    int chip_worth2 = 2;
+    int chip_worth3 = 3;
+    int chip_worth4 = 4;
+    int chip_worth5 = 5;
+
+    var room = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
+    if (room == code)
+    {
+        nr_players = Convert.ToInt32(db.QueryValue("SELECT Nr_Of_Players FROM Room WHERE Room_Code = @0", code));
+        round_time = Convert.ToString(db.QueryValue("SELECT Round_Time FROM Room WHERE Room_Code = @0", code));
+        pause_time = Convert.ToString(db.QueryValue("SELECT Pause_Time FROM Room WHERE Room_Code = @0", code));
+        min_table = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", code));
+        max_table_amount = Convert.ToInt32(db.QueryValue("SELECT Tbl_Max_Size FROM Room WHERE Room_Code = @0", code));
+        start_value = Convert.ToInt32(db.QueryValue("SELECT Start_Value FROM Room WHERE Room_Code = @0", code));
+        table_amount = Convert.ToInt32(db.QueryValue("SELECT Tbl_Amount FROM Room WHERE Room_Code = @0", code));
+        rebuy = Convert.ToInt32(db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", code));
+        chip_worth1 = Convert.ToInt32(db.QueryValue("SELECT Chip_1_Worth FROM Room WHERE Room_Code = @0", code));
+        chip_worth2 = Convert.ToInt32(db.QueryValue("SELECT Chip_2_Worth FROM Room WHERE Room_Code = @0", code));
+        chip_worth3 = Convert.ToInt32(db.QueryValue("SELECT Chip_3_Worth FROM Room WHERE Room_Code = @0", code));
+        chip_worth4 = Convert.ToInt32(db.QueryValue("SELECT Chip_4_Worth FROM Room WHERE Room_Code = @0", code));
+        chip_worth5 = Convert.ToInt32(db.QueryValue("SELECT Chip_5_Worth FROM Room WHERE Room_Code = @0", code));
+    }
 
     if (IsPost && Validation.IsValid() && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {
