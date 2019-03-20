@@ -28,4 +28,6 @@ CREATE TABLE Room
     [Start_Value] INT NOT NULL,
     [Tbl_Amount] INT NOT NULL,
     [Tbl_Max_Size] INT NOT NULL, 
+	[Small_Blind] INT NOT NULL,
+	[Big_Blind] INT NOT NULL,
 );
