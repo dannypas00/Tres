@@ -35,6 +35,7 @@
     int nr_players = 6;
     var round_time = "00:30:00";
     var pause_time = "00:00:00";
+    var blind_time = "00:00:00";
     int min_table = 4;
     int max_table_amount = 6;
     int start_value = 10;
@@ -52,6 +53,7 @@
         nr_players = Convert.ToInt32(db.QueryValue("SELECT Nr_Of_Players FROM Room WHERE Room_Code = @0", code));
         round_time = Convert.ToString(db.QueryValue("SELECT Round_Time FROM Room WHERE Room_Code = @0", code));
         pause_time = Convert.ToString(db.QueryValue("SELECT Pause_Time FROM Room WHERE Room_Code = @0", code));
+        blind_time = Convert.ToString(db.QueryValue("SELECT Blind_Time FROM Room WHERE Room_Code = @0", code));
         min_table = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", code));
         max_table_amount = Convert.ToInt32(db.QueryValue("SELECT Tbl_Max_Size FROM Room WHERE Room_Code = @0", code));
         start_value = Convert.ToInt32(db.QueryValue("SELECT Start_Value FROM Room WHERE Room_Code = @0", code));
@@ -79,6 +81,7 @@
             int max_table_size = Convert.ToInt32(Request["max_table"]);
             int allow_rebuy = Convert.ToInt32(Request["rebuy"]);
             var pause = Request["pause_time"];
+            var blind = Request["blind_time"];
             int value = Convert.ToInt32(Request["start_value"]);
             int tbl_amount = Convert.ToInt32(Request["tbl_amount"]);
             int chip1 = Convert.ToInt32(Request["chip1"]);
@@ -91,13 +94,13 @@
             var check = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
             if (check == code)
             {
-                db.Execute("UPDATE Room SET Room_Code = @0, Nr_Of_Players = @1, Tbl_Min_Size = @2, Started = @3, Chip_1_Worth = @4, Chip_2_Worth = @5, Chip_3_Worth = @6, Chip_4_Worth = @7, Chip_5_Worth = @8, Round_Time = @9, Pause_Time = @10, Allow_Rebuy = @11, Start_Value = @12, Tbl_Amount = @13, Tbl_Max_Size = @14 WHERE Room_Code = @0"
-                , code, players, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, allow_rebuy, value, tbl_amount, max_table_size);
+                db.Execute("UPDATE Room SET Room_Code = @0, Nr_Of_Players = @1, Tbl_Min_Size = @2, Started = @3, Chip_1_Worth = @4, Chip_2_Worth = @5, Chip_3_Worth = @6, Chip_4_Worth = @7, Chip_5_Worth = @8, Round_Time = @9, Pause_Time = @10, Blind_Time = @11, Allow_Rebuy = @12, Start_Value = @13, Tbl_Amount = @14, Tbl_Max_Size = @15 WHERE Room_Code = @0"
+                , code, players, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size);
             }
             else
             {
-                db.Execute("INSERT INTO Room (Room_Code, Nr_Of_Players, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size)" +
-                "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14)", code, players, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, allow_rebuy, value, tbl_amount, max_table_size);
+                db.Execute("INSERT INTO Room (Room_Code, Nr_Of_Players, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Blind_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size)" +
+                "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15)", code, players, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size);
             }
 
             string Url = "Settings.cshtml/" + code;
@@ -129,6 +132,9 @@
         <br />
         <p>Time for pause</p>
         <input type="text" name="pause_time" value="@pause_time" /><br />
+        <br />
+        <p>Time for blind</p>
+        <input type="text" name="blind_time" value="@blind_time" /><br />
         <br />
         <p>Minimum players per table</p>
         <input type="number" name="min_table" value="@min_table" /><br />

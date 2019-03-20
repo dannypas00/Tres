@@ -23,6 +23,7 @@ CREATE TABLE Room
     [Chip_5_Worth] INT NOT NULL,
     [Round_Time] TIME NOT NULl,
     [Pause_Time] TIME NULL,
+	[Blind_Time] TIME NULL,
     [Allow_Rebuy] INT NOT NULL,
     [Start_Value] INT NOT NULL,
     [Tbl_Amount] INT NOT NULL,
