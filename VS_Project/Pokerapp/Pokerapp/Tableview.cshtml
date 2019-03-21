@@ -32,20 +32,22 @@
     <h1>Table @table</h1>
     <br />
     <div>
-    @foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, urlcode, table))
-    {
-        @a.Name
-    }
-        </div><br />
+        @foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, urlcode, table))
+        {
+            @a.Name
+            <img src="~/stoel.png" name="chair" />
+        }
+    </div><br />
     <div>
         <img src="~/tafel.png" name="pokertable" />
     </div>
     <br /><div>
     @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", urlcode, table, tweede))
     {
+        <img src="~/stoel.png" name="chair" />
         @a.Name
     }
-    </div>
+</div>
     @*@foreach (var a in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, table))
           {
               if (helft <= rij)
