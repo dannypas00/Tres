@@ -1,0 +1,19 @@
+﻿.wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
+
+.sidebar {
+    width: 25%;
+    height: 25vh;
+}
+.a {
+    font-size: 6vw;
+}
+.sidebar {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+}
+
