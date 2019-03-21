@@ -372,3 +372,7 @@ ASALocalRun/
 healthchecksdb
 
 # End of https://www.gitignore.io/api/windows,visualstudio
+
+VS_Project/Pokerapp/.vs/Pokerapp/v15/Server/sqlite3/storage.ide-shm
+VS_Project/Pokerapp/.vs/Pokerapp/v15/Server/sqlite3/storage.ide-wal
+VS_Project/Pokerapp/.vs/Pokerapp/v15/.suo
