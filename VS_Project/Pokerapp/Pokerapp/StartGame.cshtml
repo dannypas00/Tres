@@ -1,0 +1,83 @@
+﻿@using WebMatrix.Data;
+@{
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+    string name = Request["name"];
+    
+    //unverified requests
+    var roomCode = Request["roomcode"];
+    var tablenr = Request["table"];
+
+    //Select the current table
+
+    var selectTable = "SELECT * FROM Players WHERE Tbl_nr = @0";
+    var getTableNumber = db.QueryValue(selectTable,tablenr);
+
+    //Show players in the current table
+    var selectCommand = "SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_Nr =@1";
+    var selectPlayers = db.Query(selectCommand, name, tablenr);
+
+}
+<html>
+<head>
+    <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+
+    $(document).ready(function () {
+        $(".timer").click(function () {
+            //needs to be database query
+            var seconds = 0;
+            var minute = 30;
+            var hours = 0;
+
+            var round = 1;
+
+            setInterval(function () {
+                document.querySelector('.timer').innerHTML = ":0"+hours+ minute + ":" +seconds;
+                document.querySelector('.number').innerHTML = round;
+                seconds--;
+
+                //update timer here
+                console.log(minute);
+
+            if (seconds <= 0) {
+                seconds = 60;
+                minute--;
+                round++;
+
+                //When it hits 0, run ajax code 
+                $.ajax({
+                    type: "GET",
+                    url: "StartGame.cshtml?roomcode=" + roomCode + "&tablenr=" + tablenr,
+                });
+            }
+        }, 1000);
+
+        });
+    });
+
+    </script>
+
+</head>
+<body>
+
+    <h1>This is table nr: @getTableNumber</h1>
+    <div>
+        @*Format is : 00:00:00*@
+        <div class="timer">Timer</div>
+
+    </div>
+    <div class="round">This is round:<div class="number"></div></div>
+    <table>
+        @foreach (var player in selectPlayers)
+        {
+            <tr>
+                <td>@player.Name</td>
+            </tr>
+        }
+    </table>
+</body>
+</html>

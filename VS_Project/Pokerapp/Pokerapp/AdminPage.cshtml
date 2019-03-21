@@ -41,6 +41,11 @@
             string rowname = Request.Form["rownameform"];
             db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", rowname, code);
         }
+
+        if (Request["start"] == "start")
+        {
+            Response.Redirect("~/StartGame.cshtml");
+        }
     }
 
 }
@@ -83,6 +88,10 @@
             </tr>
         }
     </table>
+    <form method="post">
+        <button id="start" type="submit" name="start" value="start">start</button>
+    </form>
+
 </body>
 
 </html>
