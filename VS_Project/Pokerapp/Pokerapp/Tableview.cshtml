@@ -8,7 +8,7 @@
     string url = Request.Url.AbsolutePath;
     string urlcode = url.Substring(url.Length - 7);
 
-    int table = Convert.ToInt32(Request["tablenumber"]);
+    int table = Convert.ToInt32(Session["tablenumber"]);
 
     var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, table);
     int aantal = namen.Count();
