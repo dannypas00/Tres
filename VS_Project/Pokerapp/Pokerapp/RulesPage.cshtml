@@ -1,16 +1,26 @@
 ﻿@using WebMatrix.Data
 @{
-    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database2.mdf;Integrated Security=True";
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
 
     string provider = "System.Data.SqlClient";
 
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-    double chip1 = 2;
-    double chip2 = 3;
-    double chip3 = 5;
-    double chip4 = 7.5;
-    double chip5 = 10;
+    int roomcode = 1234567;
+
+    int chip1=0;
+    int chip2=0;
+    int chip3=0;
+    int chip4=0;
+    int chip5=0;
+
+    var chips = db.QuerySingle("SELECT Chip1, Chip2, Chip3, Chip4, Chip5 FROM Room WHERE Room_Code=@0", roomcode);
+
+    chip1 = chips.Chip1;
+    chip2 = chips.Chip2;
+    chip3 = chips.Chip3;
+    chip4 = chips.Chip4;
+    chip5 = chips.Chip5;
 
 }
 <!DOCTYPE html>
@@ -41,7 +51,8 @@
             </div>
         </div>
     </nav>
-    <div class="py-md-5" style="background-image: url(&quot;assets/banner.png&quot;); background-size: cover;">
+    <div>
+        <img src="~/assets/banner.png"   width: 100%; height: auto; />
     </div>
     <div class="py-5 bg-dark wrapper" id="top">
         <div class="container">
@@ -148,7 +159,7 @@
 
                 </div>
                 <div class="col-md-3">
-                    <div id="chips" class="sticky">
+                    <div id="chips" class="container sticky">
                         <div class="row">
                             <div class="chips"><h3 style="color:darkblue">Blue: @chip1 </h3></div>
                             <div class="chips"><h3 style="color:darkred">Red: @chip2 </h3></div>
