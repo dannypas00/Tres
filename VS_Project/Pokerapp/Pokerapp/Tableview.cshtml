@@ -6,9 +6,9 @@
     Database db = Database.OpenConnectionString(connectionString, provider);
 
     string url = Request.Url.AbsolutePath;
-    string urlcode = Convert.ToString(1111111); //url.Substring(url.Length - 7);
+    string urlcode = url.Substring(url.Length - 7);
 
-    int table = 1;  //Convert.ToInt32(Request["tablenumber"]);
+    int table = Convert.ToInt32(Request["tablenumber"]);
 
     var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, table);
     int aantal = namen.Count();
@@ -20,8 +20,11 @@
     {
         tweede = eerste;
     }
-
-
+    if (aantal > 10)
+    {
+        string Url = "Players.cshtml/" + urlcode;
+        Response.Redirect("~/" + Url);
+    }
 }
 
 <html>
@@ -48,34 +51,5 @@
         @a.Name
     }
 </div>
-    @*@foreach (var a in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, table))
-          {
-              if (helft <= rij)
-              {
-                  <p>@a.Name</p>
-                  rij++;
-              }
-          }
-            </div>
-        <div>
-        @foreach (var a in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, table))
-        {
-            if (helft == rij)
-            {
-                //<img src="" name="" />
-                rij++;
-            }
-        }
-            </div>
-        <div>
-        @foreach(var a in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, table))
-        {
-            if(helft > rij)
-            {
-                <p>@a.Name</p>
-                rij++;
-            }
-        }
-            </div>*@
 </body>
 </html>
