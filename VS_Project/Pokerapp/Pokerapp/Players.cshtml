@@ -1,6 +1,44 @@
-﻿@{
-    string url = Request.Url.AbsolutePath;
-    //string urlcode = url.Substring(url.Length - 7);
-    string urlcode = "1234567";
+﻿@using WebMatrix.Data
 
+@{
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+
+    string url = Request.Url.AbsolutePath;
+    string urlcode = url.Substring(url.Length - 7);
+    int amount = Convert.ToInt32(Session["stringTbl_Needed"]);
+    for (int i = 1; i <= amount; i++)
+    {
+        if (IsPost && Convert.ToInt32(Request["Proceed"]) == i)
+        {
+            Session["tablenumber"] = i;
+            string Url = "Tableview.cshtml/" + urlcode;
+            Response.Redirect("~/" + Url);
+        }
+    }
 }
+
+<html>
+<head>
+    <title>Players</title>
+</head>
+<body>
+    <div class="row">
+        @for (int i = 1; i <= amount; i++)
+        {
+            int tbl_nr = i;
+            <div ="col">
+                @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
+                {
+                    @row.Name<br />
+                }
+                <form method="post">
+                    <input type="submit" name="Proceed" value=@i />
+                </form>
+            </div><br />
+        }
+    </div>
+</body>
+</html>
