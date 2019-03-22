@@ -69,6 +69,7 @@ body {
     font-size: 1rem;
     font-weight: 200;
     line-height: 1.5;
+    scroll-behavior: smooth;
     color: #333;
     text-align: left;
     background-color: white;
@@ -114,9 +115,6 @@ ul {
 }
 .module {
     scroll-behavior: [ auto | smooth ];
-}
-h1 {
-    font-size: 6vw;
 }
 
 p {
@@ -395,9 +393,7 @@ h1, h2, h3, h4, h5, h6,
     color: inherit;
 }
 
-h1, .h1 {
-    font-size: 2.5rem;
-}
+
 
 h2, .h2 {
     font-size: 2rem;
@@ -584,8 +580,6 @@ pre {
     margin-right: auto;
     margin-left: auto;
 }
-
-
 
 @media (min-width: 576px) {
     .container {

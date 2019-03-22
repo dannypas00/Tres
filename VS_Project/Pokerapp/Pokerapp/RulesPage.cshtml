@@ -1,117 +1,177 @@
-﻿<!DOCTYPE html>
+﻿@using WebMatrix.Data
+@{
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database2.mdf;Integrated Security=True";
+
+    string provider = "System.Data.SqlClient";
+
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+    double chip1 = 2 ;
+    double chip2 = 3 ;
+    double chip3 = 5 ;
+    double chip4 = 7.5 ;
+    double chip5 = 10 ;
+
+
+    if (!IsPost)
+    {
+        
+    }
+}
+<!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- PAGE settings -->
-    <link rel="icon" href="https://templates.pingendo.com/assets/Pingendo_favicon.ico">
     <title>Rules</title>
     <!-- CSS dependencies -->
-    <link rel="stylesheet" href="~/css/style.css">
-    <link rel="stylesheet" href="~/css/sidebar.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
     <!-- Script: Make my navbar transparent when the document is scrolled to top -->
     <script src="~/js/navbar-ontop.js"></script>
     <!-- Script: Animated entrance -->
     <script src="~/js/animate-in.js"></script>
+    <link rel="stylesheet" href="wireframe.css">
 </head>
 
-<body class="" id="top">
+<body class="" id="begin">
     <nav class="navbar navbar-expand-md fixed bg-dark navbar-dark">
         <div class="container">
             <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar2SupportedContent" aria-controls="navbar2SupportedContent" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
-            <div class="collapse navbar-collapse justify-content-center" id="navbar2SupportedContent">
-                <ul class="navbar-nav">
-                    <li class="nav-item mx-2">
-                        <a class="nav-link" href="#">Home</a>
-                    </li>
-                    <li class="nav-item mx-2">
-                        <a class="nav-link" href="#test4">Code</a>
-                    </li>
-                    <li class="nav-item mx-2">
-                        <a class="nav-link" href="#presents">Presents</a>
-                    </li>
-                </ul>
-                <a class="btn navbar-btn mx-2 text-white btn-outline-light" href="#register">Register now</a>
+            <div class="collapse navbar-collapse justify-content-center" id="navbar2SupportedContent" style="">
+                <ul class="navbar-nav"></ul>
+                <a class="btn navbar-btn mx-2 text-white btn-outline-light" href="#register">Overview</a>
             </div>
         </div>
     </nav>
-
-    <div class="py-5">
+    <div class="py-md-5" style="background-image: url(&quot;assets/banner.png&quot;); background-size: cover;">
+    </div>
+    <div class="py-5 bg-dark wrapper" id="top">
         <div class="container">
             <div class="row">
-                <div class="col-md-12"></div>
+                <div class="col-md-3 bg-dark">
+                    <div class="sticky">
+                        <ul>
+                            <li><a href="#begin">Top</a></li>
+                            <li><a href="#test">What is Texas Hold 'Em?</a></li>
+                            <li><a href="#test2">Texas Hold 'Em Ryles</a></li>
+                            <li><a href="#test3">Button</a></li>
+                            <li><a href="#test4">Blinds</a></li>
+                            <li><a href="#test5">Preflop</a></li>
+                            <li><a href="#test6">The Flopt</a></li>
+                            <li><a href="#test7">The Turn</a></li>
+                            <li><a href="#test8">The River</a></li>
+                            <li><a href="#test9">The Showdown</a></li>
+                            <li><a href="#chips">Chips value</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6 bg-light main">
+                    <div class="stickytop">
+                        <a href="#top">Top</a>
+                    </div>
+                    <div class="container">
+
+                        <div>
+                            <h2 id="test">What is Texas Hold 'Em?</h2>
+                            <p>Texas Hold'em is by far the most popular of all poker variations. All of the marquee tournaments around the world (including those played at the World Series of Poker, the World Poker Tour, the European Poker Tour, and elsewhere) feature the no-limit variation of this game. In fact, Texas hold'em is <i>so</i> popular some who aren't familiar with poker don't realize there are other ways to play the game.</p>
+                            <p>Learning how to play Texas hold'em poker is not that difficult, but don't let the simplicity of the game mislead you. The number of possible game situations is so vast that the game can be very complex, when playing at a high level. That's the inspiration for the famous saying about Texas hold'em that "it takes a moment to learn, but a lifetime to master."</p>
+                            <p>When playing the game for the first time, you will want to be familiar with the basic rules for Texas hold'em that are explained below. </p>
+                        </div>
+                        <div>
+                            <h2 id="test2">Texas Hold 'Em Rules</h2>
+                            <p>So how do you play Texas hold'em? In Texas hold'em players are trying to make the best five-card poker hand according to traditional poker rankings. In this respect, hold'em is not unlike other poker games like five-card draw. However, the way players construct their hands in Texas hold'em is a little different than in draw poker.</p>
+                            <p>In hold'em each player is dealt two cards face down (the "hole cards"), then over the course of subsequent rounds five more cards are eventually dealt face up in the middle of the table. These face up cards are called the "community cards" because each player uses them to make a five-card poker hand.</p>
+                            <p>The five community cards are dealt in three stages. The first three community cards are called the "flop." Then just one card is dealt, called the "turn." Finally one more card, the fifth and final community card, is dealt — the "river." </p>
+                            <p>Players construct their five-card poker hands using the best available five cards out of the seven total cards (the two hole cards and the five community cards). This can be done by using both of the hole cards in combination with three community cards, one hole card in combination with four community cardsm or no hole cards and playing all five community cards — whatever works to make the best five-card hand. </p>
+                            <p>If the betting causes all but one player to fold, the lone remaining player wins the pot without having to show any cards. For that reason, players don't always <i>have</i> to hold the best hand to win the pot. It's always possible a player can "bluff" and get others to fold better hands. If two or more players make it all of the way to the showdown after the last community card is dealt and all betting is complete, then the only way to win the pot is to have the highest-ranking five-card poker hand.</p>
+                            <p>Let's get into some specifics including how to deal Texas hold'em and how the betting works. A good way to explain the order of play is to talk about some of the key positions at the table — the button and the blinds (small blind and big blind).</p>
+                        </div>
+                        <div>
+                            <h2 id="test3">The Button</h2>
+                            <p>Play moves clockwise around the table, starting with action to the left of the dealer button. The button is a round disc that sits in front of a player and is rotated one seat to the left every hand. When playing in casinos and poker rooms, the player with the dealer button doesn't actually deal the cards (the poker room hires someone to do that). In home games with friends, though, the player with the button usually does deal the hands.</p>
+                            <p>Generally, the first two players sitting to the immediate left of the button are required to post a small blind and a big blind to initiate the betting. From there, action occurs on multiple streets: preflop, the flop, the turn and the river (explained further below).</p>
+                            <p>The button determines which player at the table is the acting dealer. In Texas hold'em, the player on button, or last active player closest to the button, receives last action on all postflop streets of play.</p>
+                            <p>While the dealer button dictates which players have to post the small and big blinds, it also determines where the dealing of the cards begin. The player to the immediate left of the dealer button in the small blind receives the first card and then the dealer pitches cards around the table in a clockwise motion from player to player until each has received two starting cards.</p>
+                        </div>
+                        <div>
+                            <h2 id="test4">The Blinds</h2>
+                            <p>As mentioned, before every new hand, two players at the table are obligated to post small and big blinds. These are forced bets that begin the wagering. Without these blinds, the game would be very boring because no one would be <i>required</i> to put any money into the pot. Players could just wait around until they are dealt pocket aces and only play then. The blinds, however, ensure there will be "action" on every hand.</p>
+                            <p>In tournaments, the blinds are raised at regular intervals. As the number of players keeps decreasing and the stacks of the remaining players keep getting bigger, it is a necessity that the blinds keep increasing throughout a tournament. In cash games, the blinds always stay the same.</p>
+                            <p>The player directly to the left of the button posts the small blind, and the player to his or her direct left posts the big blind. The small blind is generally half the amount of the big blind, although this stipulation varies from room to room and can also be dependent of the game being played. For example, in a "$1/$2" game of Texas hold'em, the small blind is $1 and the big blind is $2.</p>
+                        </div>
+                        <div>
+                            <h2 id="test5">Preflop</h2>
+                            <p>The first round of betting takes place right after each player has been dealt two hole cards. The first player to act is the player to the left of the big blind, a position referred to as "under the gun" because the player has to act first. This player has three options:</p>
+                            <ul>
+                                <li><b>Call:</b> match the amount of the big blind</li>
+                                <li><b>Raise:</b> increase the bet within the specific limits of the game</li>
+                                <li><b>Fold:</b> throw the hand away</li>
+                            </ul>
+                            <p>If the player chooses to fold, he or she is no longer eligible to win the current hand.</p>
+                            <p>The amount a player can raise to depends on the game that is being played. Most commonly in a game of no-limit Texas hold'em, the minimum opening raise must be at least twice the big blind, and the maximum raise can be all of the chips a player has in his or her stack (an "all-in" bet). </p>
+                            <p>There are other betting variations in hold'em poker. In fixed-limit hold'em (or just "limit hold'em), a raise is always exactly twice the big blind. In pot-limit hold'em (played much less often than the other variations), players can bet anywhere from the amount of the big blind (the minimum bet allowed) up to the total amount in the current pot.</p>
+                            <p>After the first player ("under the gun") acts, play proceeds in a clockwise fashion around the table with each player also having the same three options — to call, to raise, or fold. Once the last bet is called and the action is "closed," the preflop round is over and play moves on to the "flop."</p>
+                        </div>
+                        <div>
+                            <h2 id="test6"> The Flop</h2>
+                            <p>After the first preflop betting round has been completed, the first three community cards are dealt and a second betting round follows involving only the players who have not folded already.</p>
+                            <p>In this betting round (and subsequent ones), action starts with the first active player to the left of the button. Along with the options to bet, call, fold, or raise, a player now has the option to "check" if no betting action has occurred beforehand. A check simply means to pass the action to the next player in the hand.</p>
+                            <p>Again betting continues until the last bet or raise has been called (which closes the action). It also can happen that every player simply chooses not to be and checks around the table, which also ends the betting round. </p>
+                        </div>
+                        <div>
+                            <h2 id="test7">The Turn</h2>
+                            <p>The fourth community card, called the turn, is dealt face up following all betting action on the flop. Once this has been completed, another round of betting occurs, similar to that on the previous street of play. Again players have the option to options to check, bet, call, fold, or raise.</p>
+                        </div>
+                        <div>
+                            <h2 id="test8">The River</h2>
+                            <p>The fifth community card, called the river, is dealt face up following all betting action on the turn. Once this has been completed, another round of betting occurs, similar to what took play on the previous street of play. Once more the remaining players have the option to options to check, bet, call, fold, or raise.</p>
+                            <p>After all betting action has been completed, the remaining players in the hand with hole cards now expose their holdings to determine a winner. This is called the showdown.</p>
+                        </div>
+                        <div>
+                            <h2 id="test9">The Showdown</h2>
+                            <p>The remaining players open their hole cards, and with the assistance of the dealer a winning hand is determined. The player with the best combination of five cards wins the pot according to traditional <a href="https://www.pokernews.com/poker-hands.htm">poker hand rankings</a>. These hand rankings aren't specifically part of Texas hold'em rules, but apply to many different poker games.</p>
+                            <ul>
+                                <li><b>Royal Flush</b> — five cards of the same suit, ranked ace through ten; e.g., <b class="k ah">A<i>♥</i></b><b class="k kh">K<i>♥</i></b><b class="k qh">Q<i>♥</i></b><b class="k jh">J<i>♥</i></b><b class="k 10h">10<i>♥</i></b></li>
+                                <li><b>Straight Flush</b> — five cards of the same suit and consecutively ranked; e.g., <b class="k 9c">9<i>♣</i></b><b class="k 8c">8<i>♣</i></b><b class="k 7c">7<i>♣</i></b><b class="k 6c">6<i>♣</i></b><b class="k 5c">5<i>♣</i></b></li>
+                                <li><b>Four of a Kind</b> — four cards of the same rank; e.g., <b class="k qc">Q<i>♣</i></b><b class="k qh">Q<i>♥</i></b><b class="k qd">Q<i>♦</i></b><b class="k qs">Q<i>♠</i></b><b class="k 4d">4<i>♦</i></b></li>
+                                <li><b>Full House</b> — three cards of the same rank and two more cards of the same rank; e.g., <b class="k jc">J<i>♣</i></b><b class="k jh">J<i>♥</i></b><b class="k js">J<i>♠</i></b><b class="k 8d">8<i>♦</i></b><b class="k 8h">8<i>♥</i></b></li>
+                                <li><b>Flush</b> — any five cards of the same suit; e.g., <b class="k as">A<i>♠</i></b><b class="k js">J<i>♠</i></b><b class="k 8s">8<i>♠</i></b><b class="k 5s">5<i>♠</i></b><b class="k 2s">2<i>♠</i></b></li>
+                                <li><b>Straight</b> — any five cards consecutively ranked; e.g., <b class="k qc">Q<i>♣</i></b><b class="k jd">J<i>♦</i></b><b class="k 10h">10<i>♥</i></b><b class="k 9s">9<i>♠</i></b><b class="k 8d">8<i>♦</i></b></li>
+                                <li><b>Three of a Kind</b> — three cards of the same rank; e.g., <b class="k 8c">8<i>♣</i></b><b class="k 8s">8<i>♠</i></b><b class="k 8d">8<i>♦</i></b><b class="k kc">K<i>♣</i></b><b class="k 4h">4<i>♥</i></b></li>
+                                <li><b>Two Pair</b> — two cards of the same rank and two more cards of the same rank; e.g., <b class="k as">A<i>♠</i></b><b class="k ac">A<i>♣</i></b><b class="k jd">J<i>♦</i></b><b class="k jc">J<i>♣</i></b><b class="k 7s">7<i>♠</i></b></li>
+                                <li><b>One Pair</b> — two cards of the same rank; e.g., <b class="k 10h">10<i>♥</i></b><b class="k 10c">10<i>♣</i></b><b class="k 9h">9<i>♥</i></b><b class="k 4d">4<i>♦</i></b><b class="k 2d">2<i>♦</i></b></li>
+                                <li><b>High Card</b> — five unmatched cards; e.g., <b class="k ac">A<i>♣</i></b><b class="k jd">J<i>♦</i></b><b class="k 10s">10<i>♠</i></b><b class="k 5c">5<i>♣</i></b><b class="k 2h">2<i>♥</i></b> would be called "ace-high"</li>
+                            </ul>
+                            <p>Remember, players construct their hands by choosing the five best cards from the seven available (their two hole cards and the five community cards). </p>
+                            <p>For example, if the board is showing <b class="k 9c">9<i>♣</i></b><b class="k 5s">5<i>♠</i></b><b class="k kd">K<i>♦</i></b><b class="k 3s">3<i>♠</i></b><b class="k ah">A<i>♥</i></b>, a player with the two hole cards <b class="k ad">A<i>♦</i></b><b class="k 9s">9<i>♠</i></b> would have two pair (aces and nines), and would lose to a player who has <b class="k 9d">9<i>♦</i></b><b class="k 9h">9<i>♥</i></b> for three of a kind (three nines).</p>
+                            <p>Learning hold'em poker begins with understanding how hands are dealt and the order of play as described above. Of course, learning Texas hold'em rules is just the beginning, as the next step is to learn strategy which involves understanding what constitutes good starting hand selection, the odds and probabilities associated with the game, the significance of position and getting to act last during those postflop betting rounds, and many other aspects of the game.</p>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-3">
+                    <div id="chips" class="sticky">
+                        <div class="row">
+                            <div class="chips"><h3 style="color:darkblue">Blue: @chip1 </h3></div>
+                            <div class="chips"><h3 style="color:darkred">Red: @chip2 </h3></div>
+                            <div class="chips"><h3 style="color:whitesmoke">White: @chip3 </h3></div>
+                            <div class="chips"><h3 style="color:hotpink">Pink: @chip4 </h3></div>
+                            <div class="chips"><h3 style="color:black">Black: @chip5 </h3></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="py-5 bg-dark wrapper">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-2 bg-dark sidebar">
-                    <nav class="navbar">
-                        <ul class="">
-                            <li class="nav-item"> <a href="#top" class="nav-link">Top</a> </li>
-                            <li class="nav-item"> <a href="#poker" class="nav-link">Poker</a> </li>
-                            <li class="nav-item"> <a href="#test2" class="nav-link">Tab 2</a> </li>
-                            <li class="nav-item"> <a href="#test3" class="nav-link">Test 3</a> </li>
-                            <li class="nav-item"> <a href="#test4" class="nav-link">Test 4</a> </li>
-                        </ul>
-                    </nav>
-                </div>
-                <div class="col-md-1 bg-dark"></div>
-                    <div class="col-md-6 bg-light main">
-                        <div class="container">
-                            <div id="">
-                                <div id="poker"><h1>Poker</h1></div>
-                                <p class="">
-                                    In my soul and absorb its power, like the form of a beloved mistress, then I often think with longing. A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart.
-                                    In my soul and absorb its power, like the form of a beloved mistress, then I often think with longing. A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart.
-                                    In my soul and absorb its power, like the form of a beloved mistress, then I often think with longing. A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart.
-                                    In my soul and absorb its power, like the form of a beloved mistress, then I often think with longing. A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart.
-                                </p>
-                            </div>
-                            <div id="">
-                                <div id="test2"><h1>test2</h1></div>
-                                <p>
-                                    On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.
-                                    On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.
-                                    On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.
-                                    On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.
-                                    On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.
-                                </p>
-                            </div>
-                            <div id="">
-                                <div id="test3"><h1>test3</h1></div>
-                                <p>
-                                On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.
-                                On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.
-                                On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.
-                                On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.
-                                On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.
-                                </p>
-                            </div>
-                            <div id="test4">
-                                <div id="test4"><h1>test4</h1></div>
-                                <p class="">In my soul and absorb its power, like the form of a beloved mistress, then I often think with longing. A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart.</p>
-                            </div>
-                        </div>
-                    </div>
-                <div class="col-md-1"></div>
-                    <div class="col-md-2">
-                        <h1>hoi sang</h1>
-                    </div>
-                </div>
-            </div>
-    </div>
-
     <!-- JavaScript dependencies -->
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" style=""></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" crossorigin="anonymous" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"></script>
     <!-- Script: Smooth scrolling between anchors in the same page -->
     <script src="~/js/smooth-scroll.js"></script>
-
 </body>
 
 </html>

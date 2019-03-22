@@ -1,19 +1,16 @@
-﻿.wrapper {
-    display: flex;
-    justify-content: space-between;
-}
-
-
-.sidebar {
-    width: 25%;
-    height: 25vh;
-}
-.a {
-    font-size: 6vw;
-}
-.sidebar {
+﻿div.sticky {
     position: -webkit-sticky;
     position: sticky;
     top: 0;
 }
 
+div.stickytop {
+    position:sticky;
+    float:right;
+    top: 0;
+    margin-right: -5px;
+}
+
+div.chips{
+    padding: 3px;
+}
