@@ -373,5 +373,7 @@ healthchecksdb
 
 # End of https://www.gitignore.io/api/windows,visualstudio
 
-App_Data/Database*
-*.suo
+VS_Project/Pokerapp/.vs/Pokerapp/v15/.suo
+VS_Project/Pokerapp/.vs/Pokerapp/v15/Server/sqlite3/storage.ide-wal
+VS_Project/Pokerapp/Pokerapp/App_Data/Database.mdf
+VS_Project/Pokerapp/Pokerapp/App_Data/Database_log.ldf
