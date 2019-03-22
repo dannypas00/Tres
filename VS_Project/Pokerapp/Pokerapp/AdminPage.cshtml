@@ -10,10 +10,11 @@
     string url = Request.Url.AbsolutePath;
     string urlcode = url.Substring(url.Length - 7);
 
+    string stringTbl_Needed = "";
 
 
     int code = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", urlcode);
-    int number = 0;         //later toevoegen table number
+    int number = 1;         //later toevoegen table number
     int rebuy = 0;          //aantal rebuys standaard op 0
 
     if (!IsPost)
@@ -43,12 +44,18 @@
         }
         if (Request["Proceed"] == "Proceed")
         {
-            float Tbl_Amount = db.Execute("SELECT Tbl_Amount FROM Room WHERE Room_Code = @0", urlcode);
-            float Tbl_Max_Size = db.Execute("SELECT Tbl_Max_Size FROM Room WHERE Room_Code = @0", urlcode);
-            float Tbl_Min_Size = db.Execute("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0");
-
-
-
+            int NameCount = db.QueryValue("SELECT Count(Name) FROM Players WHERE Room_Code = @0", urlcode);
+            float Tbl_Amount = db.QueryValue("SELECT Tbl_Amount FROM Room WHERE Room_Code = @0", urlcode);
+            float Tbl_Max_Size = db.QueryValue("SELECT Tbl_Max_Size FROM Room WHERE Room_Code = @0", urlcode);
+            float Tbl_Min_Size = db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", urlcode);
+            double Tbl_Needed = Math.Ceiling(NameCount / Tbl_Max_Size);
+            stringTbl_Needed = Convert.ToString(Tbl_Needed);
+            double playerspertable = NameCount / Tbl_Needed;
+            double restplayerspertable = (NameCount / Tbl_Needed) - (Math.Floor(NameCount / Tbl_Needed));
+            double totalrestplayerspertable = restplayerspertable * Tbl_Needed;
+            Session["stringTbl_Needed"] =stringTbl_Needed;
+            string Url = "Players.cshtml/" + code;
+            Response.Redirect("~/" + Url);
         }
     }
 
@@ -93,7 +100,8 @@
         }
     </table>
     <form method="post">
-        <button type="submit" name="Proceed" value="delete">Proceed</button>
+        <button type="submit" name="Proceed" value="Proceed">Proceed</button>
+
     </form>
 </body>
 
