@@ -53,7 +53,7 @@
             double playerspertable = NameCount / Tbl_Needed;
             double restplayerspertable = (NameCount / Tbl_Needed) - (Math.Floor(NameCount / Tbl_Needed));
             double totalrestplayerspertable = restplayerspertable * Tbl_Needed;
-            Session["stringTbl_Needed"] =stringTbl_Needed;
+            Session["stringTbl_Needed"] = stringTbl_Needed;
             string Url = "Players.cshtml/" + code;
             Response.Redirect("~/" + Url);
         }
@@ -67,12 +67,6 @@
 </head>
 
 <body>
-    @*<form method="post">
-            <input type="text" name="Nr_Of_Players" value="@code"/>
-            <input type="submit" name="settings" value="Save" />
-        </form>*@
-
-
     <form method="post">
         <input type="text" name="name" placeholder="Input name here..." />
         <input type="submit" name="AddName" value="Add" />
@@ -103,5 +97,4 @@
         <button type="submit" name="Proceed" value="Proceed">Proceed</button>
     </form>
 </body>
-
 </html>

@@ -20,9 +20,9 @@
     {
         tweede = eerste;
     }
-    if (aantal > 10)
+    if (aantal > 10)    //Haal max spelers uit database
     {
-        string Url = "Players.cshtml/" + urlcode;
+        string Url = "Players.cshtml/" + urlcode;   //Needs fixing
         Response.Redirect("~/" + Url);
     }
 }

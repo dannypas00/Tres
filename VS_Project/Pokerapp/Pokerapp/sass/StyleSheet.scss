@@ -1,0 +1,197 @@
+﻿@import url(https://fonts.googleapis.com/css?family=Montserrat);
+
+/* Vars */
+$color-grey: #666;
+$color-grey-b: #f2f2f2;
+$color-purple: #6e1e52;
+$color-pink: #b7235a;
+$color-orange: #f3883c;
+$color-yellow: #f7d8a7;
+
+$size-a: .375rem;
+$size-b: .75rem;
+$size-c: 1.5rem;
+$size-d: 1.875rem;
+$size-e: 3rem;
+$size-f: 20rem;
+
+$size-border: 3px;
+
+/* Demo stuff */
+body {
+    padding-top: $size-e;
+    padding-right: $size-e;
+    padding-left: $size-e;
+    font-family: 'Montserrat', sans-serif;
+    line-height: $size-c;
+    color: $color-grey;
+    background-color: $color-grey-b;
+}
+
+.module {
+    width: $size-f;
+    margin-left: auto;
+    margin-right: auto;
+    padding: $size-c;
+    background-color: white;
+    border-radius: $size-border;
+    margin-bottom: $size-e;
+}
+
+.module__heading {
+    margin-top: - $size-c;
+    margin-right: - $size-c;
+    margin-bottom: $size-c;
+    margin-left: - $size-c;
+    padding: $size-b;
+    font-size: $size-c;
+    text-align: center;
+    text-transform: uppercase;
+    color: white;
+}
+
+.module__heading--a {
+    background-color: $color-purple;
+}
+
+.module__heading--b {
+    background-color: $color-yellow;
+}
+
+.module__heading--c {
+    background-color: $color-orange;
+}
+
+.module__heading--d {
+    background-color: $color-pink;
+}
+
+
+/* Pattern stuff */
+.custom-bullet {
+    margin-left: 0;
+    list-style: none;
+    counter-reset: counter;
+
+    > li:before {
+        counter-increment: counter;
+        content: counter(counter);
+    }
+}
+
+.custom-bullet--a {
+    position: relative;
+
+    > li {
+        &:before {
+            position: relative;
+            display: inline-block;
+            z-index: 100;
+            width: $size-c;
+            height: $size-c;
+            margin-right: $size-b;
+            margin-bottom: $size-b;
+            border: $size-border solid $color-purple;
+            line-height: $size-c;
+            text-align: center;
+            color: $color-purple;
+            background-color: white;
+            border-radius: 100em;
+            counter-increment: counter;
+            content: counter(counter);
+        }
+
+        &:after {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            z-index: 90;
+            left: $size-b;
+            margin-left: $size-border /2;
+            border-left: $size-border solid $color-purple;
+            content: "";
+        }
+
+        &:last-child:before {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.custom-bullet--b {
+
+    > li {
+        position: relative;
+        margin-bottom: $size-c;
+        border: 3px solid $color-yellow;
+        padding: $size-b;
+        border-radius: $size-border;
+
+        &:before {
+            position: absolute;
+            top: - $size-b;
+            padding-left: $size-a;
+            padding-right: $size-a;
+            color: $color-yellow;
+            background-color: white;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.custom-bullet--c {
+    > li {
+        display: block;
+        width: 100%;
+        border-bottom: $size-border solid $color-orange;
+        padding-top: $size-b;
+        padding-bottom: $size-b;
+
+        &:before {
+            float: right;
+            display: inline-block;
+            text-align: center;
+            color: $color-orange;
+        }
+    }
+}
+
+.custom-bullet--d {
+    overflow: hidden;
+
+    > li {
+        position: relative;
+        left: $size-c;
+        margin-bottom: $size-b;
+        padding-left: $size-b;
+        background-color: $color-grey-b;
+
+        &,
+        &:before {
+            padding-top: $size-a;
+            padding-bottom: $size-a;
+        }
+
+
+        &:before {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: - $size-c;
+            display: inline-block;
+            width: $size-d;
+            text-align: center;
+            color: white;
+            background-color: $color-pink;
+            border-bottom-left-radius: 100em;
+            border-top-left-radius: 100em;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
