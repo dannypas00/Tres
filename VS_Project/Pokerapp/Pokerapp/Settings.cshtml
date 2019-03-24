@@ -5,9 +5,11 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
+    //Mogen comments bij
     Validation.Add("nr_players", Validator.StringLength(2, 1, "MESSAGE"));
     Validation.Add("round_time", Validator.StringLength(8, 8, "MESSAGE"));
     Validation.Add("pause_time", Validator.StringLength(8, 0, "MESSAGE"));
+    Validation.Add("blind_time", Validator.StringLength(8, 0, "MESSAGE"));
     Validation.Add("min_table", Validator.StringLength(2, 1, "MESSAGE"));
     Validation.Add("max_table", Validator.StringLength(2, 1, "MESSAGE"));
     Validation.Add("start_value", Validator.StringLength(3, 1, "MESSAGE"));
@@ -18,33 +20,51 @@
     Validation.Add("chip3", Validator.StringLength(3, 1, "MESSAGE"));
     Validation.Add("chip4", Validator.StringLength(3, 1, "MESSAGE"));
     Validation.Add("chip5", Validator.StringLength(3, 1, "MESSAGE"));
+    Validation.Add("small", Validator.StringLength(3, 1, "MESSAGE"));
+    Validation.Add("small", Validator.StringLength(3, 1, "MESSAGE"));
 
     string url = Request.Url.AbsolutePath;
     string urlcode = url.Substring(url.Length - 7);
-    //int control = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", urlcode);
     int code = Convert.ToInt32(urlcode);
-    //if (control == code)
-    //{
-    //    code = Convert.ToInt32(urlcode);
-    //}
-    //else
-    //{
-    //    Response.Redirect("~/Gameselect.cshtml");
-    //}
 
-    int nr_players = Convert.ToInt32(db.QueryValue("SELECT Nr_Of_Players FROM Room WHERE Room_Code = @0", code));
-    var round_time = db.QueryValue("SELECT Round_Time FROM Room WHERE Room_Code = @0", code);
-    var pause_time = db.QueryValue("SELECT Pause_Time FROM Room WHERE Room_Code = @0", code);
-    int min_table = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", code));
-    int max_table_amount = Convert.ToInt32(db.QueryValue("SELECT Tbl_Max_Size FROM Room WHERE Room_Code = @0", code));
-    int start_value = Convert.ToInt32(db.QueryValue("SELECT Start_Value FROM Room WHERE Room_Code = @0", code));
-    int table_amount = Convert.ToInt32(db.QueryValue("SELECT Tbl_Amount FROM Room WHERE Room_Code = @0", code));
-    int rebuy = Convert.ToInt32(db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", code));
-    int chip_worth1 = Convert.ToInt32(db.QueryValue("SELECT Chip_1_Worth FROM Room WHERE Room_Code = @0", code));
-    int chip_worth2 = Convert.ToInt32(db.QueryValue("SELECT Chip_2_Worth FROM Room WHERE Room_Code = @0", code));
-    int chip_worth3 = Convert.ToInt32(db.QueryValue("SELECT Chip_3_Worth FROM Room WHERE Room_Code = @0", code));
-    int chip_worth4 = Convert.ToInt32(db.QueryValue("SELECT Chip_4_Worth FROM Room WHERE Room_Code = @0", code));
-    int chip_worth5 = Convert.ToInt32(db.QueryValue("SELECT Chip_5_Worth FROM Room WHERE Room_Code = @0", code));
+    int nr_players = 6;
+    var round_time = "00:30:00";
+    var pause_time = "00:00:00";
+    var blind_time = "00:00:00";
+    int min_table = 4;
+    int max_table_amount = 6;
+    int start_value = 10;
+    int table_amount = 1;
+    int rebuy = 0;
+    int chip_worth1 = 1;
+    int chip_worth2 = 2;
+    int chip_worth3 = 3;
+    int chip_worth4 = 4;
+    int chip_worth5 = 5;
+    int small = 5;
+    int big = 10;
+
+    var room = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
+    if (room == code)
+    {
+        //Comments plz
+        nr_players = Convert.ToInt32(db.QueryValue("SELECT Nr_Of_Players FROM Room WHERE Room_Code = @0", code));
+        round_time = Convert.ToString(db.QueryValue("SELECT Round_Time FROM Room WHERE Room_Code = @0", code));
+        pause_time = Convert.ToString(db.QueryValue("SELECT Pause_Time FROM Room WHERE Room_Code = @0", code));
+        blind_time = Convert.ToString(db.QueryValue("SELECT Blind_Time FROM Room WHERE Room_Code = @0", code));
+        min_table = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", code));
+        max_table_amount = Convert.ToInt32(db.QueryValue("SELECT Tbl_Max_Size FROM Room WHERE Room_Code = @0", code));
+        start_value = Convert.ToInt32(db.QueryValue("SELECT Start_Value FROM Room WHERE Room_Code = @0", code));
+        table_amount = Convert.ToInt32(db.QueryValue("SELECT Tbl_Amount FROM Room WHERE Room_Code = @0", code));
+        rebuy = Convert.ToInt32(db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", code));
+        chip_worth1 = Convert.ToInt32(db.QueryValue("SELECT Chip_1_Worth FROM Room WHERE Room_Code = @0", code));
+        chip_worth2 = Convert.ToInt32(db.QueryValue("SELECT Chip_2_Worth FROM Room WHERE Room_Code = @0", code));
+        chip_worth3 = Convert.ToInt32(db.QueryValue("SELECT Chip_3_Worth FROM Room WHERE Room_Code = @0", code));
+        chip_worth4 = Convert.ToInt32(db.QueryValue("SELECT Chip_4_Worth FROM Room WHERE Room_Code = @0", code));
+        chip_worth5 = Convert.ToInt32(db.QueryValue("SELECT Chip_5_Worth FROM Room WHERE Room_Code = @0", code));
+        small = Convert.ToInt32(db.QueryValue("SELECT Small_Blind FROM Room WHERE Room_Code = @0", code));
+        big = Convert.ToInt32(db.QueryValue("SELECT Big_Blind FROM Room WHERE Room_Code = @0", code));
+    }
 
     if (IsPost && Validation.IsValid() && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {
@@ -61,6 +81,7 @@
             int max_table_size = Convert.ToInt32(Request["max_table"]);
             int allow_rebuy = Convert.ToInt32(Request["rebuy"]);
             var pause = Request["pause_time"];
+            var blind = Request["blind_time"];
             int value = Convert.ToInt32(Request["start_value"]);
             int tbl_amount = Convert.ToInt32(Request["tbl_amount"]);
             int chip1 = Convert.ToInt32(Request["chip1"]);
@@ -69,17 +90,19 @@
             int chip4 = Convert.ToInt32(Request["chip4"]);
             int chip5 = Convert.ToInt32(Request["chip5"]);
             var started = 0;
+            int small_blind = Convert.ToInt32(Request["small"]);
+            int big_blind = Convert.ToInt32(Request["big"]);
 
             var check = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
             if (check == code)
             {
-                db.Execute("UPDATE Room SET Room_Code = @0, Nr_Of_Players = @1, Tbl_Min_Size = @2, Started = @3, Chip_1_Worth = @4, Chip_2_Worth = @5, Chip_3_Worth = @6, Chip_4_Worth = @7, Chip_5_Worth = @8, Round_Time = @9, Pause_Time = @10, Allow_Rebuy = @11, Start_Value = @12, Tbl_Amount = @13, Tbl_Max_Size = @14 WHERE Room_Code = @0"
-                , code, players, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, allow_rebuy, value, tbl_amount, max_table_size);
+                db.Execute("UPDATE Room SET Room_Code = @0, Nr_Of_Players = @1, Tbl_Min_Size = @2, Started = @3, Chip_1_Worth = @4, Chip_2_Worth = @5, Chip_3_Worth = @6, Chip_4_Worth = @7, Chip_5_Worth = @8, Round_Time = @9, Pause_Time = @10, Blind_Time = @11, Allow_Rebuy = @12, Start_Value = @13, Tbl_Amount = @14, Tbl_Max_Size = @15, Small_Blind = @16, Big_Blind = @17 WHERE Room_Code = @0"
+                , code, players, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, small_blind, big_blind);
             }
             else
             {
-                db.Execute("INSERT INTO Room (Room_Code, Nr_Of_Players, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size)" +
-                "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14)", code, players, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, allow_rebuy, value, tbl_amount, max_table_size);
+                db.Execute("INSERT INTO Room (Room_Code, Nr_Of_Players, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Blind_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size, Small_Blind, Big_Blind)" +
+                "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17)", code, players, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, small_blind, big_blind);
             }
 
             string Url = "Settings.cshtml/" + code;
@@ -103,42 +126,67 @@
         <p>Number of players</p>
         <input type="number" name="nr_players" value="@nr_players" /><br />
         <br />
+        @Html.ValidationMessage("nr_players")
         <p>Start value</p>
         <input type="number" name="start_value" value="@start_value" /><br />
         <br />
+        @Html.ValidationMessage("start_value")
         <p>Time per round</p>
         <input type="text" name="round_time" value="@round_time" /><br />
         <br />
+        @Html.ValidationMessage("round_time")
         <p>Time for pause</p>
         <input type="text" name="pause_time" value="@pause_time" /><br />
         <br />
+        @Html.ValidationMessage("pause_time")
+        <p>Time for blind</p>
+        <input type="text" name="blind_time" value="@blind_time" /><br />
+        <br />
+        @Html.ValidationMessage("blind_time")
         <p>Minimum players per table</p>
         <input type="number" name="min_table" value="@min_table" /><br />
         <br />
+        @Html.ValidationMessage("min_table")
         <p>Maximum players per table</p>
         <input type="number" name="max_table" value="@max_table_amount" /><br />
         <br />
+        @Html.ValidationMessage("max_table")
         <p>Amount of tables</p>
         <input type="number" name="tbl_amount" value="@table_amount" /><br />
         <br />
+        @Html.ValidationMessage("table_amount")
         <p>Allow rebuy</p>
         <input type="text" name="rebuy" value="@rebuy" /><br />
         <br />
+        @Html.ValidationMessage("rebuy")
         <p>Chipworth chip 1</p>
         <input type="number" name="chip1" value="@chip_worth1" /><br />
         <br />
+        @Html.ValidationMessage("chip1")
         <p>Chipworth chip 2</p>
         <input type="number" name="chip2" value="@chip_worth2" /><br />
         <br />
+        @Html.ValidationMessage("chip2")
         <p>Chipworth chip 3</p>
         <input type="number" name="chip3" value="@chip_worth3" /><br />
         <br />
+        @Html.ValidationMessage("chip3")
         <p>Chipworth chip 4</p>
         <input type="number" name="chip4" value="@chip_worth4" /><br />
         <br />
+        @Html.ValidationMessage("chip4")
         <p>Chipworth chip 5</p>
         <input type="number" name="chip5" value="@chip_worth5" /><br />
         <br /><br />
+        @Html.ValidationMessage("chip5")
+        <p>Value small blind</p>
+        <input type="number" name="small" value="@small" /><br />
+        <br /><br />
+        @Html.ValidationMessage("small")
+        <p>Value big blind</p>
+        <input type="number" name="big" value="@big" /><br />
+        <br /><br />
+        @Html.ValidationMessage("big")
         <input type="submit" name="save" value="Save" />
         <br />
     </form>

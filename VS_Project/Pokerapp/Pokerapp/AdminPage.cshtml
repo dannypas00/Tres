@@ -10,10 +10,11 @@
     string url = Request.Url.AbsolutePath;
     string urlcode = url.Substring(url.Length - 7);
 
+    string stringTbl_Needed = "";
 
 
     int code = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", urlcode);
-    int number = 0;         //later toevoegen table number
+    int number = 1;         //later toevoegen table number
     int rebuy = 0;          //aantal rebuys standaard op 0
 
     if (!IsPost)
@@ -41,10 +42,20 @@
             string rowname = Request.Form["rownameform"];
             db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", rowname, code);
         }
-
-        if (Request["start"] == "start")
+        if (Request["Proceed"] == "Proceed")
         {
-            Response.Redirect("~/StartGame.cshtml");
+            int NameCount = db.QueryValue("SELECT Count(Name) FROM Players WHERE Room_Code = @0", urlcode);
+            float Tbl_Amount = db.QueryValue("SELECT Tbl_Amount FROM Room WHERE Room_Code = @0", urlcode);
+            float Tbl_Max_Size = db.QueryValue("SELECT Tbl_Max_Size FROM Room WHERE Room_Code = @0", urlcode);
+            float Tbl_Min_Size = db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", urlcode);
+            double Tbl_Needed = Math.Ceiling(NameCount / Tbl_Max_Size);
+            stringTbl_Needed = Convert.ToString(Tbl_Needed);
+            double playerspertable = NameCount / Tbl_Needed;
+            double restplayerspertable = (NameCount / Tbl_Needed) - (Math.Floor(NameCount / Tbl_Needed));
+            double totalrestplayerspertable = restplayerspertable * Tbl_Needed;
+            Session["stringTbl_Needed"] = stringTbl_Needed;
+            string Url = "Players.cshtml/" + code;
+            Response.Redirect("~/" + Url);
         }
     }
 
@@ -56,12 +67,6 @@
 </head>
 
 <body>
-    @*<form method="post">
-            <input type="text" name="Nr_Of_Players" value="@code"/>
-            <input type="submit" name="settings" value="Save" />
-        </form>*@
-
-
     <form method="post">
         <input type="text" name="name" placeholder="Input name here..." />
         <input type="submit" name="AddName" value="Add" />
@@ -89,9 +94,7 @@
         }
     </table>
     <form method="post">
-        <button id="start" type="submit" name="start" value="start">start</button>
+        <button type="submit" name="Proceed" value="Proceed">Proceed</button>
     </form>
-
 </body>
-
 </html>
