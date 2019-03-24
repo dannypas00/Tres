@@ -371,4 +371,18 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 
+<<<<<<< HEAD
 # End of https://www.gitignore.io/api/windows,visualstudio
+=======
+# End of https://www.gitignore.io/api/windows,visualstudio
+
+<<<<<<< HEAD
+VS_Project/Pokerapp/.vs/Pokerapp/v15/.suo
+VS_Project/Pokerapp/.vs/Pokerapp/v15/Server/sqlite3/storage.ide-wal
+VS_Project/Pokerapp/Pokerapp/App_Data/Database.mdf
+VS_Project/Pokerapp/Pokerapp/App_Data/Database_log.ldf
+=======
+App_Data/Database*
+*.suo
+>>>>>>> 173dbf026dae6952ef1b0cd2f0d683cbb5a38ea7
+>>>>>>> master

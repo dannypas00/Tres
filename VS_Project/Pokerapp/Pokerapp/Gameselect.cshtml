@@ -1,0 +1,60 @@
+﻿@using WebMatrix.Data
+
+@{
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+
+    Random r = new Random();
+    var linkcode = r.Next(1000000, 9999999);
+
+    var selectQuery = "SELECT * FROM Room WHERE Room_Code = @0";
+    var selectRoomcodes = db.QuerySingle(selectQuery, linkcode);
+
+    if (!IsPost)
+    {
+        //if (Username != UsernameCheck || Password != PasswordCheck)
+        //{
+        //    Response.Redirect("Login.cshtml");
+        //}
+    }
+
+    if (selectRoomcodes == null)
+    {
+        if (IsPost && linkcode != selectRoomcodes)
+        {
+            string Url = "Settings.cshtml/" + linkcode;
+            Response.Redirect("~/" + Url);
+        }
+        else if (IsPost)
+        {
+            Response.Write("Probeer het nog eens...");
+        }
+    }
+}
+
+<html>
+<head>
+    <title>Game Select</title>
+</head>
+<body>
+    <table>
+        @foreach (var row in db.Query("SELECT Room_Code FROM Room"))
+        {
+            string code = Convert.ToString((int)row.Room_Code);
+            string Url = "Settings.cshtml/" + code;
+            <tr>
+                <td>
+                    <a href="@Url">@row.Room_Code</a>
+                </td>
+            </tr>
+        }
+    </table>
+
+    <form method="post">
+        <input type="hidden" name="linkcode" value="@linkcode" />
+        <button type="submit">Generate Linkcode</button>
+    </form>
+</body>
+</html>
