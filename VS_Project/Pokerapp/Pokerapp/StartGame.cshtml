@@ -26,38 +26,76 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>
 
-    $(document).ready(function () {
-        $(".timer").click(function () {
-            //needs to be database query
-            var seconds = 0;
-            var minute = 30;
-            var hours = 0;
+        $(document).ready(function () {
+            $.ajax({
+                url: "Timer.cshtml",
+                type: "get",
+                data: {
+                    roomcode: 2223610,
+                    table: 1,
+                },
+                success: function (response) {
+                    startTimer(response); // Returns timer from db
+                }
+            });
 
-            var round = 1;
+            function startTimer(timer) {
+                var timer = timer.split(":"); // Split timer
+                
+                var targetHours = parseInt(timer[0]);
+                var targetMinutes = parseInt(timer[1]);
+                var targetSeconds = parseInt(timer[2]);
 
-            setInterval(function () {
-                document.querySelector('.timer').innerHTML = ":0"+hours+ minute + ":" +seconds;
-                document.querySelector('.number').innerHTML = round;
-                seconds--;
+                var currentHours = 0;
+                var currentMinutes = 0;
+                var currentSeconds = 0;
 
-                //update timer here
-                console.log(minute);
+                var displayHours;
+                var displayMinutes;
+                var displaySeconds;
 
-            if (seconds <= 0) {
-                seconds = 60;
-                minute--;
-                round++;
+                var round = 1;
+                document.querySelector('#rnumber').innerHTML = round;
 
-                //When it hits 0, run ajax code 
-                $.ajax({
-                    type: "GET",
-                    url: "StartGame.cshtml?roomcode=" + roomCode + "&tablenr=" + tablenr,
-                });
+                setInterval(function () {
+                    var displayHours = currentHours;
+                    var displayMinutes = currentMinutes;
+                    var displaySeconds = currentSeconds;
+
+                    if (currentHours.toString().length < 2) {
+                        displayHours = "0" + currentHours;
+                    }
+
+                    if (currentMinutes.toString().length < 2) {
+                        displayMinutes = "0" + currentMinutes;
+                    }
+
+                    if (currentSeconds.toString().length < 2) {
+                        displaySeconds = "0" + currentSeconds;
+                    }
+
+                    document.querySelector('.timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
+
+                    if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
+                        round++;
+                        document.querySelector('#rnumber').innerHTML = round;
+                    }
+
+                    currentSeconds++;
+
+                    if (currentSeconds == 60) {
+                        currentMinutes++;
+                        currentSeconds = 0;
+                    }
+
+                    if (currentMinutes == 60) {
+                        currentHours++;
+                        currentMinutes = 0;
+                    }
+                }, 1000);
+
             }
-        }, 1000);
-
         });
-    });
 
     </script>
 
@@ -66,11 +104,10 @@
 
     <h1>This is table nr: @getTableNumber</h1>
     <div>
-        @*Format is : 00:00:00*@
         <div class="timer">Timer</div>
 
     </div>
-    <div class="round">This is round:<div class="number"></div></div>
+    <div class="round">This is round: <span id="rnumber"></span></div>
     <table>
         @foreach (var player in selectPlayers)
         {

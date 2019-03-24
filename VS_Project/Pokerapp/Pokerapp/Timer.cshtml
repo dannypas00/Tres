@@ -1,0 +1,19 @@
+﻿@using WebMatrix.Data;
+@{
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+    string url = Request.Url.AbsolutePath;
+    string urlcode = url.Substring(url.Length - 7);
+
+    string table = Request.QueryString["table"];
+    string roomcode = Request.QueryString["roomcode"];
+
+    roomcode = "2223610";
+
+
+    var selectTimer = db.QuerySingle("SELECT Round_Time FROM Room WHERE Room_Code = @0", roomcode);
+
+    Response.Write(selectTimer.Round_Time);
+}

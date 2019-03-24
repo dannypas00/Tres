@@ -1,6 +1,7 @@
 ﻿@using WebMatrix.Data
 
 @{
+
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
@@ -9,7 +10,6 @@
     string urlcode = url.Substring(url.Length - 7);
 
     int table = Convert.ToInt32(Session["tablenumber"]);
-
     var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, table);
     int aantal = namen.Count();
     double gedeeld = aantal / 2;
@@ -25,6 +25,9 @@
         string Url = "Players.cshtml/" + urlcode;   //Needs fixing
         Response.Redirect("~/" + Url);
     }
+
+    var selectTimer = db.Query("SELECT Round_Time FROM Room WHERE Room_Code = @0", urlcode, table);
+
 }
 
 <html>
@@ -44,12 +47,14 @@
     <div>
         <img src="~/tafel.png" name="pokertable" />
     </div>
-    <br /><div>
+    <br />
+    <div>
     @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", urlcode, table, tweede))
     {
         <img src="~/stoel.png" name="chair" />
         @a.Name
     }
-</div>
+    </div>
+
 </body>
 </html>
