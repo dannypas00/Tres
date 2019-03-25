@@ -14,7 +14,7 @@
         if (IsPost && Convert.ToInt32(Request["Proceed"]) == i)
         {
             Session["tablenumber"] = i;
-            string Url = "Tableview.cshtml/" + urlcode;
+            string Url = "Tableview.cshtml?roomcode=" + urlcode;
             Response.Redirect("~/" + Url);
         }
     }
