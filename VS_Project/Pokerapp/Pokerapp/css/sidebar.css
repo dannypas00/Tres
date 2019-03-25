@@ -1,16 +1,18 @@
 ﻿div.sticky {
     position: -webkit-sticky;
     position: sticky;
+    overflow: hidden;
     top: 0;
 }
 
 div.stickytop {
-    position:sticky;
-    float:right;
+    position: sticky;
+    float: right;
     top: 0;
     margin-right: -5px;
 }
 
-div.chips{
+div.chips {
     padding: 3px;
 }
+
