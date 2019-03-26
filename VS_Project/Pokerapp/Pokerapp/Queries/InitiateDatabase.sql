@@ -1,4 +1,4 @@
-﻿DROP TABLE Players;
+﻿
 CREATE TABLE Players
 (
     [Name] NVARCHAR(50) NOT NULL , 
@@ -9,7 +9,7 @@ CREATE TABLE Players
 )
 
 
-DROP TABLE Room;
+
 CREATE TABLE Room
 (
     [Room_Code] INT NOT NULL PRIMARY KEY,
