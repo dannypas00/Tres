@@ -25,6 +25,15 @@
         string Url = "Players.cshtml/" + urlcode;   //Needs fixing
         Response.Redirect("~/" + Url);
     }
+
+    int small = db.QueryValue("SELECT Small_Blind FROM Room WHERE Room_Code = @0", urlcode);
+    int big = db.QueryValue("SELECT Big_Blind FROM Room WHERE Room_Code = @0", urlcode);
+
+    if (!IsPost)
+    {
+        Session["small"] = small;
+        Session["big"] = big;
+    }
 }
 
 <html>
@@ -45,11 +54,34 @@
         <img src="~/tafel.png" name="pokertable" />
     </div>
     <br /><div>
-    @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", urlcode, table, tweede))
-    {
-        <img src="~/stoel.png" name="chair" />
-        @a.Name
+        @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", urlcode, table, tweede))
+        {
+            <img src="~/stoel.png" name="chair" />
+            @a.Name
+        }
+    </div>
+    <br />
+    <br />
+    <form method="post">
+        <input type="submit" name="blindnext" value="Raise_Blind" />
+    </form>
+    @{
+        int c_small = (int)Session["small"];
+        int c_big = (int)Session["big"];
+
+        if (IsPost && !Request["blindnext"].IsEmpty())
+        {
+            c_small = c_small + small;
+            c_big = c_big + big;
+            Session["small"] = c_small;
+            Session["big"] = c_big;
+            <script>
+                alert("The blind has been raised!");
+            </script>
+        }
     }
-</div>
+
+    <h2>@c_small</h2>
+    <h2>@c_big</h2>
 </body>
 </html>
