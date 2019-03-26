@@ -39,8 +39,10 @@
 </head>
 <body>
 
-        <div class="timer"></div>
+    <div class="timer"></div>
     <div class="round">This is round: <span id="rnumber"></span></div>
+
+    <button class="pause">=</button>
 
     <h1>Table @table</h1>
     <br />
@@ -56,12 +58,12 @@
     </div>
     <br />
     <div>
-    @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", urlcode, table, tweede))
-    {
-        <img src="~/stoel.png" name="chair" />
-        @a.Name
-    }
-                </div>
+        @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", urlcode, table, tweede))
+        {
+            <img src="~/stoel.png" name="chair" />
+            @a.Name
+        }
+    </div>
 
 </body>
 </html>

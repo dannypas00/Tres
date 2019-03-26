@@ -1,7 +1,6 @@
 ﻿$(document).ready(function () {
 
     $.ajax({
-    
         url: "Timer.cshtml",
         type: "get",
         data: {
@@ -11,6 +10,11 @@
         success: function (response) {
             startTimer(response); // Returns timer from db
         }
+    });
+
+    $(".pause").click(function () {
+        alert("Pausing");
+        clearInterval(timer);
     });
 
     function startTimer(timer) {
