@@ -25,11 +25,19 @@
     $("#close-sidebar").click(function () {
         $(".page-wrapper").removeClass("toggled");
     });
+
+
     $("#show-sidebar").click(function () {
         $(".page-wrapper").addClass("toggled");
     });
 
 
-
+    $(document).ready(function () {
+        $(".page-content").click(function () {
+            $(".page-wrapper").removeClass("toggled");
+        });
+    });
 
 });
+
+
