@@ -8,7 +8,8 @@
 
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-    int roomcode = 2223610;
+    string url = Request.Url.AbsolutePath;
+    string roomcode = url.Substring(url.Length - 7);
 
     int chip1 = 0;
     int chip2 = 0;
@@ -16,6 +17,7 @@
     int chip4 = 0;
     int chip5 = 0;
 
+    //Query to get the chip values
     var chips = db.QuerySingle("SELECT Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth FROM Room WHERE Room_Code=@0", roomcode);
 
     chip1 = chips.Chip_1_Worth;
@@ -46,6 +48,7 @@
         <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
             <i class="fas fa-bars"></i>
         </a>
+        <!--Sidebar start-->
         <nav id="sidebar" class="sidebar-wrapper">
             <div class="sidebar-content">
                 <div class="sidebar-header">
@@ -57,7 +60,7 @@
                         <i class="fas fa-times"></i>
                     </div>
                 </div>
-
+                <!-- TOC start -->
                 <div class="sidebar-menu">
                     <ul>
                         <li> <a href="#begin">Top</a> </li>
@@ -66,14 +69,15 @@
                         <li> <a href="#test3">Button</a> </li>
                         <li> <a href="#test4">Blinds</a> </li>
                         <li> <a href="#test5">Preflop</a> </li>
-                        <li> <a href="#test6">The Flopt</a> </li>
+                        <li> <a href="#test6">The Flop</a> </li>
                         <li> <a href="#test7">The Turn</a> </li>
                         <li> <a href="#test8">The River</a> </li>
                         <li> <a href="#test9">The Showdown</a> </li>
                     </ul>
                 </div>
-                <!-- sidebar-menu  -->
+                <!-- TOC end -->
             </div>
+            <!-- Footer with chip values start -->
             <div class="sidebar-footer">
                 <a>
                     <span style="color:darkblue">@chip1 </span>
@@ -91,8 +95,10 @@
                     <span style="color:black">@chip5</span>
                 </a>
             </div>
+            <!-- Footer with chip values end -->
         </nav>
-        <!-- sidebar-wrapper  -->
+        <!-- Sidebar end-->
+        <!-- Page content start-->
         <main class="page-content">
             <div class="container">
                 <div class="row">
@@ -178,8 +184,7 @@
                 </div>
             </div>
         </main>
-
-        <!-- page-content" -->
+        <!-- Page content end -->
     </div>
     <!-- page-wrapper -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>

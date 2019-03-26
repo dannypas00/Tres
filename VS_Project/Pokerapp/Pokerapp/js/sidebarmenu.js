@@ -1,37 +1,17 @@
 ﻿jQuery(function ($) {
 
-    $(".sidebar-dropdown > a").click(function () {
-        $(".sidebar-submenu").slideUp(200);
-        if (
-            $(this)
-                .parent()
-                .hasClass("active")
-        ) {
-            $(".sidebar-dropdown").removeClass("active");
-            $(this)
-                .parent()
-                .removeClass("active");
-        } else {
-            $(".sidebar-dropdown").removeClass("active");
-            $(this)
-                .next(".sidebar-submenu")
-                .slideDown(200);
-            $(this)
-                .parent()
-                .addClass("active");
-        }
-    });
-
+    
+    //Closes sidebar when X is clicked
     $("#close-sidebar").click(function () {
         $(".page-wrapper").removeClass("toggled");
     });
 
-
+    //Opens sidebar when hamburger is clicked
     $("#show-sidebar").click(function () {
         $(".page-wrapper").addClass("toggled");
     });
 
-
+    //Closes sidebar when page other than sidebar is clicked
     $(document).ready(function () {
         $(".page-content").click(function () {
             $(".page-wrapper").removeClass("toggled");
