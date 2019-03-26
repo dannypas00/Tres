@@ -5,7 +5,6 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-
     string urlcode = Request.QueryString["roomcode"];
 
     int table = Convert.ToInt32(Session["tablenumber"]);
@@ -24,9 +23,6 @@
         string Url = "Players.cshtml/" + urlcode;   //Needs fixing
         Response.Redirect("~/" + Url);
     }
-
-    var selectTimer = db.Query("SELECT Round_Time FROM Room WHERE Room_Code = @0", urlcode, table);
-
 }
 
 <html>
@@ -38,6 +34,7 @@
 
 </head>
 <body>
+<div id="urlcode" style="display:none;">@urlcode</div>
 
         <div class="timer"></div>
     <div class="round">This is round: <span id="rnumber"></span></div>

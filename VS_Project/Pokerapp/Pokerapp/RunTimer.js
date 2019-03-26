@@ -1,16 +1,17 @@
 ﻿$(document).ready(function () {
+    var roomcode = $("#urlcode").html();
+    $("#urlcode").remove();
 
     $.ajax({
-    
         url: "Timer.cshtml",
         type: "get",
         data: {
-            roomcode: '<%= ViewContext.RouteData.Values["roomcode"] %>',
-            table: '<%= ViewContext.RouteData.Values["table"] %>',
+            roomcode: roomcode
         },
         success: function (response) {
             startTimer(response); // Returns timer from db
         }
+
     });
 
     function startTimer(timer) {
