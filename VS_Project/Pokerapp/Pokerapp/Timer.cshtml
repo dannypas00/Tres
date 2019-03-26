@@ -7,8 +7,9 @@
     string url = Request.Url.AbsoluteUri;
     string urlcode = url.Substring(url.Length - 7);
 
-    var selectTimer = db.QuerySingle("SELECT Round_Time FROM Room WHERE Room_Code = @0", Request.QueryString["roomcode"].AsInt());
+    string table = Request.QueryString["tablenumber"];
+    string roomcode = Request.QueryString["roomcode"];
 
-    Response.Write(selectTimer.Round_Time);
-    //Response.Write(Request.QueryString["roomcode"]);
+    var selectTimer = db.QuerySingle("SELECT Round_Time FROM Room WHERE Room_Code = @0", roomcode, table);
+
 }

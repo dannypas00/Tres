@@ -14,6 +14,11 @@
 
     });
 
+    $(".pause").click(function () {
+        alert("Pausing");
+        clearInterval(timer);
+    });
+
     function startTimer(timer) {
         var timer = timer.split(":"); // Split timer
 
