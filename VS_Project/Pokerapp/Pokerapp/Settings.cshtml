@@ -120,34 +120,57 @@
 <html>
 <head>
     <title>Settings</title>
+    <style>
+        .form-group {
+            padding-right: 5px;
+        }
+    </style>
 </head>
 <body>
     <div class="py-5 text-center">
         <div class="container">
             <div class="row">
-                <div class="mx-auto col-lg-6 col-10">
-                    <h1>Settings</h1>
-                    <p class="mb-3"></p>
-                    <form name="Settings" method="post" class="text-left">
-                        <div class="form-group"> <label for="form1">Number of players</label> <input type="number" class="form-control" id="form1" placeholder="Number of players" name="nr_players " value="@nr_players"> </div>
-                        @Html.ValidationMessage("nr_players")
-                        <div class="form-group"> <label for="form2">Start value</label> <input type="number" class="form-control" id="form2" placeholder="Start value" name="start_value" value="@start_value"> </div>
-                        <div class="form-group"> <label for="form3">Time per round</label> <input type="time" class="form-control" id="form3" placeholder="9001" name="round_time" value="@round_time"> </div>
-                        <div class="form-group"> <label for="form4">Duration of pauses</label> <input type="time" class="form-control" id="form4" placeholder="9001" name="pause_time" value="@pause_time"> </div>
-                        <div class="form-group"> <label for="form5">Interval for blinds</label> <input type="time" class="form-control" id="form5" placeholder="9001" name="blind_time" value="@blind_time"> </div>
-                        <div class="form-group"> <label for="form6">Minimum players per table</label> <input type="number" class="form-control" id="form6" placeholder="3" name="min_table" value="@min_table"> </div>
-                        <div class="form-group"> <label for="form7">Maximum players per table</label> <input type="number" class="form-control" id="form7" placeholder="9001" name="max_table" value="@max_table_amount"> </div>
-                        <div class="form-group"> <label for="form8">Amount of tables</label> <input type="number" class="form-control" id="form8" placeholder="9001" name="table_amount" value="@table_amount"> </div>
-                        <div class="form-group"> <label for="form9">Amount of rebuys</label> <input type="number" class="form-control" id="form9" placeholder="9001" name="rebuy" value="@rebuy"> </div>
-                        <div class="form-group"> <label for="form10">Value chip 1</label> <input type="number" class="form-control" id="form10" placeholder="9001" name="chip1" value="@chip_worth1"> </div>
-                        <div class="form-group"> <label for="form11">Value chip 2</label> <input type="number" class="form-control" id="form11" placeholder="9001" name="chip2" value="@chip_worth2"> </div>
-                        <div class="form-group"> <label for="form12">Value chip 3</label> <input type="number" class="form-control" id="form12" placeholder="9001" name="chip3" value="@chip_worth3"> </div>
-                        <div class="form-group"> <label for="form13">Value chip 4</label> <input type="number" class="form-control" id="form13" placeholder="9001" name="chip4" value="@chip_worth4"> </div>
-                        <div class="form-group"> <label for="form14">Value chip 5</label> <input type="number" class="form-control" id="form14" placeholder="9001" name="chip5" value="@chip_worth5"> </div>
-                        <div class="form-group"> <label for="form15">Value small blind</label> <input type="number" class="form-control" id="form15" placeholder="9001" name="small" value="@small"> </div>
-                        <div class="form-group"> <label for="form16">Value big blind</label> <input type="number" class="form-control" id="form16" placeholder="9001" name="big" value="@big"> </div>
-                        <button type="submit" name="save" class="btn btn-primary">Save</button>
-                        <input class="btn btn-primary" type="submit" name="next" value="Proceed" />
+                <div class="col-md-12">
+                    <h3>Settings</h3>
+                    <form style="display: inline-block" name="Settings" method="post">
+                        <div class="form-row">
+                            <div class="form-group col-md-6"> <label for="form1">Number of players</label> <input type="number" class="form-control" id="form1" placeholder="Number of players" name="nr_players " value="@nr_players"> </div>
+                            @Html.ValidationMessage("nr_players")
+                            <div class="form-group col-md-6"> <label for="form2">Start value</label> <input type="number" class="form-control" id="form2" placeholder="Start value" name="start_value" value="@start_value"> </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6"> <label for="form3">Time per round</label> <input type="number" class="form-control" id="form3" placeholder="9001" name="round_time" value="@round_time"> </div>
+                            <div class="form-group col-md-6"> <label for="form4">Duration of pauses</label> <input type="number" class="form-control" id="form4" placeholder="9001" name="pause_time" value="@pause_time"> </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6"> <label for="form5">Interval for blinds</label> <input type="number" class="form-control" id="form5" placeholder="9001" name="blind_time" value="@blind_time"> </div>
+                            <div class="form-group col-md-6"> <label for="form6">Minimum players per table</label> <input type="number" class="form-control" id="form6" placeholder="3" name="min_table" value="@min_table"> </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6"> <label for="form7">Maximum players per table</label> <input type="number" class="form-control" id="form7" placeholder="9001" name="max_table" value="@max_table_amount"> </div>
+                            <div class="form-group col-md-6"> <label for="form8">Amount of tables</label> <input type="number" class="form-control" id="form8" placeholder="9001" name="table_amount" value="@table_amount"> </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6"> <label for="form9">Amount of rebuys</label> <input type="number" class="form-control" id="form9" placeholder="9001" name="rebuy" value="@rebuy"> </div>
+                            <div class="form-group col-md-6"> <label for="form10">Value chip 1</label> <input type="number" class="form-control" id="form10" placeholder="9001" name="chip1" value="@chip_worth1"> </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6"> <label for="form11">Value chip 2</label> <input type="number" class="form-control" id="form11" placeholder="9001" name="chip2" value="@chip_worth2"> </div>
+                            <div class="form-group col-md-6"> <label for="form12">Value chip 3</label> <input type="number" class="form-control" id="form12" placeholder="9001" name="chip3" value="@chip_worth3"> </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6"> <label for="form13">Value chip 4</label> <input type="number" class="form-control" id="form13" placeholder="9001" name="chip4" value="@chip_worth4"> </div>
+                            <div class="form-group col-md-6"> <label for="form14">Value chip 5</label> <input type="number" class="form-control" id="form14" placeholder="9001" name="chip5" value="@chip_worth5"> </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6"> <label for="form15">Value small blind</label> <input type="number" class="form-control" id="form15" placeholder="9001" name="small" value="@small"> </div>
+                            <div class="form-group col-md-6"> <label for="form16">Value big blind</label> <input type="number" class="form-control" id="form16" placeholder="9001" name="big" value="@big"> </div>
+                        </div>
+                            <button type="submit" name="save" class="btn btn-primary">Save</button>
+                            
+                    </form>
+                    <form method="post">
+                        <button class="btn btn-primary" type="submit" name="next" value="Proceed">Proceed</button>
                     </form>
                 </div>
             </div>
