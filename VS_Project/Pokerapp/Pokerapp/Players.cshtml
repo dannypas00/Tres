@@ -8,7 +8,7 @@
 
     string url = Request.Url.AbsolutePath;
     string urlcode = url.Substring(url.Length - 7);
-    int amount = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
+    int amount = Convert.ToInt32(Session["stringTbl_Needed"]);
     for (int i = 1; i <= amount; i++)
     {
         if (IsPost && Convert.ToInt32(Request["Proceed"]) == i)
@@ -54,49 +54,13 @@
 
 <html>
 <head>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <title>Players</title>
-    <style>
-        #names
-        {
-            padding:10px;
-            margin:10px;
-            int tbl_nr = i;
-        }
-        #namelist
-        {
-            margin-top:20px;
-        }
-    </style>
 </head>
 <body>
-
-    <div class="container">
-        <div class="row">
-            @for (int i = 0; i < amount; i++)
-            {
-                int tbl_nr = i+1;
-                <div class="row" id="names">
-                <div class="col">
-                    <img src="~/tafel.png" style="height:200px;width:300px" />
-                </div>
-                <div class="col" id="namelist">
-                    <ul style="list-style-type:none">
-                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
-                        {
-                            <li>@row.Name</li>
-                        }
-
-                        <li>
-                            <form method="post">
-                                <input type="submit" name="Proceed" value=@tbl_nr />
-                            </form>
-                        </li>
-                    </ul>
-                </div>
-                </div>
-            }
-        </div>
+    <div class="row">
+        @for (int i = 1; i <= amount; i++)
+        {
+            int tbl_nr = i;
         <div ="col">
             @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
             {
@@ -105,9 +69,10 @@
             <form method="post">
                 <input type="submit" name="Proceed" value=@i />
             </form>
+       
             @players
         </div><br />
+        }
     </div>
-
 </body>
 </html>
