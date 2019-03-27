@@ -10,10 +10,6 @@
     string url = Request.Url.AbsolutePath;
     string urlcode = url.Substring(url.Length - 7);
 
-    string stringTbl_Needed = "";
-
-
-    int code = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", urlcode);
     int number = 1;         //later toevoegen table number
     int rebuy = 0;          //aantal rebuys standaard op 0
 
@@ -31,30 +27,72 @@
 
         if (Request["AddName"] == "Add")
         {
-            if (db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1", name, code) is null)
+            if (db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1", name, urlcode) is null)
             {
-                db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr, Rebuy) VALUES (@0, @1, @2, @3)", name, code, number, rebuy);
+                db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr, Rebuy) VALUES (@0, @1, @2, @3)", name, urlcode, number, rebuy);
                 name = null;
             }
         }
         if (Request["delete"] == "delete")
         {
             string rowname = Request.Form["rownameform"];
-            db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", rowname, code);
+            db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", rowname, urlcode);
         }
         if (Request["Proceed"] == "Proceed")
         {
             int NameCount = db.QueryValue("SELECT Count(Name) FROM Players WHERE Room_Code = @0", urlcode);
+
             float Tbl_Amount = db.QueryValue("SELECT Tbl_Amount FROM Room WHERE Room_Code = @0", urlcode);
             float Tbl_Max_Size = db.QueryValue("SELECT Tbl_Max_Size FROM Room WHERE Room_Code = @0", urlcode);
             float Tbl_Min_Size = db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", urlcode);
-            double Tbl_Needed = Math.Ceiling(NameCount / Tbl_Max_Size);
-            stringTbl_Needed = Convert.ToString(Tbl_Needed);
-            double playerspertable = NameCount / Tbl_Needed;
-            double restplayerspertable = (NameCount / Tbl_Needed) - (Math.Floor(NameCount / Tbl_Needed));
-            double totalrestplayerspertable = restplayerspertable * Tbl_Needed;
-            Session["stringTbl_Needed"] = stringTbl_Needed;
-            string Url = "Players.cshtml/" + code;
+            double Tbl_Needed = Convert.ToInt32(Math.Ceiling(NameCount / Tbl_Max_Size));
+
+            double playerspertable = Math.Floor(NameCount / Tbl_Needed);
+            int floorplayerspertable = Convert.ToInt32(playerspertable);
+
+            int[] Tbl_Numberarray = new int[NameCount+1];
+            int[] Count_per_Table = new int[Convert.ToInt32(Tbl_Needed)];
+            int playernumber = 0;
+
+            for (int Tbl_Neededcount = 0; Tbl_Neededcount < Tbl_Needed; Tbl_Neededcount++)
+            {
+
+                for (int Amountplaypertable = 0; Amountplaypertable < floorplayerspertable; Amountplaypertable++)
+                {
+                    Tbl_Numberarray[playernumber] = Tbl_Neededcount + 1;
+                    Count_per_Table[Tbl_Neededcount]++;
+                    playernumber++;
+                }
+            }
+
+            if (playernumber != NameCount)
+            {
+                int restplayerspertable = NameCount - playernumber;
+                while (restplayerspertable > 0)
+                {
+                    for (int i = 1; i < Tbl_Needed - 1; i++)
+                    {
+                        if (Count_per_Table[i - 1] != Tbl_Max_Size)
+                        {
+                            Tbl_Numberarray[playernumber] = i;
+                            playernumber++;
+                            restplayerspertable--;
+                        }
+                    }
+                }
+            }
+
+            Random rnd = new Random();
+            Tbl_Numberarray = Tbl_Numberarray.OrderBy(x => rnd.Next()).ToArray();
+            int counting = 0;
+            foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", urlcode))
+            {
+
+                db.Execute("UPDATE Players SET Tbl_nr = @0 WHERE Name = @1", Tbl_Numberarray[counting], row.Name);
+                counting++;
+            }
+
+            string Url = "Players.cshtml/" + urlcode;
             Response.Redirect("~/" + Url);
         }
     }
@@ -73,7 +111,7 @@
     </form>
 
     <table>
-        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", code))
+        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", urlcode))
         {
             string rownameform = (string)row.Name;
             <tr>
