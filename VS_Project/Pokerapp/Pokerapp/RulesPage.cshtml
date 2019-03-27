@@ -8,8 +8,7 @@
 
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-    string url = Request.Url.AbsolutePath;
-    string roomcode = url.Substring(url.Length - 7);
+
 
     int chip1 = 0;
     int chip2 = 0;
@@ -17,14 +16,7 @@
     int chip4 = 0;
     int chip5 = 0;
 
-    //Query to get the chip values
-    var chips = db.QuerySingle("SELECT Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth FROM Room WHERE Room_Code=@0", roomcode);
 
-    chip1 = chips.Chip_1_Worth;
-    chip2 = chips.Chip_2_Worth;
-    chip3 = chips.Chip_3_Worth;
-    chip4 = chips.Chip_4_Worth;
-    chip5 = chips.Chip_5_Worth;
 
 }
 <!DOCTYPE html>

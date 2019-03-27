@@ -1,6 +1,8 @@
 ﻿@using WebMatrix.Data
 
 @{
+    Layout = "~/_Layout.cshtml";
+
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
