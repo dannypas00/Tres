@@ -2,6 +2,7 @@
     var roomcode = $("#urlcode").html();
     $("#urlcode").remove();
 
+    //Ajax connect with url Timer get the data roomcode
     $.ajax({
         url: "Timer.cshtml",
         type: "get",
@@ -14,6 +15,7 @@
 
     });
 
+    //Small pause button
     $(".pause").click(function () {
         alert("Pausing");
         clearInterval(timer);
@@ -22,11 +24,11 @@
     function startTimer(timer) {
         var timer = timer.split(":"); // Split timer
 
-        var targetHours = parseInt(timer[0]);
+        var targetHours = parseInt(timer[0]); // Parse hours to int
         var targetMinutes = parseInt(timer[1]);
         var targetSeconds = parseInt(timer[2]);
 
-        var currentHours = 0;
+        var currentHours = 0; 
         var currentMinutes = 0;
         var currentSeconds = 0;
 
@@ -37,6 +39,7 @@
         var round = 1;
         document.querySelector('#rnumber').innerHTML = round;
 
+        //
         setInterval(function () {
             var displayHours = currentHours;
             var displayMinutes = currentMinutes;
@@ -56,6 +59,7 @@
 
             document.querySelector('.timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
 
+            // if condition is met round + 1
             if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
                 round++;
                 document.querySelector('#rnumber').innerHTML = round;
