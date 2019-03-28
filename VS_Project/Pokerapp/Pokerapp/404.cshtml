@@ -1,0 +1,10 @@
+﻿@{
+    Page.Title = "404: page not found!";
+    Layout = "~/_Layout.cshtml";
+}
+
+<div>
+    <h1>Error 404: page not found</h1>
+    <p>If this wasn't supposed to happen, contact a moderator to solve this issue.<br /></p>
+    <a href="@Request.UrlReferrer.AbsolutePath">Return to the previous page</a>
+</div>
