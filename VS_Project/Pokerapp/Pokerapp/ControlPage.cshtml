@@ -1,0 +1,43 @@
+﻿@{
+
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database2.mdf;Integrated Security=True";
+
+    string provider = "System.Data.SqlClient";
+
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+    //SET Pause to 1 Unset pause to 0
+
+    int roomcode = Request[""]
+
+    int updatePause = 0;
+
+    if ()
+    {
+
+        updatePause = "UPDATE Players SET Pause = 1 WHERE Room_Code = @0";
+    }
+    else
+    {
+        updatePause = "UPDATE Players SET Gekocht = 0 WHERE Room_Code = @0";
+    }
+    var execute = db.QuerySingle(updatePause, roomcode);
+
+    //Selecteer de gebruiker en als gekocht 0 is laat het in de wenslijst zien
+    var selectCommand = "SELECT * FROM Gift WHERE Usercode = @0  AND Gekocht = 0 ORDER BY Prio ASC";
+    var selectGifts = db.Query(selectCommand, code);
+    int count = 1;
+    }
+
+
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="~/Pause.js"></script>
+
+</head>
+<body>
+    <h1>Controlpage</h1>
+    <button class="pause">≡</button>
+</body>
+</html>

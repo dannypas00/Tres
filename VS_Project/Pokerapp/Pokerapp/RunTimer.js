@@ -12,13 +12,6 @@
         success: function (response) {
             startTimer(response); // Returns timer from db
         }
-
-    });
-
-    //Small pause button
-    $(".pause").click(function () {
-        alert("Pausing");
-        clearInterval(timer);
     });
 
     function startTimer(timer) {
