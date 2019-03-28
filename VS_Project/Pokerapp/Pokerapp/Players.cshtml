@@ -2,6 +2,7 @@
 
 @{
     Layout = "~/_Layout.cshtml";
+    Page.Title = "Add Players";
 
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
@@ -54,11 +55,6 @@
     }
 }
 
-<html>
-<head>
-    <title>Players</title>
-</head>
-<body>
     <div class="row">
         @for (int i = 1; i <= amount; i++)
         {
@@ -76,5 +72,4 @@
         </div><br />
         }
     </div>
-</body>
-</html>
+

@@ -2,7 +2,7 @@
 
 @{
     Layout = "~/_Layout.cshtml";
-
+    Page.Title = "Settings";
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
@@ -117,16 +117,14 @@
     }
 }
 
-<html>
+
 <head>
     <title>Settings</title>
     <style>
-        .form-group {
-            padding-right: 5px;
-        }
+
     </style>
 </head>
-<body>
+
     <div class="py-5 text-center">
         <div class="container">
             <div class="row">
@@ -137,34 +135,49 @@
                             <div class="form-group col-md-6"> <label for="form1">Number of players</label> <input type="number" class="form-control" id="form1" placeholder="Number of players" name="nr_players " value="@nr_players"> </div>
                             @Html.ValidationMessage("nr_players")
                             <div class="form-group col-md-6"> <label for="form2">Start value</label> <input type="number" class="form-control" id="form2" placeholder="Start value" name="start_value" value="@start_value"> </div>
+                            @Html.ValidationMessage("start_value")
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-6"> <label for="form3">Time per round</label> <input type="number" class="form-control" id="form3" placeholder="9001" name="round_time" value="@round_time"> </div>
+                            @Html.ValidationMessage("round_time")
                             <div class="form-group col-md-6"> <label for="form4">Duration of pauses</label> <input type="number" class="form-control" id="form4" placeholder="9001" name="pause_time" value="@pause_time"> </div>
+                            @Html.ValidationMessage("pause_time")
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-6"> <label for="form5">Interval for blinds</label> <input type="number" class="form-control" id="form5" placeholder="9001" name="blind_time" value="@blind_time"> </div>
+                            @Html.ValidationMessage("blind_time")
                             <div class="form-group col-md-6"> <label for="form6">Minimum players per table</label> <input type="number" class="form-control" id="form6" placeholder="3" name="min_table" value="@min_table"> </div>
+                            @Html.ValidationMessage("min_table")
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-6"> <label for="form7">Maximum players per table</label> <input type="number" class="form-control" id="form7" placeholder="9001" name="max_table" value="@max_table_amount"> </div>
+                            @Html.ValidationMessage("max_table")
                             <div class="form-group col-md-6"> <label for="form8">Amount of tables</label> <input type="number" class="form-control" id="form8" placeholder="9001" name="table_amount" value="@table_amount"> </div>
+                            @Html.ValidationMessage("table_amount")
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-6"> <label for="form9">Amount of rebuys</label> <input type="number" class="form-control" id="form9" placeholder="9001" name="rebuy" value="@rebuy"> </div>
+                            @Html.ValidationMessage("rebuy")
                             <div class="form-group col-md-6"> <label for="form10">Value chip 1</label> <input type="number" class="form-control" id="form10" placeholder="9001" name="chip1" value="@chip_worth1"> </div>
+                            @Html.ValidationMessage("chip1")
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-6"> <label for="form11">Value chip 2</label> <input type="number" class="form-control" id="form11" placeholder="9001" name="chip2" value="@chip_worth2"> </div>
+                            @Html.ValidationMessage("chip2")
                             <div class="form-group col-md-6"> <label for="form12">Value chip 3</label> <input type="number" class="form-control" id="form12" placeholder="9001" name="chip3" value="@chip_worth3"> </div>
+                            @Html.ValidationMessage("chip3")
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-6"> <label for="form13">Value chip 4</label> <input type="number" class="form-control" id="form13" placeholder="9001" name="chip4" value="@chip_worth4"> </div>
+                            @Html.ValidationMessage("chip4")
                             <div class="form-group col-md-6"> <label for="form14">Value chip 5</label> <input type="number" class="form-control" id="form14" placeholder="9001" name="chip5" value="@chip_worth5"> </div>
+                            @Html.ValidationMessage("chip5")
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-6"> <label for="form15">Value small blind</label> <input type="number" class="form-control" id="form15" placeholder="9001" name="small" value="@small"> </div>
+                            @Html.ValidationMessage("small")
                             <div class="form-group col-md-6"> <label for="form16">Value big blind</label> <input type="number" class="form-control" id="form16" placeholder="9001" name="big" value="@big"> </div>
+                            @Html.ValidationMessage("big")
                         </div>
                             <button type="submit" name="save" class="btn btn-primary">Save</button>
                             
@@ -176,5 +189,3 @@
             </div>
         </div>
     </div>
-</body>
-</html>

@@ -3,6 +3,7 @@
 
 @{
     Layout = "~/_Layout.cshtml";
+    Page.Title = "Add Players";
 
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
@@ -101,13 +102,6 @@
 
 }
 
-<html>
-<head>
-    <link rel="stylesheet" href="~/css/tableRows.css" />
-    <title>Admin Page</title>
-</head>
-
-<body>
     <div class="py-5 text-center">
         <div class="container">
             <div class="row">
@@ -148,5 +142,5 @@
             </div>
         </div>
     </div>                    
-</body>
-</html>
+
+
