@@ -11,3 +11,12 @@
 .form-group {
     padding-right: 5px;
 }
+
+#names {
+    padding: 10px;
+    margin: 10px;
+}
+
+#namelist {
+    margin-top: 20px;
+}
