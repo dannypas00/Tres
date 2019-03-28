@@ -38,27 +38,36 @@
                 <h1>Tables</h1>
             </div>
         </div>
-
-        @for (int i = 0; i < amount; i++)
+        <div class="col-md-6">
+            @for (int i = 0; i < amount; i++)
             {
                 int tbl_nr = i + 1;
-        <div class="row" id="names" style="padding-top:2em">
-            <div class="col-lg-5 col-md-6 p-md-4 col-3">
-                <img class="img-fluid d-block" src="~/tafel.png" style="height:200px;width:300px" />
-            </div>
-            <div class="px-md-5 p-3 col-lg-6 d-flex flex-column align-items-start justify-content-center order-1 order-lg-2" style="position: relative">
-                @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
+            <form method="post">
+                <div class="clickable row" style="cursor:pointer; padding-top:2em" data-href="Tableview.cshtml/@tbl_nr">
+                    <div class="col-md-9">
+                        <div  style="background-image: url(/tafel.png) ;height:200px;width:100%"></div>
+                    </div>
+                    <div class="col-md-3 d-flex flex-column align-items-start justify-content-center order-1 order-lg-2">
+                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
                             {
-                <p class="mb-0"><b>@row.Name</b></p>
+                        <p class="mb-0"><b>@row.Name</b></p>
                             }
 
-                <form method="post" style="position: absolute; bottom: 0;">
-                    <input class="btn btn-primary" type="submit" name="Proceed" value="Table #@tbl_nr" />
-                </form>
 
-            </div>
-        </div>
+
+
+
+                    </div>
+                </div>
+            </form>
                 }
+        </div>
     </div>
 </div>
-
+<script>
+    jQuery(document).ready(function ($) {
+        $(".clickable").click(function () {
+            window.location = $(this).data("href");
+        });
+    });
+</script>

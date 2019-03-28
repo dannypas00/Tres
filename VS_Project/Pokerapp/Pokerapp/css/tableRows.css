@@ -20,3 +20,7 @@
 #namelist {
     margin-top: 20px;
 }
+
+.clickable:hover {
+    background-color:#ccc;
+}
