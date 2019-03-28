@@ -29,7 +29,25 @@
     }
 }
 
-<div class="py-5">
+<html>
+<head>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Players</title>
+    <style>
+        #names
+        {
+            padding:10px;
+            margin:10px;
+            int tbl_nr = i;
+        }
+        #namelist
+        {
+            margin-top:20px;
+        }
+    </style>
+</head>
+<body>
+
     <div class="container">
         <div class="row">
             <div class="col-md-12 text-center">
@@ -58,7 +76,21 @@
                                 
                         </div>
                 </div>
-                }
+                </div>
+            }
+        </div>
+        <div ="col">
+            @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
+            {
+                @row.Name<br />
+            }
+            <form method="post">
+                <input type="submit" name="Proceed" value=@i />
+            </form>
+            @players
+        </div><br />
     </div>
 </div>
 
+</body>
+</html>
