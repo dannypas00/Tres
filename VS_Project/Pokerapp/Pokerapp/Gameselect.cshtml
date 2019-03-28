@@ -1,6 +1,8 @@
 ﻿@using WebMatrix.Data
 
 @{
+    Layout = "~/_Layout.cshtml";
+
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
@@ -37,24 +39,60 @@
 <html>
 <head>
     <title>Game Select</title>
+    <style>
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 15px;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <table>
-        @foreach (var row in db.Query("SELECT Room_Code FROM Room"))
-        {
-            string code = Convert.ToString((int)row.Room_Code);
-            string Url = "Settings.cshtml/" + code;
-            <tr>
-                <td>
-                    <a href="@Url">@row.Room_Code</a>
-                </td>
-            </tr>
-        }
-    </table>
+    <div class="py-5 text-center">
+        <div class="container">
+            <div style="justify-content:center" class="col">
+                <div class="mx-auto col-lg-6 col-10">
+                    <div style="padding: 15px 0px 0px 0px" class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <tbody>
+                                    @foreach (var row in db.Query("SELECT Room_Code FROM Room"))
+                                    {
+                                        string code = Convert.ToString((int)row.Room_Code);
+                                        string Url = "Settings.cshtml/" + code;
+                                        <tr style="cursor:pointer" class="clickable" data-href="@Url">
+                                            <td>
+                                                    <h3>@row.Room_Code</h3>
+                                            </td>
+                                        </tr>
 
-    <form method="post">
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <form method="post">
+                <div style="padding: 0px 3px 3px 3px">
+                    
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        jQuery(document).ready(function ($) {
+            $(".clickable").click(function () {
+                window.location = $(this).data("href");
+            });
+        });
+    </script>
+
+    <div class="footer">
         <input type="hidden" name="linkcode" value="@linkcode" />
-        <button type="submit">Generate Linkcode</button>
-    </form>
+        <button class="btn btn-primary" type="submit">Generate Linkcode</button>
+    </div>
 </body>
 </html>

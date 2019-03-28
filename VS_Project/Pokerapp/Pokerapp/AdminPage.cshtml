@@ -2,6 +2,8 @@
 @using Microsoft.VisualBasic
 
 @{
+    Layout = "~/_Layout.cshtml";
+
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
@@ -101,38 +103,50 @@
 
 <html>
 <head>
+    <link rel="stylesheet" href="~/css/tableRows.css" />
     <title>Admin Page</title>
 </head>
 
 <body>
-    <form method="post">
-        <input type="text" name="name" placeholder="Input name here..." />
-        <input type="submit" name="AddName" value="Add" />
-    </form>
-
-    <table>
-        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", urlcode))
-        {
-            string rownameform = (string)row.Name;
-            <tr>
-                <td>
-                    @row.Name
-
-                </td>
-            </tr>
-            <tr>
-                <td>
+    <div class="py-5 text-center">
+        <div class="container">
+            <div class="row">
+                <div class="mx-auto col-lg-6 col-10">
+                    <h1>Add players</h1>
                     <form method="post">
-                        <button type="submit" name="delete" value="delete">X</button>
-                        @Html.Hidden("rownameform", rownameform)
+                        <div class="form-group"> <input name="name" type="text" class="form-control" placeholder="Enter player name" id="form1"> </div>
+                        <button type="submit" name="AddName" value="Add" class="btn btn-primary">Add</button>
+                        <button type="submit" name="Proceed" value="Proceed" class="btn btn-primary">Proceed</button>
                     </form>
-
-                </td>
-            </tr>
-        }
-    </table>
-    <form method="post">
-        <button type="submit" name="Proceed" value="Proceed">Proceed</button>
-    </form>
+                    <div style="padding: 15px 0px 0px 0px" class="col-md-12">
+                        <div class="table-responsive">
+                            
+                                <table class="table">
+                                    <tbody>
+                                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", urlcode))
+                                        {
+                                            string rownameform = (string)row.Name;
+                                            <tr>
+                                                <td>
+                                                @row.Name
+                                                </td>
+                                                <td>
+                                                    <form method="post">
+                                                        <button type="submit" name="delete" value="delete" class="btn btn-outline-secondary">X</button>
+                                                        @Html.Hidden("rownameform", rownameform)
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            
+                                        }
+                                    </tbody>
+                                </table>
+                            
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>                    
 </body>
 </html>
