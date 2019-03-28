@@ -6,7 +6,6 @@
     Database db = Database.OpenConnectionString(connectionString, provider);
 
     //Mogen comments bij
-    Validation.Add("nr_players", Validator.StringLength(2, 1, "MESSAGE"));
     Validation.Add("round_time", Validator.StringLength(8, 8, "MESSAGE"));
     Validation.Add("pause_time", Validator.StringLength(8, 0, "MESSAGE"));
     Validation.Add("blind_time", Validator.StringLength(8, 0, "MESSAGE"));
@@ -20,14 +19,11 @@
     Validation.Add("chip3", Validator.StringLength(3, 1, "MESSAGE"));
     Validation.Add("chip4", Validator.StringLength(3, 1, "MESSAGE"));
     Validation.Add("chip5", Validator.StringLength(3, 1, "MESSAGE"));
-    Validation.Add("small", Validator.StringLength(3, 1, "MESSAGE"));
-    Validation.Add("small", Validator.StringLength(3, 1, "MESSAGE"));
 
     string url = Request.Url.AbsolutePath;
     string urlcode = url.Substring(url.Length - 7);
     int code = Convert.ToInt32(urlcode);
 
-    int nr_players = 6;
     var round_time = "00:30:00";
     var pause_time = "00:00:00";
     var blind_time = "00:00:00";
@@ -41,14 +37,11 @@
     int chip_worth3 = 3;
     int chip_worth4 = 4;
     int chip_worth5 = 5;
-    int small = 5;
-    int big = 10;
 
     var room = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
     if (room == code)
     {
         //Comments plz
-        nr_players = Convert.ToInt32(db.QueryValue("SELECT Nr_Of_Players FROM Room WHERE Room_Code = @0", code));
         round_time = Convert.ToString(db.QueryValue("SELECT Round_Time FROM Room WHERE Room_Code = @0", code));
         pause_time = Convert.ToString(db.QueryValue("SELECT Pause_Time FROM Room WHERE Room_Code = @0", code));
         blind_time = Convert.ToString(db.QueryValue("SELECT Blind_Time FROM Room WHERE Room_Code = @0", code));
@@ -62,20 +55,12 @@
         chip_worth3 = Convert.ToInt32(db.QueryValue("SELECT Chip_3_Worth FROM Room WHERE Room_Code = @0", code));
         chip_worth4 = Convert.ToInt32(db.QueryValue("SELECT Chip_4_Worth FROM Room WHERE Room_Code = @0", code));
         chip_worth5 = Convert.ToInt32(db.QueryValue("SELECT Chip_5_Worth FROM Room WHERE Room_Code = @0", code));
-        small = Convert.ToInt32(db.QueryValue("SELECT Small_Blind FROM Room WHERE Room_Code = @0", code));
-        big = Convert.ToInt32(db.QueryValue("SELECT Big_Blind FROM Room WHERE Room_Code = @0", code));
     }
 
     if (IsPost && Validation.IsValid() && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {
-        if (Request["next"] == "Proceed")
+        if (Request["Proceed"] == "Proceed")
         {
-            string Url = "AdminPage.cshtml/" + code;
-            Response.Redirect("~/" + Url);
-        }
-        else if (Request["save"] == "Save")
-        {
-            int players = Convert.ToInt32(Request["nr_players"]);
             var time = Request["round_time"];
             int min_table_size = Convert.ToInt32(Request["min_table"]);
             int max_table_size = Convert.ToInt32(Request["max_table"]);
@@ -90,22 +75,21 @@
             int chip4 = Convert.ToInt32(Request["chip4"]);
             int chip5 = Convert.ToInt32(Request["chip5"]);
             var started = 0;
-            int small_blind = Convert.ToInt32(Request["small"]);
-            int big_blind = Convert.ToInt32(Request["big"]);
+            int blind_round = 1;
 
             var check = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
             if (check == code)
             {
-                db.Execute("UPDATE Room SET Room_Code = @0, Nr_Of_Players = @1, Tbl_Min_Size = @2, Started = @3, Chip_1_Worth = @4, Chip_2_Worth = @5, Chip_3_Worth = @6, Chip_4_Worth = @7, Chip_5_Worth = @8, Round_Time = @9, Pause_Time = @10, Blind_Time = @11, Allow_Rebuy = @12, Start_Value = @13, Tbl_Amount = @14, Tbl_Max_Size = @15, Small_Blind = @16, Big_Blind = @17 WHERE Room_Code = @0"
-                , code, players, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, small_blind, big_blind);
+                db.Execute("UPDATE Room SET Room_Code = @0, Tbl_Min_Size = @1, Started = @2, Chip_1_Worth = @3, Chip_2_Worth = @4, Chip_3_Worth = @5, Chip_4_Worth = @6, Chip_5_Worth = @7, Round_Time = @8, Pause_Time = @9, Blind_Time = @10, Allow_Rebuy = @11, Start_Value = @12, Tbl_Amount = @13, Tbl_Max_Size = @14, Blind_Round = 1 WHERE Room_Code = @0"
+                , code, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size);
             }
             else
             {
-                db.Execute("INSERT INTO Room (Room_Code, Nr_Of_Players, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Blind_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size, Small_Blind, Big_Blind)" +
-                "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17)", code, players, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, small_blind, big_blind);
+                db.Execute("INSERT INTO Room (Room_Code, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Blind_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size, Blind_Round)" +
+                "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15)", code, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, blind_round);
             }
 
-            string Url = "Settings.cshtml/" + code;
+            string Url = "AdminPage.cshtml/" + code;
             Response.Redirect("~/" + Url);
         }
         else
@@ -123,10 +107,6 @@
     <h1>Settings</h1>
     <br />
     <form name="Settings" method="post">
-        <p>Number of players</p>
-        <input type="number" name="nr_players" value="@nr_players" /><br />
-        <br />
-        @Html.ValidationMessage("nr_players")
         <p>Start value</p>
         <input type="number" name="start_value" value="@start_value" /><br />
         <br />
@@ -179,20 +159,8 @@
         <input type="number" name="chip5" value="@chip_worth5" /><br />
         <br /><br />
         @Html.ValidationMessage("chip5")
-        <p>Value small blind</p>
-        <input type="number" name="small" value="@small" /><br />
-        <br /><br />
-        @Html.ValidationMessage("small")
-        <p>Value big blind</p>
-        <input type="number" name="big" value="@big" /><br />
-        <br /><br />
-        @Html.ValidationMessage("big")
-        <input type="submit" name="save" value="Save" />
+        <input type="submit" name="Proceed" value="Proceed" />
         <br />
-    </form>
-
-    <form method="post">
-        <input type="submit" name="next" value="Proceed" />
     </form>
 </body>
 </html>

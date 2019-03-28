@@ -1,0 +1,115 @@
+﻿@using WebMatrix.Data
+@using Microsoft.VisualBasic
+
+@{
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+    //request the last 7 digits of the urgl (roomcode)
+    string url = Request.Url.AbsolutePath;
+    string urlcode = url.Substring(url.Length - 7);
+
+    if (!IsPost)
+    {
+        //if (Request.Form["adminLogin"] != "true")
+        //{
+        //    Response.Redirect("~/Login.cshtml");
+        //}
+    }
+
+    int Blind_Round = 1;
+    if (IsPost && Validation.IsValid())
+    {
+        int small = Convert.ToInt32(Request["small"]);
+        int big = Convert.ToInt32(Request["big"]);
+        if (Request["AddBlinds"] == "Add")
+        {
+            if (!Request["small"].IsEmpty() && !Request["big"].IsEmpty())
+            {
+                int id_old = Convert.ToInt32(db.QueryValue("SELECT ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID DESC", urlcode));
+                int id_new = 1;
+                if (id_old != 0)
+                {
+                    id_new = id_old + 1;
+                    Blind_Round = id_new;
+                }
+                db.Execute("INSERT INTO Blinds (Room_Code, ID, S_B, Value) VALUES (@0, @1, 's', @2)", urlcode, id_new, small);
+                db.Execute("INSERT INTO Blinds (Room_Code, ID, S_B, Value) VALUES (@0, @1, 'b', @2)", urlcode, id_new, big);
+            }
+        }
+        if (Request["delete"] == "delete")
+        {
+            string rowblind = Request.Form["rowblindform"];
+            db.Execute("DELETE FROM Blinds WHERE ID = @0 AND Room_Code = @1", rowblind, urlcode);
+        }
+        if (Request["Proceed"] == "Proceed")
+        {
+            string Url = "Players.cshtml/" + urlcode;
+            Response.Redirect("~/" + Url);
+        }
+    }
+
+}
+
+<html>
+<head>
+    <title>Blind page</title>
+</head>
+
+<body>
+    <form method="post">
+        <input type="number" name="big" placeholder="Big Blind @Blind_Round" />
+        <input type="number" name="small" placeholder="Small Blind @Blind_Round" />
+        <input type="submit" name="AddBlinds" value="Add" />
+    </form>
+    <p>Small</p>
+    <table>
+        @foreach (var row in db.Query("SELECT Value, ID FROM Blinds WHERE Room_Code = @0 AND S_B = 's' ORDER BY ID ASC", urlcode))
+        {
+            int rowblindform = (int)row.ID;
+            <tr>
+                <td>
+                    @row.Value
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <form method="post">
+                        <button type="submit" name="delete" value="delete">X</button>
+                        @Html.Hidden("rowblindform", rowblindform)
+                    </form>
+
+                </td>
+            </tr>
+        }
+    </table>
+    <br />
+    <p>Big:</p>
+    <table>
+        @foreach (var row in db.Query("SELECT Value FROM Blinds WHERE Room_Code = @0 AND S_B = 'b' ORDER BY ID ASC", urlcode))
+        {
+            int rowblindform = (int)row.Value;
+            <tr>
+                <td>
+                    @row.Value
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <form method="post">
+                        <button type="submit" name="delete" value="delete">X</button>
+                        @Html.Hidden("rownameform", rowblindform)
+                    </form>
+
+                </td>
+            </tr>
+        }
+    </table>
+    <form method="post">
+        <button type="submit" name="Proceed" value="Proceed">Proceed</button>
+    </form>
+</body>
+</html>

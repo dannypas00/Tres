@@ -54,7 +54,7 @@
             double restplayerspertable = (NameCount / Tbl_Needed) - (Math.Floor(NameCount / Tbl_Needed));
             double totalrestplayerspertable = restplayerspertable * Tbl_Needed;
             Session["stringTbl_Needed"] = stringTbl_Needed;
-            string Url = "Players.cshtml/" + code;
+            string Url = "Blinds.cshtml/" + code;
             Response.Redirect("~/" + Url);
         }
     }

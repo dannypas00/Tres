@@ -20,14 +20,11 @@
     {
         tweede = eerste;
     }
-    if (aantal > 10)    //Haal max spelers uit database
-    {
-        string Url = "Players.cshtml/" + urlcode;   //Needs fixing
-        Response.Redirect("~/" + Url);
-    }
 
-    int small = db.QueryValue("SELECT Small_Blind FROM Room WHERE Room_Code = @0", urlcode);
-    int big = db.QueryValue("SELECT Big_Blind FROM Room WHERE Room_Code = @0", urlcode);
+    int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", urlcode);
+    int blind_id = db.QueryValue("SELECT TOP (@0) ID FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, urlcode);
+    int small = db.QueryValue("SELECT Value FROM Blinds WHERE Room_Code = @0 AND S_B = 's' AND ID = @1", urlcode, blind_id);
+    int big = db.QueryValue("SELECT Value FROM Blinds WHERE Room_Code = @0 AND S_B = 'b' AND ID = @1", urlcode, blind_id);
 
     if (!IsPost)
     {
@@ -71,17 +68,20 @@
 
         if (IsPost && !Request["blindnext"].IsEmpty())
         {
-            c_small = c_small + small;
-            c_big = c_big + big;
-            Session["small"] = c_small;
-            Session["big"] = c_big;
+            int current_Round = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", urlcode);
+            int new_Round = current_Round + 1;
+            db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", new_Round, urlcode);
+            small = db.QueryValue("SELECT Value FROM Blinds WHERE Room_Code = @0 AND S_B = 's' AND ID = @1", urlcode, blind_id);
+            big = db.QueryValue("SELECT Value FROM Blinds WHERE Room_Code = @0 AND S_B = 'b' AND ID = @1", urlcode, blind_id);
+            Session["small"] = small;
+            Session["big"] = big;
             <script>
                 alert("The blind has been raised!");
             </script>
         }
     }
 
-    <h2>@c_small</h2>
-    <h2>@c_big</h2>
+    <h2>@small</h2>
+    <h2>@big</h2>
 </body>
 </html>
