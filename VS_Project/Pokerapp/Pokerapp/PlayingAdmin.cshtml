@@ -18,7 +18,9 @@
                 //pauze logic//
                 break;
             case "shuffle":
-                //shuffle logic//
+                Shuffle shuffle = new Shuffle();
+                shuffle.ShuffleTable(db, urlcode);
+                //Update tables with AJAX
                 break;
             case "manage":
                 Response.Redirect("~/AdminPage.cshtml/" + urlcode);
