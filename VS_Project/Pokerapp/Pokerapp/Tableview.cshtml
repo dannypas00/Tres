@@ -21,8 +21,19 @@
         tweede = eerste;
     }
 
+
+    if (IsPost && !Request["blindnext"].IsEmpty())
+    {
+        int current_Round = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", urlcode);
+        int new_Round = current_Round + 1;
+        db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", new_Round, urlcode);
+        <script>
+            alert("The blind has been raised!");
+        </script>
+    }
+
     int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", urlcode);
-    int blind_id = db.QueryValue("SELECT TOP (@0) ID FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, urlcode);
+    int blind_id = db.QueryValue("SELECT ID FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, urlcode);
     int small = db.QueryValue("SELECT Value FROM Blinds WHERE Room_Code = @0 AND S_B = 's' AND ID = @1", urlcode, blind_id);
     int big = db.QueryValue("SELECT Value FROM Blinds WHERE Room_Code = @0 AND S_B = 'b' AND ID = @1", urlcode, blind_id);
 
@@ -35,7 +46,7 @@
 
 <html>
 <head>
-<title>Tableview</title>
+    <title>Tableview</title>
 </head>
 <body>
     <h1>Table @table</h1>
@@ -62,24 +73,6 @@
     <form method="post">
         <input type="submit" name="blindnext" value="Raise_Blind" />
     </form>
-    @{
-        int c_small = (int)Session["small"];
-        int c_big = (int)Session["big"];
-
-        if (IsPost && !Request["blindnext"].IsEmpty())
-        {
-            int current_Round = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", urlcode);
-            int new_Round = current_Round + 1;
-            db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", new_Round, urlcode);
-            small = db.QueryValue("SELECT Value FROM Blinds WHERE Room_Code = @0 AND S_B = 's' AND ID = @1", urlcode, blind_id);
-            big = db.QueryValue("SELECT Value FROM Blinds WHERE Room_Code = @0 AND S_B = 'b' AND ID = @1", urlcode, blind_id);
-            Session["small"] = small;
-            Session["big"] = big;
-            <script>
-                alert("The blind has been raised!");
-            </script>
-        }
-    }
 
     <h2>@small</h2>
     <h2>@big</h2>
