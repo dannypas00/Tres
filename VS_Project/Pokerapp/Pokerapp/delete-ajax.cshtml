@@ -1,0 +1,19 @@
+﻿@using WebMatrix.Data
+
+@{
+    //connection database
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+    //get urlcode
+    //string url = Request.Url.AbsolutePath;
+    //string urlcode = url.Substring(url.Length - 7);
+
+    int room_code = 1234567;
+
+    var currentrebuys = db.QuerySingle("SELECT Rebuy FROM Players WHERE Room_Code = @0", room_code);
+    var currentactive = db.QuerySingle("SELECT Active FROM Players WHERE Room_Code = @0", room_code);
+    Response.Write(currentrebuys.Rebuy);
+    Response.Write(currentactive.Active);
+}

@@ -51,6 +51,8 @@
 <body>
     <h1>Table @table</h1>
     <br />
+    <div id="urlcode" style="display:none;">@urlcode</div>
+
     <div>
         @foreach (var a in db.Query("SELECT TOP (@0) Name, Rebuy FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 AND Active = 1 ORDER BY Name ASC", eerste, urlcode, table, eerste))
         {
@@ -133,7 +135,7 @@
                 }
             }
 
-
+            var wtfisgoingon = db.Query("SELECT Rebuy FROM Players WHERE Room_Code = @0", urlcode);
 
 
         }
@@ -281,6 +283,29 @@
 
         }
     </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            var roomcode = $("#urlcode").html();
+            $("#urlcode").remove();
+
+            $.ajax({
+                url: "delete-ajax.cshtml",
+                type: "get",
+                data: {
+                    roomcode: roomcode
+                    
+                },
+                success: function () {                   
+                    console.log("connection didnt fail :O");
+
+
+                }
+            });
+        });
+    </script>
 </body>
 </html>
 
