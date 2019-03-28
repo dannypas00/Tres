@@ -29,68 +29,36 @@
     }
 }
 
-<html>
-<head>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <title>Players</title>
-    <style>
-        #names
-        {
-            padding:10px;
-            margin:10px;
-            int tbl_nr = i;
-        }
-        #namelist
-        {
-            margin-top:20px;
-        }
-    </style>
-</head>
-<body>
 
+
+<div class="py-5">
     <div class="container">
         <div class="row">
             <div class="col-md-12 text-center">
                 <h1>Tables</h1>
             </div>
         </div>
-        
-            @for (int i = 0; i < amount; i++)
+
+        @for (int i = 0; i < amount; i++)
             {
                 int tbl_nr = i + 1;
-                <div class="row" id="names" style="padding-top:2em">
-                        <div class="col-lg-5 col-md-6 p-md-4 col-3">
-                            <img class="img-fluid d-block" src="~/tafel.png" style="height:200px;width:300px" />
-                        </div>
-
-                        <div class="px-md-5 p-3 col-lg-6 d-flex flex-column align-items-start justify-content-center order-1 order-lg-2" style="position: relative">
-
-                            @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
+        <div class="row" id="names" style="padding-top:2em">
+            <div class="col-lg-5 col-md-6 p-md-4 col-3">
+                <img class="img-fluid d-block" src="~/tafel.png" style="height:200px;width:300px" />
+            </div>
+            <div class="px-md-5 p-3 col-lg-6 d-flex flex-column align-items-start justify-content-center order-1 order-lg-2" style="position: relative">
+                @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
                             {
-                                <p class="mb-0"><b>@row.Name</b></p>
+                <p class="mb-0"><b>@row.Name</b></p>
                             }
-                                
-                                    <form method="post" style="position: absolute; bottom: 0;">
-                                        <input class="btn btn-primary" type="submit" name="Proceed" value="Table #@tbl_nr" />
-                                    </form>
-                                
-                        </div>
-                </div>
-                </div>
-            }
+
+                <form method="post" style="position: absolute; bottom: 0;">
+                    <input class="btn btn-primary" type="submit" name="Proceed" value="Table #@tbl_nr" />
+                </form>
+
+            </div>
         </div>
-        <div ="col">
-            @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
-            {
-                @row.Name<br />
-            }
-            <form method="post">
-                <input type="submit" name="Proceed" value=@i />
-            </form>
-            @players
-        </div><br />
+                }
     </div>
 </div>
 
-</body>
-</html>
