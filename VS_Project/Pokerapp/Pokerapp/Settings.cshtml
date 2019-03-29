@@ -70,8 +70,7 @@
     {
         if (Request["next"] == "Proceed")
         {
-            string Url = "AdminPage.cshtml/" + code;
-            Response.Redirect("~/" + Url);
+            Response.Redirect("~/AdminPage.cshtml/" + code);
         }
         else if (Request["save"] == "Save")
         {

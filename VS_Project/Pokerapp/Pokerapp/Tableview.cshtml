@@ -1,0 +1,128 @@
+﻿@using WebMatrix.Data
+
+@{
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+    string url = Request.Url.AbsolutePath;
+    string urlcode = url.Substring(url.Length - 7);
+
+    int table = Convert.ToInt32(Session["tablenumber"]);
+
+    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, table);
+    int aantal = namen.Count();
+    double gedeeld = aantal / 2;
+    int helft = Convert.ToInt32(gedeeld);
+    int eerste = Convert.ToInt32(aantal - helft);
+    int tweede = Convert.ToInt32(eerste - 1);
+    if (aantal % 2 == 0)
+    {
+        tweede = eerste;
+    }
+
+    int max_size = db.QueryValue("SELECT Tbl_Max_Size FROM Room WHERE Room_Code = @0", urlcode);
+    int min_size = db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", urlcode);
+    int amount = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
+    int needed = amount;
+    var mount = db.Query("SELECT Name FROM Players WHERE Room_Code = @0", urlcode);
+    int players = 0;
+    foreach (var a in mount)
+    {
+        players++;
+    }
+
+    var tables = db.Query("SELECT DISTINCT Tbl_nr FROM Players WHERE Room_Code = @0", urlcode);
+    int tablenr = 0;
+    foreach (var a in tables)
+    {
+        tablenr++;
+        var tabl = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tablenr);
+        int player = 0;
+        foreach (var b in tabl)
+        {
+            player++;
+        }
+
+        if (min_size >= player)
+        {
+            <script>
+                alert("The minimum size has been reached!");
+            </script>
+                int NameCount = db.QueryValue("SELECT Count(Name) FROM Players WHERE Room_Code = @0", urlcode);
+
+                float Tbl_Amount = db.QueryValue("SELECT Tbl_Amount FROM Room WHERE Room_Code = @0", urlcode);
+                float Tbl_Max_Size = db.QueryValue("SELECT Tbl_Max_Size FROM Room WHERE Room_Code = @0", urlcode);
+                float Tbl_Min_Size = db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", urlcode);
+                double Tbl_Needed = Convert.ToInt32(Math.Ceiling(NameCount / Tbl_Max_Size));
+
+                double playerspertable = Math.Floor(NameCount / Tbl_Needed);
+                int floorplayerspertable = Convert.ToInt32(playerspertable);
+
+                int[] Tbl_Numberarray = new int[NameCount + 1];
+                int[] Count_per_Table = new int[Convert.ToInt32(Tbl_Needed)];
+                int playernumber = 0;
+
+                for (int Tbl_Neededcount = 0; Tbl_Neededcount < Tbl_Needed; Tbl_Neededcount++)
+                {
+
+                    for (int Amountplaypertable = 0; Amountplaypertable < floorplayerspertable; Amountplaypertable++)
+                    {
+                        Tbl_Numberarray[playernumber] = Tbl_Neededcount + 1;
+                        Count_per_Table[Tbl_Neededcount]++;
+                        playernumber++;
+                    }
+                }
+
+                if (playernumber != NameCount)
+                {
+                    int restplayerspertable = NameCount - playernumber;
+                    while (restplayerspertable > 0)
+                    {
+                        for (int i = 1; i < Tbl_Needed - 1; i++)
+                        {
+                            if (Count_per_Table[i - 1] != Tbl_Max_Size)
+                            {
+                                Tbl_Numberarray[playernumber] = i;
+                                playernumber++;
+                                restplayerspertable--;
+                            }
+                        }
+                    }
+                }
+
+                Random rnd = new Random();
+                Tbl_Numberarray = Tbl_Numberarray.OrderBy(x => rnd.Next()).ToArray();
+                int counting = 0;
+                foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", urlcode))
+                {
+
+                    db.Execute("UPDATE Players SET Tbl_nr = @0 WHERE Name = @1", Tbl_Numberarray[counting], row.Name);
+                    counting++;
+                }
+
+                string Url = "Players.cshtml/" + urlcode;
+                Response.Redirect("~/" + Url);
+            }
+        }
+    }
+<h1>Table @table</h1>
+<br />
+<div>
+    @foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, urlcode, table))
+    {
+        <img src="~/stoel.png" name="chair" />
+    }
+</div><br />
+<div>
+    <img src="~/tafel.png" name="pokertable" />
+</div>
+<br /><div>
+    @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", urlcode, table, tweede))
+    {
+        <img src="~/stoel.png" name="chair" />
+        @a.Name
+    }
+</div>
+</body>
+</html>
