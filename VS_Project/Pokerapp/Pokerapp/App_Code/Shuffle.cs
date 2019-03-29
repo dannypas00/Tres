@@ -5,7 +5,7 @@ using System.Web;
 using WebMatrix.Data;
 
 /// <summary>
-/// Summary description for Shuffle
+/// Shuffles all players among tables
 /// </summary>
 public class Shuffle
 {

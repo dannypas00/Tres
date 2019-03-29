@@ -50,7 +50,12 @@
             <button type="submit" value="shuffle" name="submit">Shuffle all players</button>
             <button type="submit" value="manage" name="submit">Add/remove players</button>
         </form>
-            @for (int i = 0; i < tables; i++)
+        @for (int i = 0; i < tables; i++)
+        {
+            int tbl_Nr = i + 1;
+        <ul class="singleTableList" style="display: block; float:right; border: 3px solid gray;">
+            <h2>Table @tbl_Nr</h2>
+            @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_Nr))
             {
                 int tbl_Nr = i + 1;
             <ul class="singleTableList" style="display: block; float:right; border: 3px solid gray;">
@@ -61,6 +66,8 @@
                 }
             </ul>
             }
+        </ul>
+        }
     </div>
 </div>
 <br />
