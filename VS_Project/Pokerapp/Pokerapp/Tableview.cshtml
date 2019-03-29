@@ -6,11 +6,11 @@
     Database db = Database.OpenConnectionString(connectionString, provider);
 
     string url = Request.Url.AbsolutePath;
-    string[] urlcode = url.Split('/');
-    string table = urlcode[3];
-    string roomCode = urlcode[2];
+    string urlcode = url.Substring(url.Length - 7);
 
-    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
+    int table = Convert.ToInt32(Session["tablenumber"]);
+
+    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, table);
     int aantal = namen.Count();
     double gedeeld = aantal / 2;
     int helft = Convert.ToInt32(gedeeld);
@@ -22,26 +22,34 @@
     }
     if (aantal > 10)    //Haal max spelers uit database
     {
-        string Url = "Players.cshtml/" + roomCode;   //Needs fixing
+        string Url = "Players.cshtml/" + urlcode;   //Needs fixing
         Response.Redirect("~/" + Url);
     }
 }
-<h1>Table @table</h1>
-<br />
-<div>
-    @foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, roomCode, table))
+
+<html>
+<head>
+<title>Tableview</title>
+</head>
+<body>
+    <h1>Table @table</h1>
+    <br />
+    <div>
+        @foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, urlcode, table))
+        {
+            @a.Name
+            <img src="~/stoel.png" name="chair" />
+        }
+    </div><br />
+    <div>
+        <img src="~/tafel.png" name="pokertable" />
+    </div>
+    <br /><div>
+    @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", urlcode, table, tweede))
     {
-        @a.Name
-        <img src="~/stoel.png" name="chair" />
-    }
-</div><br />
-<div>
-    <img src="~/tafel.png" name="pokertable" />
-</div>
-<br /><div>
-    @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", roomCode, table, tweede))
-    {
         <img src="~/stoel.png" name="chair" />
         @a.Name
     }
 </div>
+</body>
+</html>

@@ -1,0 +1,355 @@
+﻿@using WebMatrix.Data
+
+@{
+
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+    string url = Request.Url.AbsolutePath;
+    //string urlcode = url.Substring(url.Length - 7);
+    int urlcode = 1234567;
+
+    //int table = Convert.ToInt32(Session["tablenumber"]);
+    int table = 2;
+
+    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", urlcode, table);
+    int aantal = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", urlcode, table);
+    double gedeeld = aantal / 2;
+    int helft = Convert.ToInt32(gedeeld);
+    int eerste = Convert.ToInt32(aantal - helft);
+    int tweede = Convert.ToInt32(eerste - 1);
+    if (aantal % 2 == 0)
+    {
+        tweede = eerste;
+    }
+    if (aantal > 10)    //Haal max spelers uit database
+    {
+        string Url = "Players.cshtml/" + urlcode;   //Needs fixing
+        Response.Redirect("~/" + Url);
+    }
+
+    int maxrebuy = (int)db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", urlcode);
+
+
+    if (IsPost && !Request.Form["quit"].IsEmpty())
+    {
+        int endgamequeryplayers = (int)db.Execute("UPDATE Players SET Tbl_nr = NULL, Rebuy = NULL, Active = NULL WHERE Room_Code = @0", urlcode);
+        int endbamequeryroom = (int)db.Execute("UPDATE Room SET Started = 0, Round_Time = '00:00:00', Pause_Time = '00:00:00' WHERE Room_Code = @0", urlcode);
+
+        Response.Redirect("end.cshtml");
+
+    }
+
+
+}
+
+
+
+<html>
+<head>
+    <title>Tableview</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="~/RunTimer.js"></script>
+    <link rel="stylesheet" type="text/css" href="~/StyleSheet.css">
+</head>
+<body>
+    <h1>Table @table</h1>
+    <br />
+    <div id="urlcode" style="display:none;">@urlcode</div>
+
+    <div class="timer"></div>
+    <div class="round">This is round: <span id="rnumber"></span></div>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">QUIT GAME</button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Are you sure you want to end the game?</h5>
+                </div>
+                <form method="post" name="optionsform" class="optionsform">
+                    <div class="modal-footer">
+                        <button onclick="stopTimer();" value="quit" name="quit" type="submit">CONFIRM</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <div>
+        @foreach (var a in db.Query("SELECT TOP (@0) Name, Rebuy FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 AND Active = 1 ORDER BY Name ASC", eerste, urlcode, table, eerste))
+        {
+            
+
+            string player = (string)db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2 AND Rebuy = @3", a.Name, urlcode, table, a.Rebuy);
+            int rebuyyy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2 AND Rebuy = @3", player, urlcode, table, a.Rebuy);
+
+
+            <img class="stool" src="~/assets/Tableview/Pokerstool.png" />
+            @player
+            <!-- Button trigger modal -->
+            <form method="post">
+                <button value="@player" name="player" type="button" class="btn btn-primary" data-toggle="modal" data-target="#@player">Options</button>
+            </form>
+
+            //int rebuyvalue = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1", player, urlcode);
+
+            //var nameselect = (int)db.QueryValue("SELECT * FROM Players WHERE Room_Code = @0 AND Name = @1", urlcode, player);
+
+            if (rebuyyy < maxrebuy)
+            {
+                <!-- Modal -->
+                <div class="modal fade" id="@player" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Options for: @player<br />Rebuys: @rebuyyy  / @maxrebuy</h5>
+                            </div>
+
+                            <div class="modal-body">
+                                <form method="post" name="optionsform" class="optionsform">
+                                    <div class="options-form-popup" id="player-options">
+                                        <button value="@player" name="rebuy" type="submit">Rebuy</button>
+                                    </div>
+                                    <div>
+                                        <button value="@player" name="delete" type="submit">Delete</button>
+                                        @Html.Hidden("sender", player)
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                if (IsPost && Request.Form["rebuy"] != null && Request.Form["sender"] == player)
+                {
+                    db.Execute("UPDATE Players SET Rebuy = @0, Active = 1 WHERE Name = @1 AND Room_Code = @2 AND Tbl_nr = @3", rebuyyy + 1, player, urlcode, table);
+
+
+                }
+                if (IsPost && Request.Form["delete"] != null && Request.Form["sender"] == player)
+                {
+                    db.Execute("UPDATE Players SET Active = 0 WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", player, urlcode, table);
+                }
+            }
+
+
+
+            if (rebuyyy == maxrebuy - 1 || rebuyyy == maxrebuy)
+            {
+                <!-- Modal -->
+                <div class="modal fade" id="@player" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Player @player has reached the maximum amount of @maxrebuy rebuys</h5>
+                            </div>
+                            <div class="modal-body">
+                                <form method="post" name="optionsform" class="optionsform">
+                                    <div>
+                                        <button value="delete" name="delete" type="submit">Delete</button>
+                                        @Html.Hidden("sender", player)
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                if (IsPost && Request.Form["delete"] != null && Request.Form["sender"] == player)
+                {
+                    var deleteplayer = db.Execute("UPDATE Players SET Active = 0 WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", player, urlcode, table);
+
+                }
+            }
+
+            var wtfisgoingon = db.Query("SELECT Rebuy FROM Players WHERE Room_Code = @0", urlcode);
+
+
+        }
+
+
+    </div><br />
+    <div>
+        <img class="table" src="~/assets/Tableview/Pokertable.png" />
+    </div>
+    <br /><div>
+        @foreach (var a in db.Query("SELECT TOP (@2) Name, Rebuy FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1 ORDER BY Name DESC", urlcode, table, tweede, tweede))
+        {
+            string player = (string)db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", a.Name, urlcode, table);
+            int rebuyyy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2 AND Rebuy = @3", a.Name, urlcode, table, a.Rebuy);
+
+            <img class="stool" src="~/assets/Tableview/Pokerstool.png" />
+            @player
+            <!-- Button trigger modal -->
+            <form method="post">
+                <button value="@player" name="player" type="button" class="btn btn-primary" data-toggle="modal" data-target="#@player">Options</button>
+            </form>
+
+            //int rebuyvalue = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1", player, urlcode);
+
+            //var nameselect = (int)db.QueryValue("SELECT * FROM Players WHERE Room_Code = @0 AND Name = @1", urlcode, player);
+
+            if (rebuyyy < maxrebuy)
+            {
+                <!-- Modal -->
+                <div class="modal fade" id="@player" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Options for: @player<br />Rebuys: @rebuyyy / @maxrebuy</h5>
+                            </div>
+
+                            <div class="modal-body">
+                                <form method="post" name="optionsform" class="optionsform">
+                                    <div class="options-form-popup" id="player-options">
+                                        <button value="rebuy" name="rebuy" type="submit">Rebuy</button>
+                                    </div>
+                                    <div>
+                                        <button value="delete" name="delete" type="submit">Delete</button>
+                                        @Html.Hidden("sender", player)
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                if (IsPost && Request.Form["rebuy"] != null && Request.Form["sender"] == player)
+                {
+                    db.Execute("UPDATE Players SET Rebuy = @0, Active = 1 WHERE Name = @1 AND Room_Code = @2 AND Tbl_nr = @3 AND Active = 1", rebuyyy + 1, player, urlcode, table);
+
+
+                }
+                if (IsPost && Request.Form["delete"] != null && Request.Form["sender"] == player)
+                {
+                    db.Execute("UPDATE Players SET Active = 0 WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", player, urlcode, table);
+                }
+            }
+
+
+            if (rebuyyy == maxrebuy - 1 || rebuyyy == maxrebuy)
+            {
+                <!-- Modal -->
+                <div class="modal fade" id="@player" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Player @player has reached the maximum amount of @maxrebuy rebuys</h5>
+                            </div>
+                            <div class="modal-body">
+                                <form method="post" name="optionsform" class="optionsform">
+                                    <div>
+                                        <button value="delete" name="delete" type="submit">Delete</button>
+                                        @Html.Hidden("sender", player)
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                if (IsPost && Request.Form["delete"] != null && Request.Form["sender"] == player)
+                {
+                    db.Execute("UPDATE Players SET Active = 0 WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", player, urlcode, table);
+                }
+            }
+        }
+
+    </div>
+    <div>
+        @foreach (var pirnp in db.Query("SELECT Name, Rebuy FROM Players WHERE Room_Code = @0 AND Active = 0 AND Rebuy = @1 ORDER BY Name DESC", urlcode, maxrebuy))
+        {
+            string playerinactivernp = (string)db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", pirnp.Name, urlcode, table);
+            <h3>@playerinactivernp</h3>
+        }
+    </div>
+    <div>
+        @foreach (var pirp in db.Query("SELECT Name, Rebuy FROM Players WHERE Room_Code = @0 AND Active = 0 AND Rebuy < @1 ORDER BY Name DESC", urlcode, maxrebuy))
+        {
+            string playerinactiverp = (string)db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", pirp.Name, urlcode, table);
+            int rebuyyy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2 AND Rebuy = @3", pirp.Name, urlcode, table, pirp.Rebuy);
+            <h2>@playerinactiverp</h2>
+            <form method="post">
+                <button value="@playerinactiverp" name="player" type="button" class="btn btn-primary" data-toggle="modal" data-target="#@playerinactiverp">Options</button>
+            </form>
+
+            //int rebuyvalue = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1", player, urlcode);
+
+            //var nameselect = (int)db.QueryValue("SELECT * FROM Players WHERE Room_Code = @0 AND Name = @1", urlcode, player);
+
+            if (rebuyyy < maxrebuy)
+            {
+                <!-- Modal -->
+                <div class="modal fade" id="@playerinactiverp" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Options for: @playerinactiverp<br />Rebuys: @rebuyyy / @maxrebuy</h5>
+                            </div>
+
+                            <div class="modal-body">
+                                <form method="post" name="optionsform" class="optionsform">
+                                    <div class="options-form-popup" id="player-options">
+                                        <button value="rebuy" name="rebuy" type="submit">Rebuy</button>
+                                        @Html.Hidden("sender", playerinactiverp)
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                if (IsPost && Request.Form["rebuy"] != null && Request.Form["sender"] == playerinactiverp)
+                {
+                    db.Execute("UPDATE Players SET Rebuy = @0, Active = 1 WHERE Name = @1 AND Room_Code = @2 AND Tbl_nr = @3 AND Active = 0", rebuyyy + 1, playerinactiverp, urlcode, table);
+
+
+                }
+
+            }
+
+
+        }
+    </div>
+
+ 
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            var roomcode = $("#urlcode").html();
+            $("#urlcode").remove();
+
+            $.ajax({
+                url: "delete-ajax.cshtml",
+                type: "get",
+                data: {
+                    roomcode: roomcode
+
+                },
+                success: function () {
+                    console.log("connection didnt fail :O");
+
+
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

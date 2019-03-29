@@ -30,7 +30,7 @@
                 </div>
                 <div class="col" id="namelist">
                     <ul style="list-style-type:none">
-                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
+                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tablenr))
                         {
                             <li>@row.Name</li>
                         }
@@ -42,7 +42,18 @@
                         </li>
                     </ul>
                 </div>
-            </div>
-        }
+                </div>
+            }
+        </div>
+        <div ="col">
+            @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tablenr))
+            {
+                @row.Name<br />
+            }
+            <form method="post">
+                <input type="submit" name="Proceed" value=i />
+            </form>
+            @players
+        </div><br />
     </div>
 </div>
