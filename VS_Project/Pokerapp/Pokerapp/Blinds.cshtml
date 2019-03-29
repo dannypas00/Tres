@@ -30,7 +30,7 @@
         {
             if (!Request["small"].IsEmpty() && !Request["big"].IsEmpty())
             {
-                if (small_blind <= small || big_blind <= big)
+                if ((small_blind <= small) && (big_blind <= big))
                 {
                     int id_old = Convert.ToInt32(db.QueryValue("SELECT ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID DESC", urlcode));
                     int id_new = 1;
