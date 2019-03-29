@@ -6,11 +6,11 @@
     Database db = Database.OpenConnectionString(connectionString, provider);
 
     string url = Request.Url.AbsolutePath;
-    string urlcode = url.Substring(url.Length - 7);
+    string[] urlcode = url.Split('/');
+    string table = urlcode[3];
+    string roomCode = urlcode[2];
 
-    int table = Convert.ToInt32(Session["tablenumber"]);
-
-    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, table);
+    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     int aantal = namen.Count();
     double gedeeld = aantal / 2;
     int helft = Convert.ToInt32(gedeeld);
@@ -20,7 +20,6 @@
     {
         tweede = eerste;
     }
-
 
     if (IsPost && !Request["blindnext"].IsEmpty())
     {
@@ -58,39 +57,41 @@
     {
         db.Execute("UPDATE Room SET Small_Blind = @0, Big_Blind = @1 WHERE Room_Code = @2", small, big, urlcode);
     }
+}
+
+<h1>Table @table</h1>
+<br />
+<div>
+    @foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, urlcode, table))
+    {
+        player++;
     }
-
-<html>
-<head>
-    <title>Tableview</title>
-</head>
-<body>
-    <h1>Table @table</h1>
-    <br />
-    <div>
-        @foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, urlcode, table))
-        {
-            @a.Name
-            <img src="~/stoel.png" name="chair" />
-        }
-    </div><br />
-    <div>
-        <img src="~/tafel.png" name="pokertable" />
-    </div>
-    <br /><div>
-        @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", urlcode, table, tweede))
-        {
-            <img src="~/stoel.png" name="chair" />
-            @a.Name
-        }
-    </div>
-    <br />
-    <br />
-    <form method="post">
-        <input type="submit" name="blindnext" value="Raise_Blind" />
-    </form>
-
-    <h2>Small blind: @small</h2>
-    <h2>Big blind: @big</h2>
-</body>
-</html>
+    if (min_size >= player)
+    {
+        <script>
+            alert("The minimum size has been reached!");
+        </script>
+            Shuffle shuffle = new Shuffle();
+            shuffle.shuffle(db, roomCode);
+            string Url = "Players.cshtml/" + urlcode;
+            Response.Redirect("~/" + Url);
+    }
+<h1>Table @table</h1>
+<br />
+<div>
+    @foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, urlcode, table))
+    {
+        @a.Name
+        <img src="~/stoel.png" name="chair" />
+    }
+</div><br />
+<div>
+    <img src="~/tafel.png" name="pokertable" />
+</div>
+<br /><div>
+    @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", urlcode, table, tweede))
+    {
+        <img src="~/stoel.png" name="chair" />
+        @a.Name
+    }
+</div>

@@ -61,6 +61,11 @@
     {
         if (Request["Proceed"] == "Proceed")
         {
+            Response.Redirect("~/AdminPage.cshtml/" + code);
+        }
+        else if (Request["save"] == "Save")
+        {
+            int players = Convert.ToInt32(Request["nr_players"]);
             var time = Request["round_time"];
             int min_table_size = Convert.ToInt32(Request["min_table"]);
             int max_table_size = Convert.ToInt32(Request["max_table"]);
