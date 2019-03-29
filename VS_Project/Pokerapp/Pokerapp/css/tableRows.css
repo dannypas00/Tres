@@ -1,0 +1,26 @@
+﻿tr:hover {
+    background-color: #ccc;
+}
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 15px;
+    width: 100%;
+    text-align: center;
+}
+.form-group {
+    padding-right: 5px;
+}
+
+#names {
+    padding: 10px;
+    margin: 10px;
+}
+
+#namelist {
+    margin-top: 20px;
+}
+
+.clickable:hover {
+    background-color:#ccc;
+}
