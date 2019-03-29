@@ -5,7 +5,7 @@ using System.Web;
 using WebMatrix.Data;
 
 /// <summary>
-/// Summary description for Shuffle
+/// Shuffles all players among tables
 /// </summary>
 public class Shuffle
 {
@@ -21,35 +21,17 @@ public class Shuffle
         double playerspertable = Math.Floor(NameCount / Tbl_Needed);
         int floorplayerspertable = Convert.ToInt32(playerspertable);
 
-        int[] Tbl_Numberarray = new int[NameCount + 1];
+        int[] Tbl_Numberarray = new int[NameCount];
         int[] Count_per_Table = new int[Convert.ToInt32(Tbl_Needed)];
-        int playernumber = 0;
 
-        for (int Tbl_Neededcount = 0; Tbl_Neededcount < Tbl_Needed; Tbl_Neededcount++)
+        int playerInTable = 0;
+        for (int i = 0; i < NameCount; i++)
         {
-
-            for (int Amountplaypertable = 0; Amountplaypertable < floorplayerspertable; Amountplaypertable++)
+            playerInTable++;
+            Tbl_Numberarray[i] = playerInTable;
+            if (playerInTable >= Tbl_Needed)
             {
-                Tbl_Numberarray[playernumber] = Tbl_Neededcount + 1;
-                Count_per_Table[Tbl_Neededcount]++;
-                playernumber++;
-            }
-        }
-
-        if (playernumber != NameCount)
-        {
-            int restplayerspertable = NameCount - playernumber;
-            while (restplayerspertable > 0)
-            {
-                for (int i = 1; i < Tbl_Needed - 1; i++)
-                {
-                    if (Count_per_Table[i - 1] != Tbl_Max_Size)
-                    {
-                        Tbl_Numberarray[playernumber] = i;
-                        playernumber++;
-                        restplayerspertable--;
-                    }
-                }
+                playerInTable = 0;
             }
         }
 
