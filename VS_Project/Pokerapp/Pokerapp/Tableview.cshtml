@@ -33,16 +33,32 @@
     }
 
     int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", urlcode);
-    int blind_id = db.QueryValue("SELECT ID FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, urlcode);
-    int small = db.QueryValue("SELECT Value FROM Blinds WHERE Room_Code = @0 AND S_B = 's' AND ID = @1", urlcode, blind_id);
-    int big = db.QueryValue("SELECT Value FROM Blinds WHERE Room_Code = @0 AND S_B = 'b' AND ID = @1", urlcode, blind_id);
+    var blind_id = db.Query("SELECT Top (@0) ID FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, urlcode);
+
+    var small_blind = db.Query("SELECT TOP (@0) Value FROM Blinds WHERE Room_Code = @1 AND S_B = 's' ORDER BY ID ASC", id, urlcode);
+    int small = 0;
+    foreach(var a in small_blind)
+    {
+        if(a.Value > small)
+        {
+            small = a.Value;
+        }
+    }
+    var big_blind = db.Query("SELECT TOP (@0) Value FROM Blinds WHERE Room_Code = @1 AND S_B = 'b' ORDER BY ID ASC", id, urlcode);
+    int big = 0;
+    foreach (var a in big_blind)
+    {
+        if (a.Value > big)
+        {
+            big = a.Value;
+        }
+    }
 
     if (!IsPost)
     {
-        Session["small"] = small;
-        Session["big"] = big;
+        db.Execute("UPDATE Room SET Small_Blind = @0, Big_Blind = @1 WHERE Room_Code = @2", small, big, urlcode);
     }
-}
+    }
 
 <html>
 <head>
@@ -74,7 +90,7 @@
         <input type="submit" name="blindnext" value="Raise_Blind" />
     </form>
 
-    <h2>@small</h2>
-    <h2>@big</h2>
+    <h2>Small blind: @small</h2>
+    <h2>Big blind: @big</h2>
 </body>
 </html>

@@ -18,24 +18,34 @@
         //}
     }
 
+    string error = "";
     int Blind_Round = 1;
     if (IsPost && Validation.IsValid())
     {
         int small = Convert.ToInt32(Request["small"]);
         int big = Convert.ToInt32(Request["big"]);
+        int small_blind = Convert.ToInt32(db.QueryValue("SELECT Value FROM Blinds WHERE Room_Code = @0 AND S_B = 's' ORDER BY Value DESC", urlcode));
+        int big_blind = Convert.ToInt32(db.QueryValue("SELECT Value FROM Blinds WHERE Room_Code = @0 AND S_B = 'b' ORDER BY Value DESC", urlcode));
         if (Request["AddBlinds"] == "Add")
         {
             if (!Request["small"].IsEmpty() && !Request["big"].IsEmpty())
             {
-                int id_old = Convert.ToInt32(db.QueryValue("SELECT ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID DESC", urlcode));
-                int id_new = 1;
-                if (id_old != 0)
+                if (small_blind <= small || big_blind <= big)
                 {
-                    id_new = id_old + 1;
-                    Blind_Round = id_new;
+                    int id_old = Convert.ToInt32(db.QueryValue("SELECT ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID DESC", urlcode));
+                    int id_new = 1;
+                    if (id_old != 0)
+                    {
+                        id_new = id_old + 1;
+                        Blind_Round = id_new;
+                    }
+                    db.Execute("INSERT INTO Blinds (Room_Code, ID, S_B, Value) VALUES (@0, @1, 's', @2)", urlcode, id_new, small);
+                    db.Execute("INSERT INTO Blinds (Room_Code, ID, S_B, Value) VALUES (@0, @1, 'b', @2)", urlcode, id_new, big);
                 }
-                db.Execute("INSERT INTO Blinds (Room_Code, ID, S_B, Value) VALUES (@0, @1, 's', @2)", urlcode, id_new, small);
-                db.Execute("INSERT INTO Blinds (Room_Code, ID, S_B, Value) VALUES (@0, @1, 'b', @2)", urlcode, id_new, big);
+                else
+                {
+                    error = "This value('s) are too low.";
+                }
             }
         }
         if (Request["delete"] == "delete")
@@ -63,6 +73,7 @@
         <input type="number" name="small" placeholder="Small Blind @Blind_Round" />
         <input type="submit" name="AddBlinds" value="Add" />
     </form>
+    <p>@error</p>
     <p>Small</p>
     <table>
         @foreach (var row in db.Query("SELECT Value, ID FROM Blinds WHERE Room_Code = @0 AND S_B = 's' ORDER BY ID ASC", urlcode))

@@ -28,6 +28,8 @@ CREATE TABLE Room
     [Tbl_Amount] INT NOT NULL,
     [Tbl_Max_Size] INT NOT NULL, 
 	[Blind_Round] INT NOT NULL,
+	[Small_Blind] INT NOT NULL,
+	[Big_Blind] INT NOT NUll,
 );
 
 DROP TABLE Blinds;

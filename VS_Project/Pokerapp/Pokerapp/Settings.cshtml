@@ -76,17 +76,19 @@
             int chip5 = Convert.ToInt32(Request["chip5"]);
             var started = 0;
             int blind_round = 1;
+            int small = 0;
+            int big = 0;
 
             var check = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
             if (check == code)
             {
-                db.Execute("UPDATE Room SET Room_Code = @0, Tbl_Min_Size = @1, Started = @2, Chip_1_Worth = @3, Chip_2_Worth = @4, Chip_3_Worth = @5, Chip_4_Worth = @6, Chip_5_Worth = @7, Round_Time = @8, Pause_Time = @9, Blind_Time = @10, Allow_Rebuy = @11, Start_Value = @12, Tbl_Amount = @13, Tbl_Max_Size = @14, Blind_Round = 1 WHERE Room_Code = @0"
+                db.Execute("UPDATE Room SET Room_Code = @0, Tbl_Min_Size = @1, Started = @2, Chip_1_Worth = @3, Chip_2_Worth = @4, Chip_3_Worth = @5, Chip_4_Worth = @6, Chip_5_Worth = @7, Round_Time = @8, Pause_Time = @9, Blind_Time = @10, Allow_Rebuy = @11, Start_Value = @12, Tbl_Amount = @13, Tbl_Max_Size = @14, Blind_Round = 1, Small_Blind = 0, Big_Blind = 0 WHERE Room_Code = @0"
                 , code, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size);
             }
             else
             {
-                db.Execute("INSERT INTO Room (Room_Code, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Blind_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size, Blind_Round)" +
-                "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15)", code, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, blind_round);
+                db.Execute("INSERT INTO Room (Room_Code, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Blind_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size, Blind_Round, Small_Blind, Big_Blind)" +
+                "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17)", code, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, blind_round, small, big);
             }
 
             string Url = "AdminPage.cshtml/" + code;
