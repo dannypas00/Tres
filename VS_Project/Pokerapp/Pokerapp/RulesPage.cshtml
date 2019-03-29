@@ -3,10 +3,13 @@
     Layout = "~/_Layout.cshtml";
 
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
-
     string provider = "System.Data.SqlClient";
-
     Database db = Database.OpenConnectionString(connectionString, provider);
+
+    if (Request.Cookies["LoginCookie"].Value != "true")
+    {
+        Response.Redirect("~/Gameselect.cshtml");
+    }
 
     string url = Request.Url.AbsolutePath;
     string roomcode = url.Substring(url.Length - 7);

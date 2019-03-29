@@ -5,6 +5,11 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
+    if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
+    {
+        Response.Redirect("~/Login.cshtml");
+    }
+
     //Mogen comments bij
     Validation.Add("nr_players", Validator.StringLength(2, 1, "MESSAGE"));
     Validation.Add("round_time", Validator.StringLength(8, 8, "MESSAGE"));

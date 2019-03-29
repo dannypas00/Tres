@@ -7,6 +7,11 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
+    if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
+    {
+        Response.Redirect("~/Login.cshtml");
+    }
+
     string url = Request.Url.AbsolutePath;
     int urlcode = Convert.ToInt32(url.Substring(url.Length - 7));
     int tables = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
@@ -29,6 +34,10 @@
                 break;
         }
     }
+    string prelink = Request.Url.AbsoluteUri;
+    string[] link = prelink.Split('/');
+    prelink = link[0] + "//" + link[2];
+    string linked = prelink + "/Players/" + urlcode;
 }
 
 <div>
@@ -49,8 +58,10 @@
                 @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_Nr))
                 {
                     <li class="singlePlayer">@row.Name</li>
-        }
+                }
             </ul>
             }
     </div>
 </div>
+<br />
+<a href=@linked>@linked</a>
