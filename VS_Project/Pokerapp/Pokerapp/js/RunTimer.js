@@ -40,7 +40,7 @@
         //
         setInterval(function () {
             var displayHours = currentHours;
-            var c = currentMinutes;
+            var displayMinutes = currentMinutes;
             var displaySeconds = currentSeconds;
 
             sessionStorage.setItem("timer", displayHours);
