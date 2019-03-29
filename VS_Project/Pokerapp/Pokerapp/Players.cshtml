@@ -5,6 +5,10 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
+    if (Request.Cookies["LoginCookie"].Value != "true")
+    {
+        Response.Redirect("~/Gameselect.cshtml");
+    }
 
     string url = Request.Url.AbsolutePath;
     string urlcode = url.Substring(url.Length - 7);
