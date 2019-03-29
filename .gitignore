@@ -379,4 +379,4 @@ healthchecksdb
 App_Data/Database*
 *.suo
 *applicationhost.config
-
+*storage.ide
