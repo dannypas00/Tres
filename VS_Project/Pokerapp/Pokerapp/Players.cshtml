@@ -11,22 +11,12 @@
 
 
 
-    string url = Request.Url.AbsolutePath;
-    string urlcode = url.Substring(url.Length - 7);
-
-    urlcode = "1234567";
 
 
+    int urlcode = Int32.Parse(Request.QueryString["rc"]);
     int amount = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
-    for (int i = 1; i <= amount; i++)
-    {
-        if (IsPost && Convert.ToInt32(Request["Proceed"]) == i)
-        {
-            Session["tablenumber"] = i;
-            string Url = "Tableview.cshtml/" + urlcode;
-            Response.Redirect("~/" + Url);
-        }
-    }
+
+
 }
 
 
@@ -42,10 +32,11 @@
             @for (int i = 0; i < amount; i++)
             {
                 int tbl_nr = i + 1;
+            string Url = "Tableview.cshtml?rc=" + urlcode + "&tn=" + tbl_nr;
             <form method="post">
-                <div class="clickable row" style="cursor:pointer; padding-top:2em" data-href="Tableview.cshtml/@tbl_nr">
+                <div class="clickable row" style="cursor:pointer; padding-top:2em">
                     <div class="col-md-9">
-                        <div  style="background-image: url(/tafel.png) ;height:200px;width:100%"></div>
+                        <div style="background-image: url(/tafel.png) ;height:200px;width:100%"></div>
                     </div>
                     <div class="col-md-3 d-flex flex-column align-items-start justify-content-center order-1 order-lg-2">
                         @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
@@ -58,6 +49,8 @@
 
 
                     </div>
+
+                    <a href=@Url></a>
                 </div>
             </form>
                 }
@@ -67,7 +60,7 @@
 <script>
     jQuery(document).ready(function ($) {
         $(".clickable").click(function () {
-            window.location = $(this).data("href");
+            window.location = $(this).find("a:first").attr("href");
         });
     });
 </script>

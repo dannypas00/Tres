@@ -95,7 +95,7 @@
                 counting++;
             }
 
-            string Url = "Players.cshtml/" + urlcode;
+            string Url = "Players.cshtml/?rc=" + urlcode;
             Response.Redirect("~/" + Url);
         }
     }

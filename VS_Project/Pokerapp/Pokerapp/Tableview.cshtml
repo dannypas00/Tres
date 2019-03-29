@@ -1,14 +1,17 @@
 ﻿@using WebMatrix.Data
 
 @{
+    Layout = "~/_Layout.cshtml";
+    Page.Title = "Table View";
+
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-    string url = Request.Url.AbsolutePath;
-    string urlcode = url.Substring(url.Length - 7);
 
-    int table = Convert.ToInt32(Session["tablenumber"]);
+
+    int urlcode = Int32.Parse(Request.QueryString["rc"]);
+    int table = Int32.Parse(Request.QueryString["tn"]);
 
     var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, table);
     int aantal = namen.Count();
@@ -26,30 +29,107 @@
         Response.Redirect("~/" + Url);
     }
 }
-
-<html>
-<head>
-<title>Tableview</title>
-</head>
-<body>
-    <h1>Table @table</h1>
-    <br />
-    <div>
-        @foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, urlcode, table))
-        {
-            @a.Name
-            <img src="~/stoel.png" name="chair" />
-        }
-    </div><br />
-    <div>
-        <img src="~/tafel.png" name="pokertable" />
-    </div>
-    <br /><div>
-    @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", urlcode, table, tweede))
-    {
-        <img src="~/stoel.png" name="chair" />
-        @a.Name
+<style>
+    .gridd {
+        display: grid;
+        grid-template-columns: 20% 20% 20% 20% 20%;
+        grid-template-rows: 20% 30% 30% 20%;
     }
-</div>
-</body>
-</html>
+    .chair{
+        grid-column-start: auto;
+        order: inherit;
+    }
+    .chair2{
+        grid-row-start: 4;
+        grid-column-start: auto;
+        order:inherit;
+    }
+    .table {
+        flex:auto;
+        grid-area: 2 / 2 / 4 / 5;
+    }
+    .white{
+        grid-column: 1;
+        grid-row: 1;
+    }
+    .white2 {
+        grid-column: 5;
+        grid-row: 1;
+    }
+    .white3 {
+        grid-column: 1;
+        grid-row: 4;
+    }
+    .white4 {
+        grid-column: 5;
+        grid-row-end: 5;
+    }
+</style>
+    <div class="py-5">
+        <div class="container">
+
+                <div class="col-md-12 text-center">
+                    <h1>Table @table</h1>
+                </div>
+                <div class="gridd">
+
+                    <div class="white"></div>
+                    <div class="white2"></div>
+                    <div class="white3"></div>
+                    <div class="white4"></div>
+                    @if(aantal <= 7){
+                     foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", urlcode, table, tweede)){
+                    <div class="chair2">
+
+                        <img src="stoel.png" alt="chair" style="width:75px;height:75px" />
+
+                        <b>@a.Name</b>
+
+                    </div>
+                    }
+
+                    foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, urlcode, table))
+                                 {
+
+                    <div class="chair">
+
+                        <img src="stoel.png" alt="chair" style="width:75px;height:75px" />
+
+                        <b>@a.Name</b>
+
+                    </div>
+                                }
+                    }
+                    @if(aantal > 7){
+                    foreach (var a in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name ASC",  urlcode, table)){
+                    <div class="chair">
+
+                        <img src="stoel.png" alt="chair" style="width:75px;height:75px" />
+
+                        <b>@a.Name</b>
+
+                    </div>
+                    }
+                    }
+
+
+                    <div class="table">
+                        <img src="~/tafel.png" name="pokertable" style="height:250px; width:100%" />
+                    </div>
+
+
+                    @*@foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", urlcode, table, tweede))
+        {
+                                    <div class="item">
+
+                                        <img src="stoel.png" alt="chair" style="width:75px;height:75px" />
+
+                                        <b>@a.Name</b>
+
+                                    </div>
+        }*@
+
+                </div>
+                    </div>
+                </div>
+
