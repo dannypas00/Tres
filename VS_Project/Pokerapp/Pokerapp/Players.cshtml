@@ -45,15 +45,4 @@
                 </div>
             }
         </div>
-        <div ="col">
-            @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
-            {
-                @row.Name<br />
-            }
-            <form method="post">
-                <input type="submit" name="Proceed" value=i />
-            </form>
-            @players
-        </div><br />
     </div>
-</div>
