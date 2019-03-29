@@ -1,6 +1,10 @@
 @using WebMatrix.Data
 
 @{
+
+    Layout = "~/_Layout.cshtml";
+    Page.Title = "Add Players";
+
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
@@ -23,30 +27,51 @@
         }
     }
 }
-<div class="container">
-    <div class="row">
-        @for (int i = 0; i < amount; i++)
-        {
-            int tbl_nr = i + 1;
-            <div class="row" id="names">
-                <div class="col">
-                    <img src="~/tafel.png" style="height:200px;width:300px" />
-                </div>
-                <div class="col" id="namelist">
-                    <ul style="list-style-type:none">
-                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
-                        {
-                            <li>@row.Name</li>
-                        }
 
-                        <li>
-                            <form method="post">
-                                <input type="submit" name="Proceed" value=@tbl_nr />
-                            </form>
-                        </li>
-                    </ul>
+
+
+<div class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h1>Tables</h1>
+            </div>
+        </div>
+        <div class="col-md-6">
+            @for (int i = 0; i < amount; i++)
+            {
+                int tbl_nr = i + 1;
+            string Url = "Tableview.cshtml?rc=" + urlcode + "&tn=" + tbl_nr;
+            <form method="post">
+                <div class="clickable row" style="cursor:pointer; padding-top:2em">
+                    <div class="col-md-9">
+                        <div style="background-image: url(/tafel.png) ;height:200px;width:100%"></div>
+                    </div>
+                    <div class="col-md-3 d-flex flex-column align-items-start justify-content-center order-1 order-lg-2">
+                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
+                            {
+                        <p class="mb-0"><b>@row.Name</b></p>
+                            }
+
+
+
+
+                    </div>
+
+                    <a href=@Url></a>
                 </div>
             </div>
         }
+            </form>
+                }
+        </div>
     </div>
 </div>
+</div>
+<script>
+    jQuery(document).ready(function ($) {
+        $(".clickable").click(function () {
+            window.location = $(this).find("a:first").attr("href");
+        });
+    });
+</script>
