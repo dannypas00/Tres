@@ -13,70 +13,18 @@
     {
         if (IsPost && Convert.ToInt32(Request["Proceed"]) == i)
         {
-            Session["tablenumber"] = i;
-            string Url = "Tableview.cshtml/" + urlcode;
+            string table = i.ToString();
+            string Url = "Tableview.cshtml/" + urlcode + "/" + table;
             Response.Redirect("~/" + Url);
         }
     }
-
-    int max_size = db.QueryValue("SELECT Tbl_Max_Size FROM Room WHERE Room_Code = @0", urlcode);
-    int min_size = db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", urlcode);
-    int needed = amount;
-    var mount = db.Query("SELECT Name FROM Players WHERE Room_Code = @0", urlcode);
-    int players = 0;
-    foreach(var a in mount)
-    {
-        players++;
-    }
-
-    var tables = db.Query("SELECT DISTINCT Tbl_nr FROM Players WHERE Room_Code = @0", urlcode);
-    int tablenr = 0;
-    foreach(var a in tables)
-    {
-        tablenr++;
-        var table = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tablenr);
-        int player = 0;
-        foreach (var b in table)
-        {
-            player++;
-        }
-
-        if (min_size >= player)
-        {
-            <script>
-                alert("The minimum size has been reached!");
-            </script>
-
-            //shuffle
-        }
-    }
 }
-
-<html>
-<head>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <title>Players</title>
-    <style>
-        #names
+<div class="container">
+    <div class="row">
+        @for (int i = 0; i < amount; i++)
         {
-            padding:10px;
-            margin:10px;
-            int tbl_nr = i;
-        }
-        #namelist
-        {
-            margin-top:20px;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <div class="row">
-            @for (int i = 0; i < amount; i++)
-            {
-                int tbl_nr = i+1;
-                <div class="row" id="names">
+            int tbl_nr = i + 1;
+            <div class="row" id="names">
                 <div class="col">
                     <img src="~/tafel.png" style="height:200px;width:300px" />
                 </div>
@@ -94,20 +42,7 @@
                         </li>
                     </ul>
                 </div>
-                </div>
-            }
-        </div>
-        <div ="col">
-            @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
-            {
-                @row.Name<br />
-            }
-            <form method="post">
-                <input type="submit" name="Proceed" value=@i />
-            </form>
-            @players
-        </div><br />
+            </div>
+        }
     </div>
-
-</body>
-</html>
+</div>
