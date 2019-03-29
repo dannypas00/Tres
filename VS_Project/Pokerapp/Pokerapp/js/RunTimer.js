@@ -14,6 +14,11 @@
         }
     });
 
+    function pauseTimer() {
+
+        alert("Stopped");
+    }
+
     function startTimer(timer) {
         var timer = timer.split(":"); // Split timer
 
@@ -35,8 +40,11 @@
         //
         setInterval(function () {
             var displayHours = currentHours;
-            var displayMinutes = currentMinutes;
+            var c = currentMinutes;
             var displaySeconds = currentSeconds;
+
+            sessionStorage.setItem("timer", displayHours);
+
 
             if (currentHours.toString().length < 2) {
                 displayHours = "0" + currentHours;
@@ -52,10 +60,12 @@
 
             document.querySelector('.timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
 
+
             // if condition is met round + 1
             if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
                 round++;
                 document.querySelector('#rnumber').innerHTML = round;
+              
                 currentHours = 0;
                 currentMinutes = 0;
                 currentSeconds = 0;
@@ -73,6 +83,5 @@
                 currentMinutes = 0;
             }
         }, 1000);
-
     }
 });
