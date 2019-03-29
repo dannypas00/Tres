@@ -5,19 +5,16 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
+    if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
+    {
+        Response.Redirect("~/Login.cshtml");
+    }
+
     Random r = new Random();
     var linkcode = r.Next(1000000, 9999999);
 
     var selectQuery = "SELECT * FROM Room WHERE Room_Code = @0";
     var selectRoomcodes = db.QuerySingle(selectQuery, linkcode);
-
-    if (!IsPost)
-    {
-        //if (Username != UsernameCheck || Password != PasswordCheck)
-        //{
-        //    Response.Redirect("Login.cshtml");
-        //}
-    }
 
     if (selectRoomcodes == null)
     {

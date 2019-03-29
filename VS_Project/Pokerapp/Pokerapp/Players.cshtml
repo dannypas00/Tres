@@ -1,10 +1,14 @@
-﻿@using WebMatrix.Data
+@using WebMatrix.Data
 
 @{
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
+    if (Request.Cookies["LoginCookie"].Value != "true")
+    {
+        Response.Redirect("~/Gameselect.cshtml");
+    }
 
     string url = Request.Url.AbsolutePath;
     string urlcode = url.Substring(url.Length - 7);
@@ -13,37 +17,18 @@
     {
         if (IsPost && Convert.ToInt32(Request["Proceed"]) == i)
         {
-            Session["tablenumber"] = i;
-            string Url = "Tableview.cshtml?roomcode=" + urlcode;
+            string table = i.ToString();
+            string Url = "Tableview.cshtml/" + urlcode + "/" + table;
             Response.Redirect("~/" + Url);
         }
     }
 }
-
-<html>
-<head>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <title>Players</title>
-    <style>
-        #names
+<div class="container">
+    <div class="row">
+        @for (int i = 0; i < amount; i++)
         {
-            padding:10px;
-            margin:10px;
-        }
-        #namelist
-        {
-            margin-top:20px;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <div class="row">
-            @for (int i = 0; i < amount; i++)
-            {
-                int tbl_nr = i+1;
-                <div class="row" id="names">
+            int tbl_nr = i + 1;
+            <div class="row" id="names">
                 <div class="col">
                     <img src="~/tafel.png" style="height:200px;width:300px" />
                 </div>
@@ -61,10 +46,7 @@
                         </li>
                     </ul>
                 </div>
-                </div>
-            }
-        </div>
+            </div>
+        }
     </div>
-
-</body>
-</html>
+</div>

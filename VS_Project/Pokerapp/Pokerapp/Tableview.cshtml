@@ -5,10 +5,12 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-    string urlcode = Request.QueryString["roomcode"];
+    string url = Request.Url.AbsolutePath;
+    string[] urlCode = url.Split('/');
+    string table = urlCode[3];
+    string roomCode = urlCode[2];
 
-    int table = Convert.ToInt32(Session["tablenumber"]);
-    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, table);
+    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     int aantal = namen.Count();
     double gedeeld = aantal / 2;
     int helft = Convert.ToInt32(gedeeld);
@@ -18,33 +20,71 @@
     {
         tweede = eerste;
     }
-    if (aantal > 10)    //Haal max spelers uit database
+
+    if (IsPost && !Request["blindnext"].IsEmpty())
     {
-        string Url = "Players.cshtml/" + urlcode;   //Needs fixing
-        Response.Redirect("~/" + Url);
+        int current_Round = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
+        int new_Round = current_Round + 1;
+        db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", new_Round, roomCode);
+        <script>
+            alert("The blind has been raised!");
+        </script>
+    }
+
+    int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
+    var blind_id = db.Query("SELECT Top (@0) ID FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
+
+    var small_blind = db.Query("SELECT TOP (@0) Value FROM Blinds WHERE Room_Code = @1 AND S_B = 's' ORDER BY ID ASC", id, roomCode);
+    int small = 0;
+    foreach (var a in small_blind)
+    {
+        if (a.Value > small)
+        {
+            small = a.Value;
+        }
+    }
+    var big_blind = db.Query("SELECT TOP (@0) Value FROM Blinds WHERE Room_Code = @1 AND S_B = 'b' ORDER BY ID ASC", id, roomCode);
+    int big = 0;
+    foreach (var a in big_blind)
+    {
+        if (a.Value > big)
+        {
+            big = a.Value;
+        }
+    }
+
+    if (!IsPost)
+    {
+        db.Execute("UPDATE Room SET Small_Blind = @0, Big_Blind = @1 WHERE Room_Code = @2", small, big, roomCode);
     }
 }
 
+<h1>Table @table</h1>
+<br />
+<div>
+    @{
 
+        //Jorit, fix je code, het werkt voor geen meter.
 
-<html>
-<head>
-    <title>Tableview</title>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="js/RunTimer.js"></script>
-
-</head>
-<body>
-<div id="urlcode" style="display:none;">@urlcode</div>
-
-    <div name="timer" class="timer"></div>
-    <div class="round">This is round: <span id="rnumber"></span></div>
-
+        @*foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, roomCode, table))
+        {
+            player++;
+        }
+        if (min_size >= player)
+        {
+            <script>
+                alert("The minimum size has been reached!");
+            </script>
+            Shuffle shuffle = new Shuffle();
+            shuffle.ShuffleTable(db, roomCode);
+            string Url = "Players.cshtml/" + roomCode;
+            Response.Redirect("~/" + Url);
+        }*@
+    }
     <h1>Table @table</h1>
     <br />
     <div>
-        @foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, urlcode, table))
+        @foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, roomCode, table))
         {
             @a.Name
             <img src="~/stoel.png" name="chair" />
@@ -55,12 +95,10 @@
     </div>
     <br />
     <div>
-        @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", urlcode, table, tweede))
+        @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", roomCode, table, tweede))
         {
             <img src="~/stoel.png" name="chair" />
             @a.Name
         }
     </div>
-
-</body>
-</html>
+</div>
