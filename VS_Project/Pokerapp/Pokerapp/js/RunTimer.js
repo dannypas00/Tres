@@ -14,11 +14,7 @@
         }
     });
 
-    function pauseTimer() {
-
-        alert("Stopped");
-    }
-
+   
     function startTimer(timer) {
         var timer = timer.split(":"); // Split timer
 
@@ -37,7 +33,7 @@
         var round = 1;
         document.querySelector('#rnumber').innerHTML = round;
 
-        //
+        //Increment timer
         setInterval(function () {
             var displayHours = currentHours;
             var displayMinutes = currentMinutes;
