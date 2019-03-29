@@ -1,10 +1,10 @@
 ﻿@using WebMatrix.Data
-@using Microsoft.VisualBasic
 
 @{
     Layout = "~/_Layout.cshtml";
     Page.Title = "Add Players";
 
+    //Database connection
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
@@ -14,37 +14,28 @@
         Response.Redirect("~/Login.cshtml");
     }
 
-    //request the last 7 digits of the urgl (roomcode)
-    string url = Request.Url.AbsolutePath;
-    int urlcode = Convert.ToInt32(url.Substring(url.Length - 7));
+    //Gather roomcode
+    int urlcode = Convert.ToInt32(Request.Url.AbsolutePath.Split('/')[2]);
 
     int number = 1;         //later toevoegen table number
     int rebuy = 0;          //aantal rebuys standaard op 0
 
-
-
-    if (IsPost && Validation.IsValid())
+    if (IsPost)
     {
         string name = Request["name"];
-
-        if (Request["AddName"] == "Add")
+        if (Request["AddName"] == "Add" && db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1", name, urlcode) is null)
         {
-            if (db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1", name, urlcode) is null)
-            {
-                db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr, Rebuy) VALUES (@0, @1, @2, @3)", name, urlcode, number, rebuy);
-                name = null;
-            }
+            db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr, Rebuy) VALUES (@0, @1, @2, @3)", name, urlcode, number, rebuy);
+            name = null;
         }
-        if (Request["delete"] == "delete")
+        else if (Request["delete"] == "delete")
         {
-            string rowname = Request.Form["rownameform"];
-            db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", rowname, urlcode);
+            db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", Request.Form["rownameform"], urlcode);
         }
-        if (Request["Proceed"] == "Proceed")
+        else if (Request["Proceed"] == "Proceed")
         {
             Shuffle shuffle = new Shuffle();
             shuffle.ShuffleTable(db, urlcode);
-
             Response.Redirect("~/PlayingAdmin/" + urlcode);
         }
     }

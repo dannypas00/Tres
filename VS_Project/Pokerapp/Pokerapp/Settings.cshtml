@@ -1,12 +1,18 @@
 ﻿@using WebMatrix.Data
-
 @{
     Layout = "~/_Layout.cshtml";
     Page.Title = "Settings";
+    //Database connection
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
+    //Retrieving the url code
+    string url = Request.Url.AbsolutePath;
+    string urlcode = url.Substring(url.Length - 7);
+    int code = Convert.ToInt32(urlcode);
+
+    #region Validators
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
         Response.Redirect("~/Login.cshtml");
@@ -26,11 +32,9 @@
     Validation.Add("chip3", Validator.StringLength(3, 1, "MESSAGE"));
     Validation.Add("chip4", Validator.StringLength(3, 1, "MESSAGE"));
     Validation.Add("chip5", Validator.StringLength(3, 1, "MESSAGE"));
+    #endregion
 
-    string url = Request.Url.AbsolutePath;
-    string urlcode = url.Substring(url.Length - 7);
-    int code = Convert.ToInt32(urlcode);
-
+    #region Setting default
     var round_time = "00:30:00";
     var pause_time = "00:00:00";
     var blind_time = "00:00:00";
@@ -44,11 +48,14 @@
     int chip_worth3 = 3;
     int chip_worth4 = 4;
     int chip_worth5 = 5;
+    #endregion
 
-    var room = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
+    #region Retrieving from database
+    dynamic room = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
     if (room == code)
     {
         //Comments plz
+        //Haal de object "room" op uit de database en haal daar alle waardes uit. Is minder resource intensive
         round_time = Convert.ToString(db.QueryValue("SELECT Round_Time FROM Room WHERE Room_Code = @0", code));
         pause_time = Convert.ToString(db.QueryValue("SELECT Pause_Time FROM Room WHERE Room_Code = @0", code));
         blind_time = Convert.ToString(db.QueryValue("SELECT Blind_Time FROM Room WHERE Room_Code = @0", code));
@@ -63,48 +70,54 @@
         chip_worth4 = Convert.ToInt32(db.QueryValue("SELECT Chip_4_Worth FROM Room WHERE Room_Code = @0", code));
         chip_worth5 = Convert.ToInt32(db.QueryValue("SELECT Chip_5_Worth FROM Room WHERE Room_Code = @0", code));
     }
+    #endregion
+
+    #region Saving logic
+    void Save()
+    {
+        int players = Convert.ToInt32(Request["nr_players"]);
+        var time = Request["round_time"];
+        int min_table_size = Convert.ToInt32(Request["min_table"]);
+        int max_table_size = Convert.ToInt32(Request["max_table"]);
+        int allow_rebuy = Convert.ToInt32(Request["rebuy"]);
+        var pause = Request["pause_time"];
+        var blind = Request["blind_time"];
+        int value = Convert.ToInt32(Request["start_value"]);
+        int tbl_amount = Convert.ToInt32(Request["tbl_amount"]);
+        int chip1 = Convert.ToInt32(Request["chip1"]);
+        int chip2 = Convert.ToInt32(Request["chip2"]);
+        int chip3 = Convert.ToInt32(Request["chip3"]);
+        int chip4 = Convert.ToInt32(Request["chip4"]);
+        int chip5 = Convert.ToInt32(Request["chip5"]);
+        var started = 0;
+        int blind_round = 1;
+        int small = 0;
+        int big = 0;
+
+        var check = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
+        if (check == code)
+        {
+            db.Execute("UPDATE Room SET Room_Code = @0, Tbl_Min_Size = @1, Started = @2, Chip_1_Worth = @3, Chip_2_Worth = @4, Chip_3_Worth = @5, Chip_4_Worth = @6, Chip_5_Worth = @7, Round_Time = @8, Pause_Time = @9, Blind_Time = @10, Allow_Rebuy = @11, Start_Value = @12, Tbl_Amount = @13, Tbl_Max_Size = @14, Blind_Round = 1, Small_Blind = 0, Big_Blind = 0 WHERE Room_Code = @0"
+            , code, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size);
+        }
+        else
+        {
+            db.Execute("INSERT INTO Room (Room_Code, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Blind_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size, Blind_Round, Small_Blind, Big_Blind)" +
+            "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17)", code, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, blind_round, small, big);
+        }
+    }
+    #endregion
 
     if (IsPost && Validation.IsValid() && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {
         if (Request["Proceed"] == "Proceed")
         {
+            Save();
             Response.Redirect("~/AdminPage.cshtml/" + code);
         }
         else if (Request["save"] == "Save")
         {
-            int players = Convert.ToInt32(Request["nr_players"]);
-            var time = Request["round_time"];
-            int min_table_size = Convert.ToInt32(Request["min_table"]);
-            int max_table_size = Convert.ToInt32(Request["max_table"]);
-            int allow_rebuy = Convert.ToInt32(Request["rebuy"]);
-            var pause = Request["pause_time"];
-            var blind = Request["blind_time"];
-            int value = Convert.ToInt32(Request["start_value"]);
-            int tbl_amount = Convert.ToInt32(Request["tbl_amount"]);
-            int chip1 = Convert.ToInt32(Request["chip1"]);
-            int chip2 = Convert.ToInt32(Request["chip2"]);
-            int chip3 = Convert.ToInt32(Request["chip3"]);
-            int chip4 = Convert.ToInt32(Request["chip4"]);
-            int chip5 = Convert.ToInt32(Request["chip5"]);
-            var started = 0;
-            int blind_round = 1;
-            int small = 0;
-            int big = 0;
-
-            var check = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
-            if (check == code)
-            {
-                db.Execute("UPDATE Room SET Room_Code = @0, Tbl_Min_Size = @1, Started = @2, Chip_1_Worth = @3, Chip_2_Worth = @4, Chip_3_Worth = @5, Chip_4_Worth = @6, Chip_5_Worth = @7, Round_Time = @8, Pause_Time = @9, Blind_Time = @10, Allow_Rebuy = @11, Start_Value = @12, Tbl_Amount = @13, Tbl_Max_Size = @14, Blind_Round = 1, Small_Blind = 0, Big_Blind = 0 WHERE Room_Code = @0"
-                , code, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size);
-            }
-            else
-            {
-                db.Execute("INSERT INTO Room (Room_Code, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Blind_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size, Blind_Round, Small_Blind, Big_Blind)" +
-                "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17)", code, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, blind_round, small, big);
-            }
-
-            string Url = "AdminPage.cshtml/" + code;
-            Response.Redirect("~/" + Url);
+            Save();
         }
         else
         {
