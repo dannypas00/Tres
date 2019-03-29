@@ -6,6 +6,11 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
+    if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
+    {
+        Response.Redirect("~/Login.cshtml");
+    }
+
     //request the last 7 digits of the urgl (roomcode)
     string url = Request.Url.AbsolutePath;
     int urlcode = Convert.ToInt32(url.Substring(url.Length - 7));
@@ -13,13 +18,7 @@
     int number = 1;         //later toevoegen table number
     int rebuy = 0;          //aantal rebuys standaard op 0
 
-    if (!IsPost)
-    {
-        //if (Request.Form["adminLogin"] != "true")
-        //{
-        //    Response.Redirect("~/Login.cshtml");
-        //}
-    }
+
 
     if (IsPost && Validation.IsValid())
     {
@@ -42,7 +41,7 @@
         {
             Shuffle shuffle = new Shuffle();
             shuffle.ShuffleTable(db, urlcode);
-            
+
             Response.Redirect("~/PlayingAdmin/" + urlcode);
         }
     }

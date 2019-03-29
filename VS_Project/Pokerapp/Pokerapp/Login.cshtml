@@ -3,7 +3,8 @@
     {
         if (Request.Form["name"] == "TimoSchraa" && Request.Form["password"] == "password")
         {
-            Html.Hidden("adminLogin", "true");
+            Response.Cookies["LoginCookie"].Value = "true";
+            Response.Cookies["LoginCookie"].Expires = DateTime.Now.AddHours(3);
             Response.Redirect("~/Gameselect.cshtml");
         }
         else
@@ -20,5 +21,6 @@
         <label for="password">Password:</label><br />
         <input type="password" name="password" placeholder="Password" /><br /><br />
         <input type="submit" name="Login" value="Login"><br />
+        
     </form>
 </div>
