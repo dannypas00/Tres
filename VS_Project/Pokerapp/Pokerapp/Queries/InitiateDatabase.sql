@@ -13,7 +13,6 @@ DROP TABLE Room;
 CREATE TABLE Room
 (
     [Room_Code] INT NOT NULL PRIMARY KEY,
-    [Nr_Of_Players] INT NOT NULL,
     [Tbl_Min_Size] INT NOT NULL,
     [Started] CHAR(1) NOT NULL,
     [Chip_1_Worth] INT NOT NULL,
@@ -28,6 +27,17 @@ CREATE TABLE Room
     [Start_Value] INT NOT NULL,
     [Tbl_Amount] INT NOT NULL,
     [Tbl_Max_Size] INT NOT NULL, 
+	[Blind_Round] INT NOT NULL,
 	[Small_Blind] INT NOT NULL,
-	[Big_Blind] INT NOT NULL,
+	[Big_Blind] INT NOT NUll,
+);
+
+DROP TABLE Blinds;
+CREATE TABLE Blinds
+(
+[Room_Code] INT NOT NULL,
+[ID] INT NOT NULL,
+[S_B] CHAR(1) NOT NULL,
+[Value] INT NOT NULL,
+PRIMARY KEY ([Room_Code],[ID], [S_B]), 
 );
