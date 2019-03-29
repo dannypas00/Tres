@@ -1,0 +1,40 @@
+﻿body {
+    background-color: aliceblue;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.textInput {
+    border-radius: 20px;
+    height: 40px;
+    width: auto;
+    background-color: ghostwhite;
+    padding: 5px;
+    font-family: 'Comic Sans MS';
+}   
+.buttonInput {
+    border-radius: 7px;
+    height: 24px;
+    width: auto;
+}
+.addCode {
+    min-width: 20%;
+    height: 20px;
+    display: block;
+}
+.pauze {
+    rotation: 90deg;
+}
+.roomsTable {
+    height: 90%;
+    margin: 5%;
+    display: block;
+}
+.hidden {
+    display: none;
+}
+.centered {
+    justify-content: center;
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 80%
+}

@@ -9,14 +9,23 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
+    if (Request.Cookies["LoginCookie"].Value != "true")
+    {
+        Response.Redirect("~/Gameselect.cshtml");
+    }
 
-
-
-
-    int urlcode = Int32.Parse(Request.QueryString["rc"]);
+    string url = Request.Url.AbsolutePath;
+    string urlcode = url.Substring(url.Length - 7);
     int amount = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
-
-
+    for (int i = 1; i <= amount; i++)
+    {
+        if (IsPost && Convert.ToInt32(Request["Proceed"]) == i)
+        {
+            string table = i.ToString();
+            string Url = "Tableview.cshtml/" + urlcode + "/" + table;
+            Response.Redirect("~/" + Url);
+        }
+    }
 }
 
 
@@ -47,15 +56,17 @@
 
 
 
-
                     </div>
 
                     <a href=@Url></a>
                 </div>
+            </div>
+        }
             </form>
                 }
         </div>
     </div>
+</div>
 </div>
 <script>
     jQuery(document).ready(function ($) {
