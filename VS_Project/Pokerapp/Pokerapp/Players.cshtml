@@ -22,7 +22,7 @@
         if (IsPost && Convert.ToInt32(Request["Proceed"]) == i)
         {
             string table = i.ToString();
-            string Url = "Tableview.cshtml/" + urlcode + "/" + table;
+            string Url = "Tableview.cshtml?roomcode=" + urlcode + "&table=" + table;
             Response.Redirect("~/" + Url);
         }
     }
@@ -41,33 +41,33 @@
             @for (int i = 0; i < amount; i++)
             {
                 int tbl_nr = i + 1;
-            string Url = "Tableview.cshtml?rc=" + urlcode + "&tn=" + tbl_nr;
-            <form method="post">
-                <div class="clickable row" style="cursor:pointer; padding-top:2em">
-                    <div class="col-md-9">
-                        <div style="background-image: url(/tafel.png) ;height:200px;width:100%"></div>
-                    </div>
-                    <div class="col-md-3 d-flex flex-column align-items-start justify-content-center order-1 order-lg-2">
-                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
+                string Url = "Tableview.cshtml?rc=" + urlcode + "&tn=" + tbl_nr;
+                <form method="post">
+                    <div class="clickable row" style="cursor:pointer; padding-top:2em">
+                        <div class="col-md-9">
+                            <div style="background-image: url(/tafel.png) ;height:200px;width:100%"></div>
+                        </div>
+                        <div class="col-md-3 d-flex flex-column align-items-start justify-content-center order-1 order-lg-2">
+                            @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
                             {
-                        <p class="mb-0"><b>@row.Name</b></p>
+                                <p class="mb-0"><b>@row.Name</b></p>
                             }
 
 
 
 
-                    </div>
+                        </div>
 
-                    <a href=@Url></a>
-                </div>
-            </div>
-        }
-            </form>
-                }
+                        <a href=@Url></a>
+                    </div>
+                </form>
+            }
+        </div>
+
+     
+
         </div>
     </div>
-</div>
-</div>
 <script>
     jQuery(document).ready(function ($) {
         $(".clickable").click(function () {
