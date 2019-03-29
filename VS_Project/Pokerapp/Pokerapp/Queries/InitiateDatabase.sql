@@ -33,3 +33,12 @@ CREATE TABLE Room
     PRIMARY KEY CLUSTERED ([Room_Code] ASC)
 );
 
+DROP TABLE Blinds;
+CREATE TABLE Blinds
+(
+[Room_Code] INT NOT NULL,
+[ID] INT NOT NULL,
+[S_B] CHAR(1) NOT NULL,
+[Value] INT NOT NULL,
+PRIMARY KEY ([Room_Code],[ID], [S_B]), 
+);
