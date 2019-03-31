@@ -1,13 +1,20 @@
 ﻿$(document).ready(function () {
-    var roomcode = $("#urlcode").html();
-    $("#urlcode").remove();
+    var roomcode = $("#roomcode").html();
+    $("#roomcode").remove();
 
+    var table = $("#table").html();
+    $("#table").remove();
+
+    console.log(roomcode);
+    console.log(table);
     //Ajax connect with url Timer get the data roomcode
     $.ajax({
         url: "Timer.cshtml",
         type: "get",
         data: {
-            roomcode: roomcode
+            roomcode: roomcode,
+            table: table
+
         },
         success: function (response) {
             startTimer(response); // Returns timer from db

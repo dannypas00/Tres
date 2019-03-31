@@ -1,17 +1,14 @@
 ﻿@using WebMatrix.Data
 
 @{
-    Layout = "~/_Layout.cshtml";
-    Page.Title = "Table View";
-
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
     string url = Request.Url.AbsolutePath;
-    string[] urlCode = url.Split('/');
-    string table = urlCode[3];
-    string roomCode = urlCode[2];
+    string[] urlcode = url.Split('/');
+    string roomCode = urlcode[2];
+    string table = urlcode[3];
 
     var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     int aantal = namen.Count();
@@ -23,67 +20,29 @@
     {
         tweede = eerste;
     }
-
-    if (IsPost && !Request["blindnext"].IsEmpty())
+    if (aantal > 10)    //Haal max spelers uit database
     {
-        int current_Round = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
-        int new_Round = current_Round + 1;
-        db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", new_Round, roomCode);
-        <script>
-            alert("The blind has been raised!");
-        </script>
-    }
-
-    int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
-    var blind_id = db.Query("SELECT Top (@0) ID FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
-
-    var small_blind = db.Query("SELECT TOP (@0) Value FROM Blinds WHERE Room_Code = @1 AND S_B = 's' ORDER BY ID ASC", id, roomCode);
-    int small = 0;
-    foreach (var a in small_blind)
-    {
-        if (a.Value > small)
-        {
-            small = a.Value;
-        }
-    }
-    var big_blind = db.Query("SELECT TOP (@0) Value FROM Blinds WHERE Room_Code = @1 AND S_B = 'b' ORDER BY ID ASC", id, roomCode);
-    int big = 0;
-    foreach (var a in big_blind)
-    {
-        if (a.Value > big)
-        {
-            big = a.Value;
-        }
-    }
-
-    if (!IsPost)
-    {
-        db.Execute("UPDATE Room SET Small_Blind = @0, Big_Blind = @1 WHERE Room_Code = @2", small, big, roomCode);
+        string Url = "Players.cshtml/" + urlcode;   //Needs fixing
+        Response.Redirect("~/" + Url);
     }
 }
 
-<h1>Table @table</h1>
-<br />
-<div>
-    @{
 
-        //Jorit, fix je code, het werkt voor geen meter.
 
-        @*foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, roomCode, table))
-        {
-            player++;
-        }
-        if (min_size >= player)
-        {
-            <script>
-                alert("The minimum size has been reached!");
-            </script>
-            Shuffle shuffle = new Shuffle();
-            shuffle.ShuffleTable(db, roomCode);
-            string Url = "Players.cshtml/" + roomCode;
-            Response.Redirect("~/" + Url);
-        }*@
-    }
+<html>
+<head>
+    <title>Tableview</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+</head>
+<body>
+    <div id="roomcode" style="display:none;">@roomCode</div>
+    <div id="table" style="display:none;">@table</div>
+
+    <div name="timer" class="timer"></div>
+    <div class="round">This is round: <span id="rnumber"></span></div>
+
     <h1>Table @table</h1>
     <br />
     <div>
@@ -104,4 +63,8 @@
             @a.Name
         }
     </div>
-</div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+</body>
+</html>
