@@ -7,9 +7,8 @@
 
     string url = Request.Url.AbsolutePath;
     string[] urlcode = url.Split('/');
-    string roomCode = urlcode[2];
-    string table = urlcode[3];
-
+    int roomCode = Request["roomcode"].AsInt();
+    int table = Request["table"].AsInt();
     var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     int aantal = namen.Count();
     double gedeeld = aantal / 2;
@@ -65,6 +64,7 @@
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="js/RunTimer.js"></script>
 
 </body>
 </html>

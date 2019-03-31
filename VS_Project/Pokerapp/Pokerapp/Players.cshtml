@@ -19,10 +19,10 @@
     int amount = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
     for (int i = 1; i <= amount; i++)
     {
-        if (IsPost && Convert.ToInt32(Request["Proceed"]) == i)
+        if (IsPost && Convert.ToInt32(Request["table"]) == i)
         {
             string table = i.ToString();
-            string Url = "Tableview.cshtml/" + urlcode + "/" + table;
+            string Url = "Tableview.cshtml?roomcode=" + urlcode + "&table=" + table;
             Response.Redirect("~/" + Url);
         }
     }
@@ -49,7 +49,9 @@
 
                             <li>
                                 <form method="post">
-                                    <input type="submit" name="Proceed" value=@tbl_nr />
+                                    <input type="hidden" name="roomcode" value=@urlcode />
+                                    <input type="submit" name="table" value=@tbl_nr />
+
                                 </form>
                             </li>
                         </ul>
