@@ -1,17 +1,22 @@
 ﻿@{
+    //load layout
     Layout = "_Layout.cshtml";
     Page.Title = "Login";
 
+    //if the page is posted and validation is valid
     if (IsPost && Validation.IsValid())
     {
+        //check if name and password are correct
         if (Request.Form["name"] == "TimoSchraa" && Request.Form["password"] == "password")
         {
+            //turn on a cookie for 3 hours
             Response.Cookies["LoginCookie"].Value = "true";
             Response.Cookies["LoginCookie"].Expires = DateTime.Now.AddHours(3);
             Response.Redirect("~/Gameselect.cshtml");
         }
         else
         {
+            //error message by wrong login
             <p style="color: red">Invalid credentials!</p>
         }
     }
