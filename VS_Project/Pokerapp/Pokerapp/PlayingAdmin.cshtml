@@ -19,9 +19,7 @@
     {
         switch (Request.Form["submit"])
         {
-            case "pauze":
-                //pauze logic//
-                break;
+  
             case "shuffle":
                 Shuffle shuffle = new Shuffle();
                 shuffle.ShuffleTable(db, urlcode);
@@ -45,20 +43,22 @@
         <h1>Game in progress</h1>
     </header>
     <div class="playingBody">
+        <div id="demo">
+            <button type="button" value="pauze" onclick="loadDoc()">Pause</button>
+        </div>
         <form name="updateSettings" method="post">
-            <button type="submit" value="pauze" name="submit" >Pauze the game</button>
             <button type="submit" value="shuffle" name="submit">Shuffle all players</button>
             <button type="submit" value="manage" name="submit">Add/remove players</button>
         </form>
         @for (int i = 0; i < tables; i++)
         {
             int tbl_Nr = i + 1;
-        <ul class="singleTableList" style="display: block; float:right; border: 3px solid gray;">
-            <h2>Table @tbl_Nr</h2>
-            @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_Nr))
-            {
-                <li class="singlePlayer">@row.Name</li>
-            }
+            <ul class="singleTableList" style="display: block; float:right; border: 3px solid gray;">
+                <h2>Table @tbl_Nr</h2>
+                @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_Nr))
+                {
+                    <li class="singlePlayer">@row.Name</li>
+                }
             </ul>
         }
         </ul>
@@ -66,3 +66,36 @@
 </div>
 <br />
 <a href=@linked>@linked</a>
+<script>
+    function loadDoc() {
+        let xhr = new XMLHttpRequest();
+
+        // 2. Configure it: GET-request for the URL /article/.../load
+        xhr.open('GET',  );
+
+        // 3. Send the request over the network
+        xhr.send();
+
+        // 4. This will be called after the response is received
+        xhr.onload = function () {
+            if (xhr.status != 200) { // analyze HTTP status of the response
+                alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
+            } else { // show the result
+                alert(`Done, got ${xhr.response.length} bytes`); // responseText is the server
+            }
+        };
+
+        xhr.onprogress = function (event) {
+            if (event.lengthComputable) {
+                alert(`Received ${event.loaded} of ${event.total} bytes`);
+            } else {
+                alert(`Received ${event.loaded} bytes`); // no Content-Length
+            }
+
+        };
+
+        xhr.onerror = function () {
+            alert("Request failed");
+        };
+    }
+</script>
