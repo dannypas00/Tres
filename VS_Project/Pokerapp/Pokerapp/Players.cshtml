@@ -1,44 +1,71 @@
-﻿@using WebMatrix.Data
+@using WebMatrix.Data
 
 @{
+
+    Layout = "~/_Layout.cshtml";
+    Page.Title = "Add Players";
+
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
-    z
+
+    if (Request.Cookies["LoginCookie"].Value != "true")
+    {
+        Response.Redirect("~/Gameselect.cshtml");
+    }
 
     string url = Request.Url.AbsolutePath;
     string urlcode = url.Substring(url.Length - 7);
-    int amount = Convert.ToInt32(Session["stringTbl_Needed"]);
+    int amount = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
     for (int i = 1; i <= amount; i++)
     {
-        if (IsPost && Convert.ToInt32(Request["Proceed"]) == i)
+        if (IsPost && Convert.ToInt32(Request["table"]) == i)
         {
-            Session["tablenumber"] = i;
-            string Url = "Tableview.cshtml/" + urlcode;
+            string table = i.ToString();
+            string Url = "Tableview.cshtml?roomcode=" + urlcode + "&table=" + table;
             Response.Redirect("~/" + Url);
         }
     }
 }
 
-<html>
-<head>
-    <title>Players</title>
-</head>
-<body>
-    <div class="row">
-        @for (int i = 1; i <= amount; i++)
-        {
-            int tbl_nr = i;
-            <div ="col">
-                @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
-                {
-                    @row.Name<br />
-                }
-                <form method="post">
-                    <input type="submit" name="Proceed" value=@i />
-                </form>
-            </div><br />
-        }
+
+
+<div class="py-5">
+    <div class="container">
+        <div class="row">
+            @for (int i = 0; i < amount; i++)
+            {
+                int tbl_nr = i + 1;
+                <div class="row" id="names">
+                    <div class="col">
+                        <img src="~/tafel.png" style="height:200px;width:300px" />
+                    </div>
+                    <div class="col" id="namelist">
+                        <ul style="list-style-type:none">
+                            @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
+                            {
+                                <li>@row.Name</li>
+                            }
+
+                            <li>
+                                <form method="post">
+                                    <input type="hidden" name="roomcode" value=@urlcode />
+                                    <input type="submit" name="table" value=@tbl_nr />
+
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
-</body>
-</html>
+</div>
+
+<script>
+    jQuery(document).ready(function ($) {
+        $(".clickable").click(function () {
+            window.location = $(this).find("a:first").attr("href");
+        });
+    });
+</script>
