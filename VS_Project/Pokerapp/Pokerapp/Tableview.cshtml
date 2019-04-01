@@ -1,6 +1,9 @@
 ﻿@using WebMatrix.Data
 
 @{
+    Layout = "~/_Layout.cshtml";
+    Page.Title = "Select Game";
+
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
@@ -71,14 +74,7 @@
         }
     }
 
-<html>
-<head>
-    <title>Tableview</title>
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-</head>
-<body>
     <div id="roomcode" style="display:none;">@roomCode</div>
     <div id="table" style="display:none;">@table</div>
 
@@ -114,6 +110,3 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="js/RunTimer.js"></script>
-
-</body>
-</html>
