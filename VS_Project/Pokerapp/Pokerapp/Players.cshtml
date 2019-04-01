@@ -36,13 +36,14 @@
             @for (int i = 0; i < amount; i++)
             {
                 int tbl_nr = i + 1;
-                <div class="row" id="names">
-                    <div class="col">
-                        <img src="~/tafel.png" style="height:200px;width:300px" />
-                    </div>
-                    <div class="col" id="namelist">
-                        <ul style="list-style-type:none">
-                            @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
+                string Url = "Tableview?rc=" + roomCode + "&tn=" + tbl_nr;
+                <form method="post">
+                    <div class="clickable row" style="cursor:pointer; padding-top:2em">
+                        <div class="col-md-9">
+                            <div style="background-image: url(/tafel.png) ;height:200px;width:100%"></div>
+                        </div>
+                        <div class="col-md-3 d-flex flex-column align-items-start justify-content-center order-1 order-lg-2">
+                            @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, tbl_nr))
                             {
                                 <li>@row.Name</li>
                             }

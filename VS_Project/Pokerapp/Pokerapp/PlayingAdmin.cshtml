@@ -37,7 +37,7 @@
     string prelink = Request.Url.AbsoluteUri;
     string[] link = prelink.Split('/');
     prelink = link[0] + "//" + link[2];
-    string linked = prelink + "/Players/" + urlcode;
+    string linked = prelink + "/Players?rc=" + urlcode;
 }
 
 <div>
