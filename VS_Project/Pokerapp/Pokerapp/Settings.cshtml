@@ -1,8 +1,10 @@
 ﻿@using WebMatrix.Data
 @{
+    //load loadout
     Layout = "~/_Layout.cshtml";
     Page.Title = "Settings";
-    //Database connection
+    
+    //database connection
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
@@ -13,44 +15,47 @@
     int code = Convert.ToInt32(urlcode);
 
     #region Validators
+    //check if cookie is still valid
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
         Response.Redirect("~/Login.cshtml");
     }
 
-    //Mogen comments bij
-    Validation.Add("round_time", Validator.StringLength(8, 8, "MESSAGE"));
-    Validation.Add("pause_time", Validator.StringLength(8, 0, "MESSAGE"));
-    Validation.Add("blind_time", Validator.StringLength(8, 0, "MESSAGE"));
-    Validation.Add("min_table", Validator.StringLength(2, 1, "MESSAGE"));
-    Validation.Add("max_table", Validator.StringLength(2, 1, "MESSAGE"));
-    Validation.Add("start_value", Validator.StringLength(3, 1, "MESSAGE"));
-    Validation.Add("table_amount", Validator.StringLength(2, 1, "MESSAGE"));
-    Validation.Add("rebuy", Validator.StringLength(1, 1, "MESSAGE"));
-    Validation.Add("chip1", Validator.StringLength(3, 1, "MESSAGE"));
-    Validation.Add("chip2", Validator.StringLength(3, 1, "MESSAGE"));
-    Validation.Add("chip3", Validator.StringLength(3, 1, "MESSAGE"));
-    Validation.Add("chip4", Validator.StringLength(3, 1, "MESSAGE"));
-    Validation.Add("chip5", Validator.StringLength(3, 1, "MESSAGE"));
+    //Validation for input
+    Validation.Add("round_time", Validator.StringLength(8, 8, "MESSAGE1"));
+    Validation.Add("pause_time", Validator.StringLength(8, 0, "MESSAGE2"));
+    Validation.Add("blind_time", Validator.StringLength(8, 0, "MESSAGE3"));
+    Validation.Add("min_table", Validator.StringLength(2, 1, "MESSAGE4"));
+    Validation.Add("max_table", Validator.StringLength(2, 1, "MESSAGE5"));
+    Validation.Add("start_value", Validator.StringLength(10, 1, "MESSAGE6"));
+    Validation.Add("table_amount", Validator.StringLength(2, 1, "MESSAGE7"));
+    Validation.Add("rebuy", Validator.StringLength(1, 1, "MESSAGE8"));
+    Validation.Add("chip1", Validator.StringLength(3, 1, "MESSAGE9"));
+    Validation.Add("chip2", Validator.StringLength(3, 1, "MESSAGE10"));
+    Validation.Add("chip3", Validator.StringLength(3, 1, "MESSAGE11"));
+    Validation.Add("chip4", Validator.StringLength(3, 1, "MESSAGE12"));
+    Validation.Add("chip5", Validator.StringLength(3, 1, "MESSAGE13"));
     #endregion
 
     #region Setting default
+    //on first load settings
     var round_time = "00:30:00";
-    var pause_time = "00:00:00";
-    var blind_time = "00:00:00";
-    int min_table = 4;
-    int max_table_amount = 6;
-    int start_value = 10;
-    int table_amount = 1;
-    int rebuy = 0;
+    var pause_time = "00:30:00";
+    var blind_time = "00:05:00";
+    int min_table = 2;
+    int max_table_amount = 8;
+    int start_value = 1000;
+    int table_amount = 3;
+    int rebuy = 3;
     int chip_worth1 = 1;
     int chip_worth2 = 2;
-    int chip_worth3 = 3;
-    int chip_worth4 = 4;
-    int chip_worth5 = 5;
+    int chip_worth3 = 5;
+    int chip_worth4 = 10;
+    int chip_worth5 = 25;
     #endregion
 
     #region Retrieving from database
+    //check for correct roomcode
     dynamic room = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
     if (room == code)
     {
@@ -73,6 +78,7 @@
     #endregion
 
     #region Saving logic
+    //updates or adds all the values 
     void Save()
     {
         int players = Convert.ToInt32(Request["nr_players"]);
@@ -108,16 +114,13 @@
     }
     #endregion
 
+    //continues to next page
     if (IsPost && Validation.IsValid() && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {
         if (Request["Proceed"] == "Proceed")
         {
             Save();
             Response.Redirect("~/Blinds.cshtml/" + code);
-        }
-        else if (Request["save"] == "Save")
-        {
-            Save();
         }
         else
         {
@@ -180,7 +183,7 @@
                             <div class="form-group col-md-6"> <label for="form14">Value chip 5</label> <input type="number" class="form-control" id="form14" placeholder="9001" name="chip5" value="@chip_worth5"> </div>
                             @Html.ValidationMessage("chip5")
                         </div>
-                            <button class="btn btn-primary" type="submit" name="Proceed" value="Proceed">Proceed</button>
+                            <input class="btn btn-primary" type="submit" name="Proceed" value="Proceed" />
                     </form>
                 </div>
             </div>

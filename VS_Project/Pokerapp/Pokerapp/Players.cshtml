@@ -11,7 +11,7 @@
 
     if (Request.Cookies["LoginCookie"].Value != "true")
     {
-        Response.Redirect("~/Gameselect.cshtml");
+        Response.Redirect("~/Login.cshtml");
     }
 
     string url = Request.Url.AbsolutePath;

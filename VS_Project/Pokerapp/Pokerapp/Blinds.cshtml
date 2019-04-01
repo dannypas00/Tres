@@ -2,7 +2,7 @@
 @using Microsoft.VisualBasic
 
 @{
-    Layout = "~/_Layout.cshtml";
+    Layout = "~/_Layout.cshtml";	
     Page.Title = "Blindsettings";
 
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
@@ -12,14 +12,6 @@
     //request the last 7 digits of the urgl (roomcode)
     string url = Request.Url.AbsolutePath;
     string urlcode = url.Substring(url.Length - 7);
-
-    if (!IsPost)
-    {
-        //if (Request.Form["adminLogin"] != "true")
-        //{
-        //    Response.Redirect("~/Login.cshtml");
-        //}
-    }
 
     string error = "";
     int Blind_Round = (db.QueryValue("SELECT COUNT(Value) FROM Blinds WHERE Room_Code = @0 AND S_B = 's'", urlcode));
@@ -64,11 +56,9 @@
     }
 
 }
-
     <form method="post">
         <input type="number" name="small" placeholder="Small Blind @Blind_Round" />
-        <input type="number" name="big" placeholder="Big Blind @Blind_Round" />
-
+        <input type="number" name="big" placeholder="Big Blind @Blind_Round" />        
         <input type="submit" name="AddBlinds" value="Add" />
     </form>
     <p>@error</p>
