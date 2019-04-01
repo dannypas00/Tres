@@ -2,7 +2,7 @@
 
 @{
     Layout = "~/_Layout.cshtml";
-    Page.Title = "Table View";
+    Page.Title = "Select Game";
 
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
@@ -24,14 +24,57 @@
     }
     if (aantal > 10)    //Haal max spelers uit database
     {
-        string Url = "Players.cshtml/" + roomCode;   //Needs fixing
+        string Url = "Players.cshtml/" + roomCode;
         Response.Redirect("~/" + Url);
     }
-}
-<style>
 
+    if (IsPost && !Request["blindnext"].IsEmpty())
+    {
+        int current_Round = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
+        int new_Round = current_Round + 1;
+        db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", new_Round, roomCode);
+        <script class="popup">
+            $(document).ready(function(){
+                alert("The blind has been raised!");
+            })
+        </script>
+    }
 
-</style>
+    int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
+    var blind_id = db.Query("SELECT Top (@0) ID FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
+    int min_size = db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", roomCode);
+    var small_blind = db.Query("SELECT TOP (@0) Value FROM Blinds WHERE Room_Code = @1 AND S_B = 's' ORDER BY ID ASC", id, roomCode);
+    int small = 0;
+    foreach (var a in small_blind)
+    {
+        if (a.Value > small)
+        {
+            small = a.Value;
+        }
+    }
+    var big_blind = db.Query("SELECT TOP (@0) Value FROM Blinds WHERE Room_Code = @1 AND S_B = 'b' ORDER BY ID ASC", id, roomCode);
+    int big = 0;
+    foreach (var a in big_blind)
+    {
+        if (a.Value > big)
+        {
+            big = a.Value;
+        }
+    }
+    
+    db.Execute("UPDATE Room SET Small_Blind = @0, Big_Blind = @1 WHERE Room_Code = @2", small, big, roomCode);
+    int players = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
+        if (min_size >= players)
+        {
+            <script>
+                alert("The minimum size has been reached!");
+            </script>
+            Shuffle shuffle = new Shuffle();
+            shuffle.ShuffleTable(db, roomCode);
+            string Url = "Players.cshtml/" + roomCode;
+            Response.Redirect("~/" + Url);
+        }
+    }
 
 
 
@@ -88,6 +131,12 @@
             </div>
         </div>
     </div>
+
+    <form method="post">
+        <input type="submit" name="blindnext" value="Raise_Blind" />
+    </form>
+    <h2>Small blind: @small</h2>
+    <h2>Big blind: @big</h2>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>$(document).ready(function () {
