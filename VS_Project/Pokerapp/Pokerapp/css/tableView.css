@@ -7,12 +7,14 @@
 .chair {
     grid-column-start: auto;
     order: inherit;
+    position:relative;
 }
 
 .chair2 {
     grid-row-start: 4;
     grid-column-start: auto;
     order: inherit;
+    position:relative;
 }
 
 .table {

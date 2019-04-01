@@ -1,7 +1,7 @@
 ﻿@using WebMatrix.Data
 
 @{
-    Layout = "~/_Layout.cshtml";	
+    Layout = "~/_Layout.cshtml";
     Page.Title = "Select Game";
 
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
@@ -24,7 +24,7 @@
     }
     if (aantal > 10)    //Haal max spelers uit database
     {
-         string Url = "Players.cshtml/" + roomCode;
+        string Url = "Players.cshtml/" + roomCode;
         Response.Redirect("~/" + Url);
     }
 
@@ -39,29 +39,29 @@
                 alert("The blind has been raised!");
             //})
         </script>
+        }
+        int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
+        var blind_id = db.Query("SELECT Top (@0) ID FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
+        int min_size = db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", roomCode);
+        var small_blind = db.Query("SELECT TOP (@0) ValueSB FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
+        int small = 0;
+        foreach (var a in small_blind)
+        {
+            if (a.ValueSB > small)
+            {
+                small = a.ValueSB;
+            }
+        }
+        var big_blind = db.Query("SELECT TOP (@0) ValueBB FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
+        int big = 0;
+        foreach (var a in big_blind)
+        {
+            if (a.ValueBB > big)
+            {
+                big = a.ValueBB;
+            }
+        }
     }
-    int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);	
-    var blind_id = db.Query("SELECT Top (@0) ID FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
-    int min_size = db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", roomCode);
-    var small_blind = db.Query("SELECT TOP (@0) Value FROM Blinds WHERE Room_Code = @1 AND S_B = 's' ORDER BY ID ASC", id, roomCode);
-    int small = 0;	
-    foreach (var a in small_blind)	
-    {	
-        if (a.Value > small)	
-        {	
-            small = a.Value;	
-        }	
-    }	
-    var big_blind = db.Query("SELECT TOP (@0) Value FROM Blinds WHERE Room_Code = @1 AND S_B = 'b' ORDER BY ID ASC", id, roomCode);	
-    int big = 0;	
-    foreach (var a in big_blind)	
-    {	
-        if (a.Value > big)	
-        {	
-            big = a.Value;	
-        }	
-    }	
-
 
 
     <div class="py-5">
@@ -76,53 +76,58 @@
                 <div name="timer" class="timer"></div>
                 <div class="round">This is round: <span id="rnumber"></span></div>
             </div>
-            <div class="gridd">
-                <div class="white"></div>
-                <div class="white2"></div>
-                <div class="white3"></div>
-                <div class="white4"></div>
-                @if (aantal <= 7)
-                {
-                    foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", roomCode, table, tweede))
+            <div class="row">
+                <div class="col-md-2">
+                    <p>Small blind: @small</p>
+                    <p>Big blind: @big</p>
+                    <form method="post">
+                        <input class="btn btn-outline-secondary" type="submit" name="blindnext" value="Raise blinds" />
+                    </form>
+                </div>
+                <div class="gridd">
+                    <div class="white"></div>
+                    <div class="white2"></div>
+                    <div class="white3"></div>
+                    <div class="white4"></div>
+                    @if (aantal <= 7)
                     {
-                        <div class="chair2">
-                            <img src="~/stoel.png" alt="chair" style="width:75px;height:75px" />
-                            <b>@a.Name</b>
-                        </div>
+                        foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", roomCode, table, tweede))
+                        {
+                            <div class="chair2">
+                                <img src="~/stoel.png" alt="chair" style="width:75px;height:75px" />
+                                <b>@a.Name</b>
+                            </div>
+                        }
+
+                        foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, roomCode, table))
+                        {
+
+                            <div class="chair">
+                                <img src="~/stoel.png" alt="chair" style="width:75px;height:75px" />
+                                <b>@a.Name</b>
+                            </div>
+                        }
+                    }
+                    @if (aantal > 7)
+                    {
+                        foreach (var a in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name ASC", roomCode, table))
+                        {
+                            <div class="chair">
+                                <img src="stoel.png" alt="chair" style="width:75px;height:75px" />
+                                <b>@a.Name</b>
+                            </div>
+                        }
                     }
 
-                    foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, roomCode, table))
-                    {
-
-                        <div class="chair">
-                            <img src="~/stoel.png" alt="chair" style="width:75px;height:75px" />
-                            <b>@a.Name</b>
-                        </div>
-                    }
-                }
-                @if (aantal > 7)
-                {
-                    foreach (var a in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name ASC", roomCode, table))
-                    {
-                        <div class="chair">
-                            <img src="stoel.png" alt="chair" style="width:75px;height:75px" />
-                            <b>@a.Name</b>
-                        </div>
-                    }
-                }
-
-                <div class="table">
-                    <img src="~/tafel.png" name="pokertable" style="height:250px; width:100%" />
+                    <div class="table">
+                        <img src="~/tafel.png" name="pokertable" style="height:250px; width:100%" />
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <form method="post">	
-        <input type="submit" name="blindnext" value="Raise_Blind" />	
-    </form>	
-    <h2>Small blind: @small</h2>	
-    <h2>Big blind: @big</h2>	
+    
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>$(document).ready(function () {

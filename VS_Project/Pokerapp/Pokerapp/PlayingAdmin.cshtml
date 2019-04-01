@@ -39,44 +39,51 @@
     }
 }
 
-<div>
-    <header>
-        <h1>Game in progress</h1>
-    </header>
-    <div class="playingBody">
-        <div style="padding-left:20px"class="row">
-            <form name="updateSettings" method="post">
-                <button class="btn btn-primary" type="submit" value="pauze" name="submit">Pause the game</button>
-                <button class="btn btn-primary" type="submit" value="shuffle" name="submit">Shuffle all players</button>
-                <button class="btn btn-primary" type="submit" value="manage" name="submit">Add/remove players</button>
-            </form>
-            <div style="padding-left:20px"><p>Share this link: <a href=@linked>@linked</a></p></div>
-        </div>
-        <div class="row"></div>
-        <div class="mx-auto col-lg-6 col-10">
-            <div  class="row">
-                @for (int i = 0; i < tables; i++)
-                {
-                    int tbl_Nr = i + 1;
-                    <div style="width:200px; padding-left:20px; padding-top:30px" class="table-responsive">
-                        <table class="table">
-                            <tbody>
-                                Table @tbl_Nr
-                                @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_Nr))
-                                {
-                                    <tr>
-                                        <td>
-                                            <h3>@row.Name</h3>
-                                        </td>
-                                    </tr>
+<div class="py-5">
+    <div class="container">
+        <div class="col-md-12 text-center">
+            <header>
+                <h1>Game in progress</h1>
+            </header>
+            <div class="col-md-12 text-center">
+                <div class="row" style="justify-content:center">
+                    <form name="updateSettings" method="post">
+                        <button class="btn btn-primary" type="submit" value="pauze" name="submit">Pause the game</button>
+                        <button class="btn btn-primary" type="submit" value="shuffle" name="submit">Shuffle all players</button>
+                        <button class="btn btn-primary" type="submit" value="manage" name="submit">Add/remove players</button>
+                    </form>
 
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
                 </div>
+                <div class="row"></div>
+                <div style="justify-content:center; padding-top:20px" class="row"><p>Share this link: <a href=@linked>@linked</a></p></div>
+            </div>
+                <div class="col-md-12" style="justify-content:center">
+                    <div class="row">
+                        @for (int i = 0; i < tables; i++)
+                        {
+                            int tbl_Nr = i + 1;
+                            <div style="width:200px; padding-left:20px; padding-top:30px" class="table-responsive">
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <th>Table @tbl_Nr</th>
+                                        </tr>
+                                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_Nr))
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <p>@row.Name</p>
+                                                </td>
+                                            </tr>
+
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+            </div>
         </div>
-        
     </div>
-</div>

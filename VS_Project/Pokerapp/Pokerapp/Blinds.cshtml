@@ -14,7 +14,7 @@
     string urlcode = url.Substring(url.Length - 7);
 
     string error = "";
-    int Blind_Round = (db.QueryValue("SELECT COUNT(Value) FROM Blinds WHERE Room_Code = @0 AND S_B = 's'", urlcode));
+    int Blind_Round = (db.QueryValue("SELECT COUNT(ValueSB) FROM Blinds WHERE Room_Code = @0", urlcode));
     if (IsPost && Validation.IsValid())
     {
 
@@ -22,8 +22,8 @@
         {
             int small = Convert.ToInt32(Request["small"]);
             int big = Convert.ToInt32(Request["big"]);
-            int small_blind = Convert.ToInt32(db.QueryValue("SELECT Value FROM Blinds WHERE Room_Code = @0 AND S_B = 's' ORDER BY Value DESC", urlcode));
-            int big_blind = Convert.ToInt32(db.QueryValue("SELECT Value FROM Blinds WHERE Room_Code = @0 AND S_B = 'b' ORDER BY Value DESC", urlcode));
+            int small_blind = Convert.ToInt32(db.QueryValue("SELECT ValueSB FROM Blinds WHERE Room_Code = @0 ORDER BY ValueSB DESC", urlcode));
+            int big_blind = Convert.ToInt32(db.QueryValue("SELECT ValueBB FROM Blinds WHERE Room_Code = @0 ORDER BY ValueBB DESC", urlcode));
             if (!Request["small"].IsEmpty() && !Request["big"].IsEmpty())
             {
                 if ((small_blind <= small) && (big_blind <= big))
@@ -35,12 +35,11 @@
                         id_new = id_old + 1;
                         Blind_Round = id_new;
                     }
-                    db.Execute("INSERT INTO Blinds (Room_Code, ID, S_B, Value) VALUES (@0, @1, 's', @2)", urlcode, id_new, small);
-                    db.Execute("INSERT INTO Blinds (Room_Code, ID, S_B, Value) VALUES (@0, @1, 'b', @2)", urlcode, id_new, big);
+                    db.Execute("INSERT INTO Blinds (Room_Code, ID, ValueSB, ValueBB) VALUES (@0, @1, @2, @3)", urlcode, id_new, small, big);
                 }
                 else
                 {
-                    error = "This value('s) are too low.";
+                    error = "This value(s) are too low.";
                 }
             }
         }
@@ -79,16 +78,29 @@
                         <div class="mx-auto col-lg-6 col-10">
                             <p>@error</p>
                             <div class="row" style="justify-content:center">
-                                <div style="width:200px" class="table-responsive">
-                                    <p>Small</p>
+                                <div style="width:350px" class="table-responsive">
+                                    <p>Blinds</p>
                                     <table class="table">
                                         <tbody>
-                                            @foreach (var row in db.Query("SELECT Value, ID FROM Blinds WHERE Room_Code = @0 AND S_B = 's' ORDER BY ID ASC", urlcode))
+                                            <tr>
+                                                <th>Round</th>
+                                                <th>Small</th>
+                                                <th>Big</th>
+                                                <th></th>
+                                            </tr>
+                                            @foreach (var row in db.Query("SELECT ValueSB, ValueBB, ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID ASC", urlcode))
                                             {
                                                 int rowblindform = (int)row.ID;
+
                                                 <tr>
                                                     <td>
-                                                        <p><b>Round @rowblindform:</b> @row.Value</p>
+                                                        <p>@rowblindform</p>
+                                                    </td>
+                                                    <td>
+                                                        @row.ValueSB
+                                                    </td>
+                                                    <td>
+                                                        <p>@row.ValueBB</p>
                                                     </td>
                                                     <td>
                                                         <form method="post">
@@ -101,33 +113,6 @@
                                             }
                                         </tbody>
                                     </table>
-                                </div>
-
-
-                                <div style="width:200px" class="table-responsive">
-                                    <p>Big:</p>
-                                    <table class="table">
-                                        <tbody>
-                                            @foreach (var row in db.Query("SELECT Value, ID FROM Blinds WHERE Room_Code = @0 AND S_B = 'b' ORDER BY ID ASC", urlcode))
-                                            {
-                                                int rowblindform = (int)row.Value;
-                                                int roundNr = (int)row.ID;
-                                                <tr>
-                                                    <td>
-                                                        <p><b>Round @roundNr:</b> @row.Value</p>
-                                                    </td>
-                                                    <td>
-                                                        <form method="post">
-                                                            <button class="btn btn-outline-primary" type="submit" name="delete" value="delete">X</button>
-                                                            @Html.Hidden("rownameform", rowblindform)
-                                                        </form>
-
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-
                                 </div>
                             </div>
                             <form method="post">
