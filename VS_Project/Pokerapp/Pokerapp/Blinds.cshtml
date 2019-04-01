@@ -2,6 +2,9 @@
 @using Microsoft.VisualBasic
 
 @{
+    Layout = "~/_Layout.cshtml";	
+    Page.Title = "Blindsettings";
+
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
@@ -10,16 +13,8 @@
     string url = Request.Url.AbsolutePath;
     string urlcode = url.Substring(url.Length - 7);
 
-    if (!IsPost)
-    {
-        //if (Request.Form["adminLogin"] != "true")
-        //{
-        //    Response.Redirect("~/Login.cshtml");
-        //}
-    }
-
     string error = "";
-    int Blind_Round = 1;
+    int Blind_Round = (db.QueryValue("SELECT COUNT(Value) FROM Blinds WHERE Room_Code = @0 AND S_B = 's'", urlcode));
     if (IsPost && Validation.IsValid())
     {
         int small = Convert.ToInt32(Request["small"]);
@@ -55,22 +50,15 @@
         }
         if (Request["Proceed"] == "Proceed")
         {
-            string Url = "Adminpage.cshtml/" + urlcode;
+            string Url = "AdminPage.cshtml/" + urlcode;
             Response.Redirect("~/" + Url);
         }
     }
 
 }
-
-<html>
-<head>
-    <title>Blind page</title>
-</head>
-
-<body>
     <form method="post">
-        <input type="number" name="big" placeholder="Big Blind @Blind_Round" />
         <input type="number" name="small" placeholder="Small Blind @Blind_Round" />
+        <input type="number" name="big" placeholder="Big Blind @Blind_Round" />        
         <input type="submit" name="AddBlinds" value="Add" />
     </form>
     <p>@error</p>
@@ -122,5 +110,3 @@
     <form method="post">
         <button type="submit" name="Proceed" value="Proceed">Proceed</button>
     </form>
-</body>
-</html>
