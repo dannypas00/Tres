@@ -56,12 +56,8 @@
             big = a.Value;
         }
     }
-
-    if (IsPost || !IsPost)
-    {
-        db.Execute("UPDATE Room SET Small_Blind = @0, Big_Blind = @1 WHERE Room_Code = @2", small, big, roomCode);
-    }
-
+    
+    db.Execute("UPDATE Room SET Small_Blind = @0, Big_Blind = @1 WHERE Room_Code = @2", small, big, roomCode);
     int players = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
         if (min_size >= players)
         {
