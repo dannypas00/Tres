@@ -21,7 +21,7 @@
 
    
     function startTimer(timer) {
-        var timer = timer.split(":"); // Split timer
+        timer = timer.split(":"); // Split timer
 
         var targetHours = parseInt(timer[0]); // Parse hours to int
         var targetMinutes = parseInt(timer[1]);
@@ -63,7 +63,7 @@
 
 
             // if condition is met round + 1
-            if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
+            if (currentHours === targetHours && currentMinutes === targetMinutes && currentSeconds === targetSeconds) {
                 round++;
                 document.querySelector('#rnumber').innerHTML = round;
               
@@ -74,12 +74,12 @@
 
             currentSeconds++;
 
-            if (currentSeconds == 60) {
+            if (currentSeconds === 60) {
                 currentMinutes++;
                 currentSeconds = 0;
             }
 
-            if (currentMinutes == 60) {
+            if (currentMinutes === 60) {
                 currentHours++;
                 currentMinutes = 0;
             }
