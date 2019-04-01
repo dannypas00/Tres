@@ -1,14 +1,17 @@
 ﻿@using WebMatrix.Data
 
 @{
+    Layout = "~/_Layout.cshtml";
+    Page.Title = "Table View";
+
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-    string url = Request.Url.AbsolutePath;
-    string[] urlcode = url.Split('/');
-    int roomCode = Request["roomcode"].AsInt();
-    int table = Request["table"].AsInt();
+
+    int roomCode = Request.QueryString["roomcode"].AsInt();
+    int table = Request.QueryString["table"].AsInt();
+
     var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     int aantal = namen.Count();
     double gedeeld = aantal / 2;
@@ -21,50 +24,158 @@
     }
     if (aantal > 10)    //Haal max spelers uit database
     {
-        string Url = "Players.cshtml/" + urlcode;   //Needs fixing
+        string Url = "Players.cshtml/" + roomCode;   //Needs fixing
         Response.Redirect("~/" + Url);
     }
 }
+<style>
+
+
+</style>
 
 
 
-<html>
-<head>
-    <title>Tableview</title>
+    <div class="py-5">
+        <div class="container">
+            <div class="col-md-12 text-center">
+                <h1>Table @table</h1>
+            </div>
+            <div class="col-md-12 text-center">
+                <div id="roomCode" style="display:none;">@roomCode</div>
+                <div id="table" style="display:none;">@table</div>
+
+                <div name="timer" class="timer"></div>
+                <div class="round">This is round: <span id="rnumber"></span></div>
+            </div>
+            <div class="gridd">
+                <div class="white"></div>
+                <div class="white2"></div>
+                <div class="white3"></div>
+                <div class="white4"></div>
+                @if (aantal <= 7)
+                {
+                    foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", roomCode, table, tweede))
+                    {
+                        <div class="chair2">
+                            <img src="~/stoel.png" alt="chair" style="width:75px;height:75px" />
+                            <b>@a.Name</b>
+                        </div>
+                    }
+
+                    foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, roomCode, table))
+                    {
+
+                        <div class="chair">
+                            <img src="~/stoel.png" alt="chair" style="width:75px;height:75px" />
+                            <b>@a.Name</b>
+                        </div>
+                    }
+                }
+                @if (aantal > 7)
+                {
+                    foreach (var a in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name ASC", roomCode, table))
+                    {
+                        <div class="chair">
+                            <img src="stoel.png" alt="chair" style="width:75px;height:75px" />
+                            <b>@a.Name</b>
+                        </div>
+                    }
+                }
+
+                <div class="table">
+                    <img src="~/tafel.png" name="pokertable" style="height:250px; width:100%" />
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>$(document).ready(function () {
+            var roomcode = $("#roomCode").html();
+            $("#roomCode").remove();
 
-</head>
-<body>
-    <div id="roomcode" style="display:none;">@roomCode</div>
-    <div id="table" style="display:none;">@table</div>
+            var table = $("#table").html();
+            $("#table").remove();
 
-    <div name="timer" class="timer"></div>
-    <div class="round">This is round: <span id="rnumber"></span></div>
+            console.log("roomcode" + roomcode);
+            console.log("table" + table);
+            //Ajax connect with url Timer get the data roomcode
+            $.ajax({
+                url: "Timer.cshtml", 
+                type: "get",
+                data: {
+                    roomCode: @roomCode,
+                    table: @table,
+                },
+                success: function (response) {
+                    startTimer(response); // Returns timer from db
+                }
+            });
 
-    <h1>Table @table</h1>
-    <br />
-    <div>
-        @foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, roomCode, table))
-        {
-            @a.Name
-            <img src="~/stoel.png" name="chair" />
-        }
-    </div><br />
-    <div>
-        <img src="~/tafel.png" name="pokertable" />
-    </div>
-    <br />
-    <div>
-        @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", roomCode, table, tweede))
-        {
-            <img src="~/stoel.png" name="chair" />
-            @a.Name
-        }
-    </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="js/RunTimer.js"></script>
+            function startTimer(timer) {
+                var timer = timer.split(":"); // Split timer
 
-</body>
-</html>
+                var targetHours = parseInt(timer[0]); // Parse hours to int
+                var targetMinutes = parseInt(timer[1]);
+                var targetSeconds = parseInt(timer[2]);
+
+                var currentHours = 0;
+                var currentMinutes = 0;
+                var currentSeconds = 0;
+
+                var displayHours;
+                var displayMinutes;
+                var displaySeconds;
+
+                var round = 1;
+                document.querySelector('#rnumber').innerHTML = round;
+
+                //Increment timer
+                setInterval(function () {
+                    var displayHours = currentHours;
+                    var displayMinutes = currentMinutes;
+                    var displaySeconds = currentSeconds;
+
+                    sessionStorage.setItem("timer", displayHours);
+
+
+                    if (currentHours.toString().length < 2) {
+                        displayHours = "0" + currentHours;
+                    }
+
+                    if (currentMinutes.toString().length < 2) {
+                        displayMinutes = "0" + currentMinutes;
+                    }
+
+                    if (currentSeconds.toString().length < 2) {
+                        displaySeconds = "0" + currentSeconds;
+                    }
+
+                    document.querySelector('.timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
+
+
+                    // if condition is met round + 1
+                    if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
+                        round++;
+                        document.querySelector('#rnumber').innerHTML = round;
+
+                        currentHours = 0;
+                        currentMinutes = 0;
+                        currentSeconds = 0;
+                    }
+
+                    currentSeconds++;
+
+                    if (currentSeconds == 60) {
+                        currentMinutes++;
+                        currentSeconds = 0;
+                    }
+
+                    if (currentMinutes == 60) {
+                        currentHours++;
+                        currentMinutes = 0;
+                    }
+                }, 1000);
+            }
+        });</script>
