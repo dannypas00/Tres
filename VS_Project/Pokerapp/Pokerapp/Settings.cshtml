@@ -22,19 +22,19 @@
     }
 
     //Validation for input
-    Validation.Add("round_time", Validator.StringLength(8, 8, "MESSAGE"));
-    Validation.Add("pause_time", Validator.StringLength(8, 0, "MESSAGE"));
-    Validation.Add("blind_time", Validator.StringLength(8, 0, "MESSAGE"));
-    Validation.Add("min_table", Validator.StringLength(2, 1, "MESSAGE"));
-    Validation.Add("max_table", Validator.StringLength(2, 1, "MESSAGE"));
-    Validation.Add("start_value", Validator.StringLength(3, 1, "MESSAGE"));
-    Validation.Add("table_amount", Validator.StringLength(2, 1, "MESSAGE"));
-    Validation.Add("rebuy", Validator.StringLength(1, 1, "MESSAGE"));
-    Validation.Add("chip1", Validator.StringLength(3, 1, "MESSAGE"));
-    Validation.Add("chip2", Validator.StringLength(3, 1, "MESSAGE"));
-    Validation.Add("chip3", Validator.StringLength(3, 1, "MESSAGE"));
-    Validation.Add("chip4", Validator.StringLength(3, 1, "MESSAGE"));
-    Validation.Add("chip5", Validator.StringLength(3, 1, "MESSAGE"));
+    Validation.Add("round_time", Validator.StringLength(8, 8, "MESSAGE1"));
+    Validation.Add("pause_time", Validator.StringLength(8, 0, "MESSAGE2"));
+    Validation.Add("blind_time", Validator.StringLength(8, 0, "MESSAGE3"));
+    Validation.Add("min_table", Validator.StringLength(2, 1, "MESSAGE4"));
+    Validation.Add("max_table", Validator.StringLength(2, 1, "MESSAGE5"));
+    Validation.Add("start_value", Validator.StringLength(10, 1, "MESSAGE6"));
+    Validation.Add("table_amount", Validator.StringLength(2, 1, "MESSAGE7"));
+    Validation.Add("rebuy", Validator.StringLength(1, 1, "MESSAGE8"));
+    Validation.Add("chip1", Validator.StringLength(3, 1, "MESSAGE9"));
+    Validation.Add("chip2", Validator.StringLength(3, 1, "MESSAGE10"));
+    Validation.Add("chip3", Validator.StringLength(3, 1, "MESSAGE11"));
+    Validation.Add("chip4", Validator.StringLength(3, 1, "MESSAGE12"));
+    Validation.Add("chip5", Validator.StringLength(3, 1, "MESSAGE13"));
     #endregion
 
     #region Setting default
@@ -183,7 +183,7 @@
                             <div class="form-group col-md-6"> <label for="form14">Value chip 5</label> <input type="number" class="form-control" id="form14" placeholder="9001" name="chip5" value="@chip_worth5"> </div>
                             @Html.ValidationMessage("chip5")
                         </div>
-                            <button class="btn btn-primary" type="submit" name="Proceed" value="Proceed">Proceed</button>
+                            <input class="btn btn-primary" type="submit" name="Proceed" value="Proceed" />
                     </form>
                 </div>
             </div>

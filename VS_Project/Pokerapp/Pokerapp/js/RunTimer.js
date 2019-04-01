@@ -23,7 +23,7 @@
 
    
     function startTimer(timer) {
-        var timer = timer.split(":"); // Split timer
+        timer = timer.split(":"); // Split timer
 
         var targetHours = parseInt(timer[0]); // Parse hours to int
         var targetMinutes = parseInt(timer[1]);

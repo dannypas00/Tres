@@ -24,17 +24,17 @@
          string Url = "Players.cshtml/" + roomCode;
         Response.Redirect("~/" + Url);
     }
-}
+
 
     if (IsPost && !Request["blindnext"].IsEmpty())
     {
         int current_Round = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
         int new_Round = current_Round + 1;
         db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", new_Round, roomCode);
-        <script class="popup">
-            $(document).ready(function(){
+        <script>
+            //$(document).ready(function() {
                 alert("The blind has been raised!");
-            })
+            //})
         </script>
     }
     int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);	
@@ -71,7 +71,7 @@
             string Url = "Players.cshtml/" + roomCode;	
             Response.Redirect("~/" + Url);	
         }	
-    }
+}
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
