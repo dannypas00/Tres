@@ -26,6 +26,17 @@
     }
 }
 
+    if (IsPost && !Request["blindnext"].IsEmpty())
+    {
+        int current_Round = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
+        int new_Round = current_Round + 1;
+        db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", new_Round, roomCode);
+        <script class="popup">
+            $(document).ready(function(){
+                alert("The blind has been raised!");
+            })
+        </script>
+    }
 
 
 <html>
