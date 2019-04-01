@@ -141,19 +141,17 @@
                     <h3>Settings</h3>
                     <form style="display: inline-block" name="Settings" method="post">
                         <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form1">Number of players</label> <input type="number" class="form-control" id="form1" placeholder="Number of players" name="nr_players " value="@nr_players"> </div>
-                            @Html.ValidationMessage("nr_players")
                             <div class="form-group col-md-6"> <label for="form2">Start value</label> <input type="number" class="form-control" id="form2" placeholder="Start value" name="start_value" value="@start_value"> </div>
                             @Html.ValidationMessage("start_value")
                         </div>
                         <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form3">Time per round</label> <input type="number" class="form-control" id="form3" placeholder="9001" name="round_time" value="@round_time"> </div>
+                            <div class="form-group col-md-6"> <label for="form3">Time per round</label> <input type="text" class="form-control" id="form3" placeholder="9001" name="round_time" value="@round_time"> </div>
                             @Html.ValidationMessage("round_time")
-                            <div class="form-group col-md-6"> <label for="form4">Duration of pauses</label> <input type="number" class="form-control" id="form4" placeholder="9001" name="pause_time" value="@pause_time"> </div>
+                            <div class="form-group col-md-6"> <label for="form4">Duration of pauses</label> <input type="text" class="form-control" id="form4" placeholder="9001" name="pause_time" value="@pause_time"> </div>
                             @Html.ValidationMessage("pause_time")
                         </div>
                         <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form5">Interval for blinds</label> <input type="number" class="form-control" id="form5" placeholder="9001" name="blind_time" value="@blind_time"> </div>
+                            <div class="form-group col-md-6"> <label for="form5">Interval for blinds</label> <input type="text" class="form-control" id="form5" placeholder="9001" name="blind_time" value="@blind_time"> </div>
                             @Html.ValidationMessage("blind_time")
                             <div class="form-group col-md-6"> <label for="form6">Minimum players per table</label> <input type="number" class="form-control" id="form6" placeholder="3" name="min_table" value="@min_table"> </div>
                             @Html.ValidationMessage("min_table")
@@ -182,13 +180,7 @@
                             <div class="form-group col-md-6"> <label for="form14">Value chip 5</label> <input type="number" class="form-control" id="form14" placeholder="9001" name="chip5" value="@chip_worth5"> </div>
                             @Html.ValidationMessage("chip5")
                         </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form15">Value small blind</label> <input type="number" class="form-control" id="form15" placeholder="9001" name="small" value="@small"> </div>
-                            @Html.ValidationMessage("small")
-                            <div class="form-group col-md-6"> <label for="form16">Value big blind</label> <input type="number" class="form-control" id="form16" placeholder="9001" name="big" value="@big"> </div>
-                            @Html.ValidationMessage("big")
-                        </div>
-                            <button class="btn btn-primary" type="submit" name="next" value="Proceed">Proceed</button>
+                            <button class="btn btn-primary" type="submit" name="Proceed" value="Proceed">Proceed</button>
                     </form>
                 </div>
             </div>
