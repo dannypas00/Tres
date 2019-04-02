@@ -1,9 +1,10 @@
 ﻿@using WebMatrix.Data
+
 @{
     //load loadout
     Layout = "~/_Layout.cshtml";
     Page.Title = "Settings";
-    
+
     //database connection
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
@@ -22,19 +23,19 @@
     }
 
     //Validation for input
-    Validation.Add("round_time", Validator.StringLength(8, 8, "MESSAGE1"));
-    Validation.Add("pause_time", Validator.StringLength(8, 0, "MESSAGE2"));
-    Validation.Add("blind_time", Validator.StringLength(8, 0, "MESSAGE3"));
-    Validation.Add("min_table", Validator.StringLength(2, 1, "MESSAGE4"));
-    Validation.Add("max_table", Validator.StringLength(2, 1, "MESSAGE5"));
-    Validation.Add("start_value", Validator.StringLength(10, 1, "MESSAGE6"));
-    Validation.Add("table_amount", Validator.StringLength(2, 1, "MESSAGE7"));
-    Validation.Add("rebuy", Validator.StringLength(1, 1, "MESSAGE8"));
-    Validation.Add("chip1", Validator.StringLength(3, 1, "MESSAGE9"));
-    Validation.Add("chip2", Validator.StringLength(3, 1, "MESSAGE10"));
-    Validation.Add("chip3", Validator.StringLength(3, 1, "MESSAGE11"));
-    Validation.Add("chip4", Validator.StringLength(3, 1, "MESSAGE12"));
-    Validation.Add("chip5", Validator.StringLength(3, 1, "MESSAGE13"));
+    Validation.Add("round_time", Validator.StringLength(8, 8, "Incorrect format for round time please use hh:mm:ss"));
+    Validation.Add("pause_time", Validator.StringLength(8, 8, "Incorrect format for pause time please use hh:mm:ss"));
+    Validation.Add("blind_time", Validator.StringLength(8, 8, "Incorrect format for blind time please use hh:mm:ss"));
+    Validation.Add("min_table", Validator.Range(2, 99, "Minimum amount is 2 players per table"));
+    Validation.Add("max_table", Validator.Range(2, 10, "Maximum amount of players per table is 10"));
+    Validation.Add("start_value", Validator.Range(1, 999999, "The range of the start value is 1 - 9.999.999"));
+    Validation.Add("tbl_amount", Validator.Range(1, 99, "Please set a realistic amount of tables"));
+    Validation.Add("rebuy", Validator.Range(0, 999, "Rebuy has to be 0 or higher"));
+    Validation.Add("chip1", Validator.Range(1, 999999, "Chip 1 has to have a value of at least 1"));
+    Validation.Add("chip2", Validator.Range(1, 999999, "Chip 2 has to have a value of at least 1"));
+    Validation.Add("chip3", Validator.Range(1, 999999, "Chip 3 has to have a value of at least 1"));
+    Validation.Add("chip4", Validator.Range(1, 999999, "Chip 4 has to have a value of at least 1"));
+    Validation.Add("chip5", Validator.Range(1, 999999, "Chip 5 has to have a value of at least 1"));
     #endregion
 
     #region Setting default
@@ -78,10 +79,10 @@
     #endregion
 
     #region Saving logic
-    //updates or adds all the values 
+    //updates or adds all the values
     void Save()
     {
-        int players = Convert.ToInt32(Request["nr_players"]);
+
         var time = Request["round_time"];
         int min_table_size = Convert.ToInt32(Request["min_table"]);
         int max_table_size = Convert.ToInt32(Request["max_table"]);
@@ -115,77 +116,81 @@
     #endregion
 
     //continues to next page
-    if (IsPost && Validation.IsValid() && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
+    if (IsPost && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {
-        if (Request["Proceed"] == "Proceed")
+        if (Validation.IsValid())
         {
-            Save();
-            Response.Redirect("~/Blinds.cshtml/" + code);
-        }
-        else
-        {
-            Response.Redirect("~/Login.cshtml");
+            if (Request["Proceed"] == "Proceed")
+            {
+                Save();
+                Response.Redirect("~/Blinds.cshtml/" + code);
+            }
+            else
+            {
+                Response.Redirect("~/Login.cshtml");
+            }
         }
     }
 }
 
 
 <head>
-    <title>Settings</title>
     <style>
+        .validation-summary-errors {
+            color: red;
+            font-weight: bold;
+        }
 
+        .field-validation-error {
+            font-weight: bold;
+            color: red;
+        }
+        .help-block ul {
+            list-style-type: none;
+        }
     </style>
 </head>
 
-    <div class="py-5 text-center">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <h3>Settings</h3>
+
+<div class="py-5 text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Settings</h3>
+                <span class="help-block">
+                    @Html.ValidationSummary()
+                </span>
                     <form style="display: inline-block" name="Settings" method="post">
                         <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form2">Start value</label> <input type="number" class="form-control" id="form2" placeholder="Start value" name="start_value" value="@start_value"> </div>
-                            @Html.ValidationMessage("start_value")
+                            <div class="form-group col-md-6"> <label for="form2">Start value</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric"class="form-control" id="form2" placeholder="Start value" name="start_value" value="@start_value"> </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-6"> <label for="form3">Time per round</label> <input type="text" class="form-control" id="form3" placeholder="9001" name="round_time" value="@round_time"> </div>
-                            @Html.ValidationMessage("round_time")
                             <div class="form-group col-md-6"> <label for="form4">Duration of pauses</label> <input type="text" class="form-control" id="form4" placeholder="9001" name="pause_time" value="@pause_time"> </div>
-                            @Html.ValidationMessage("pause_time")
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-6"> <label for="form5">Interval for blinds</label> <input type="text" class="form-control" id="form5" placeholder="9001" name="blind_time" value="@blind_time"> </div>
-                            @Html.ValidationMessage("blind_time")
-                            <div class="form-group col-md-6"> <label for="form6">Minimum players per table</label> <input type="number" class="form-control" id="form6" placeholder="3" name="min_table" value="@min_table"> </div>
-                            @Html.ValidationMessage("min_table")
+                            <div class="form-group col-md-6"> <label for="form6">Minimum players per table</label> <input type="number" step="1" min="2" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form6" placeholder="3" name="min_table" value="@min_table"> </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form7">Maximum players per table</label> <input type="number" class="form-control" id="form7" placeholder="9001" name="max_table" value="@max_table_amount"> </div>
-                            @Html.ValidationMessage("max_table")
-                            <div class="form-group col-md-6"> <label for="form8">Amount of tables</label> <input type="number" class="form-control" id="form8" placeholder="9001" name="table_amount" value="@table_amount"> </div>
-                            @Html.ValidationMessage("table_amount")
+                            <div class="form-group col-md-6"> <label for="form7">Maximum players per table</label> <input type="number" step="1" min="3" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form7" placeholder="9001" name="max_table" value="@max_table_amount"> </div>
+                            <div class="form-group col-md-6"> <label for="form8">Amount of tables</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form8" placeholder="9001" name="tbl_amount" value="@table_amount"> </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form9">Amount of rebuys</label> <input type="number" class="form-control" id="form9" placeholder="9001" name="rebuy" value="@rebuy"> </div>
-                            @Html.ValidationMessage("rebuy")
-                            <div class="form-group col-md-6"> <label for="form10">Value chip 1</label> <input type="number" class="form-control" id="form10" placeholder="9001" name="chip1" value="@chip_worth1"> </div>
-                            @Html.ValidationMessage("chip1")
+                            <div class="form-group col-md-6"> <label for="form9">Amount of rebuys</label> <input type="number" step="1" min="0" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form9" placeholder="9001" name="rebuy" value="@rebuy"> </div>
+                            <div class="form-group col-md-6"> <label for="form10">Value chip 1</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form10" placeholder="9001" name="chip1" value="@chip_worth1"> </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form11">Value chip 2</label> <input type="number" class="form-control" id="form11" placeholder="9001" name="chip2" value="@chip_worth2"> </div>
-                            @Html.ValidationMessage("chip2")
-                            <div class="form-group col-md-6"> <label for="form12">Value chip 3</label> <input type="number" class="form-control" id="form12" placeholder="9001" name="chip3" value="@chip_worth3"> </div>
-                            @Html.ValidationMessage("chip3")
+                            <div class="form-group col-md-6"> <label for="form11">Value chip 2</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form11" placeholder="9001" name="chip2" value="@chip_worth2"> </div>
+                            <div class="form-group col-md-6"> <label for="form12">Value chip 3</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form12" placeholder="9001" name="chip3" value="@chip_worth3"> </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form13">Value chip 4</label> <input type="number" class="form-control" id="form13" placeholder="9001" name="chip4" value="@chip_worth4"> </div>
-                            @Html.ValidationMessage("chip4")
-                            <div class="form-group col-md-6"> <label for="form14">Value chip 5</label> <input type="number" class="form-control" id="form14" placeholder="9001" name="chip5" value="@chip_worth5"> </div>
-                            @Html.ValidationMessage("chip5")
+                            <div class="form-group col-md-6"> <label for="form13">Value chip 4</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form13" placeholder="9001" name="chip4" value="@chip_worth4"> </div>
+                            <div class="form-group col-md-6"> <label for="form14">Value chip 5</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form14" placeholder="9001" name="chip5" value="@chip_worth5"> </div>
                         </div>
-                            <input class="btn btn-primary" type="submit" name="Proceed" value="Proceed" />
+                        <input class="btn btn-primary" type="submit" name="Proceed" value="Proceed" />
                     </form>
-                </div>
             </div>
         </div>
     </div>
+</div>
