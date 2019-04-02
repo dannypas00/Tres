@@ -2,7 +2,7 @@
 @using Microsoft.VisualBasic
 
 @{
-    Layout = "~/_Layout.cshtml";	
+    Layout = "~/_Layout.cshtml";
     Page.Title = "Blindsettings";
 
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
@@ -26,6 +26,16 @@
             int big_blind = Convert.ToInt32(db.QueryValue("SELECT ValueBB FROM Blinds WHERE Room_Code = @0 ORDER BY ValueBB DESC", urlcode));
             if (!Request["small"].IsEmpty() && !Request["big"].IsEmpty())
             {
+                int hRound = Convert.ToInt32(db.QueryValue("SELECT ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID DESC", urlcode));
+
+                //if (Blind_Round <= hRound)
+                //{
+                //    if ((small_blind <= small) && (big_blind-1 <= big) && ())
+                //    {
+
+                //    }
+
+
                 if ((small_blind <= small) && (big_blind <= big))
                 {
                     int id_old = Convert.ToInt32(db.QueryValue("SELECT ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID DESC", urlcode));
@@ -39,7 +49,7 @@
                 }
                 else
                 {
-                    error = "This value(s) are too low.";
+                    error = "The value(s) is/are too low.";
                 }
             }
         }
@@ -53,9 +63,11 @@
             string Url = "AdminPage.cshtml/" + urlcode;
             Response.Redirect("~/" + Url);
         }
-    }
 
+    }
 }
+
+
 <div class="py-5 text-center">
     <div class="container">
         <div class="row">
@@ -77,55 +89,59 @@
                     <div class="row">
                         <div class="mx-auto col-lg-6 col-10">
                             <p>@error</p>
-                            <div class="row" style="justify-content:center">
-                                <div style="width:350px" class="table-responsive">
-                                    <p>Blinds</p>
-                                    <table class="table">
-                                        <tbody>
-                                            <tr>
-                                                <th>Round</th>
-                                                <th>Small</th>
-                                                <th>Big</th>
-                                                <th></th>
-                                            </tr>
-                                            @foreach (var row in db.Query("SELECT ValueSB, ValueBB, ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID ASC", urlcode))
-                                            {
-                                                int rowblindform = (int)row.ID;
+                            @if (db.QueryValue("SELECT * FROM Blinds") != null ) {
 
-                                                <tr>
-                                                    <td>
-                                                        <p>@rowblindform</p>
-                                                    </td>
-                                                    <td>
-                                                        @row.ValueSB
-                                                    </td>
-                                                    <td>
-                                                        <p>@row.ValueBB</p>
-                                                    </td>
-                                                    <td>
-                                                        <form method="post">
-                                                            <button class="btn btn-outline-primary" type="submit" name="delete" value="delete">X</button>
-                                                            @Html.Hidden("rowblindform", rowblindform)
-                                                        </form>
+                                    <div class="row" style="justify-content:center">
+                                        <div style="width:350px" class="table-responsive">
+                                            <p>Blinds</p>
+                                            <table class="table serial">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Round</th>
+                                                        <th>Small</th>
+                                                        <th>Big</th>
+                                                        <th><button class="btn btn-outline-primary" type="submit" name="edit" value="edit">Edit</button></th>
+                                                    </tr>
+                                                    @foreach (var row in db.Query("SELECT ValueSB, ValueBB, ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID ASC", urlcode))
+                                                    {
+                                                        int rowblindform = (int)row.ID;
+                                                        <tr>
 
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <form method="post">
-                                
-                            </form>
+                                                            <td>
+                                                                <p>@row.ValueSB</p>
+                                                            </td>
+                                                            <td>
+                                                                <p>@row.ValueBB</p>
+                                                            </td>
+                                                            <td>
+                                                                <form method="post">
+                                                                    <button class="btn btn-outline-primary" type="submit" name="delete" value="delete">X</button>
+                                                                    @Html.Hidden("rowblindform", rowblindform)
+                                                                </form>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                            }
                         </div>
                     </div>
-
-
-
                 </div>
             </div>
-    </div>
+</div>
+
+<script>
+    function addRowCount(tableAttr) {
+        $(tableAttr).each(function () {
+            $('td:first-child', this).each(function (i) {
+                $(this).before('<td>' + (i + 1) + '</td>');
+            });
+        });
+    }
+    addRowCount('.serial');
+</script>
 
 
                 
