@@ -10,11 +10,9 @@
     //Ajax connect with url Timer get the data roomcode
     $.ajax({
         url: "Timer.cshtml",
-        type: "get",
         data: {
             roomcode: roomcode,
-            table: table
-
+            table: roomcode
         },
         success: function (response) {
             startTimer(response); // Returns timer from db
