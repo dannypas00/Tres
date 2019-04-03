@@ -97,7 +97,7 @@
 
 
 <div class="py-5">
-    <div class="hidden"><p id="Hours">@hrs</p><p id="Minutes">@mns</p><p id="Seconds">@scs</p></div>
+    <div style="display: none;"><p id="Hours">@hrs</p><p id="Minutes">@mns</p><p id="Seconds">@scs</p></div>
     <div class="container">
         <div class="col-md-12 text-center">
             <h1>Table @table</h1>
@@ -181,11 +181,12 @@
     console.log("table" + table);
     //Ajax connect with url Timer get the data roomcode
     $.ajax({
-        url: "Timer.cshtml",
+        url: "_Timer.cshtml",
         type: "get",
         data: {
             roomCode: roomcode,
-            table: table
+            table: table,
+            round: round
         },
         success: function (response) {
             startTimer(response); // Returns timer from db
@@ -235,7 +236,6 @@
             if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
                 round++;
                 document.querySelector('#rnumber').innerHTML = round;
-    
                 currentHours = 0;
                 currentMinutes = 0;
                 currentSeconds = 0;
