@@ -3,7 +3,7 @@
 @{
     Page.Title = "Game running";
     Layout = "~/_Layout.cshtml";
-    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string connectionString = @"Server = tcp: pokerapptres.database.windows.net;Database=Pokerapp;User ID =dannypas00@pokerapptres.database.windows.net;Password=Lugia123.;Trusted_Connection=False;Encrypt=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
@@ -14,7 +14,7 @@
 
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
-        Response.Redirect("~/Login.cshtml");
+        Response.Redirect("~/default.cshtml");
     }
 
     int tables = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);

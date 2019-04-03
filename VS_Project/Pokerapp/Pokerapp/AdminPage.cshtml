@@ -5,7 +5,7 @@
     Page.Title = "Add Players";
 
     //Database connection
-    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string connectionString = @"Server = tcp: pokerapptres.database.windows.net;Database=Pokerapp;User ID =dannypas00@pokerapptres.database.windows.net;Password=Lugia123.;Trusted_Connection=False;Encrypt=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
