@@ -1,6 +1,9 @@
 ﻿@using WebMatrix.Data
 
 @{
+    Layout = "~/_Layout.cshtml";
+    Page.Title = "Add Players";
+
     //Database connection
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
@@ -17,19 +20,25 @@
     int number = 1;         //later toevoegen table number
     int rebuy = 0;          //aantal rebuys standaard op 0
 
+    Validation.Add("name", Validator.StringLength(40, 1, "Name has to between 1 - 40"));
+    Validation.RequireField("name", "A name is Required");
+
     if (IsPost)
     {
-        string name = Request["name"];
-        if (Request["AddName"] == "Add" && db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1", name, urlcode) is null)
+        if (Validation.IsValid())
         {
-            db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr, Rebuy) VALUES (@0, @1, @2, @3)", name, urlcode, number, rebuy);
-            name = null;
+            string name = Request["name"];
+            if (Request["AddName"] == "Add" && db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1", name, urlcode) is null)
+            {
+                db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr, Rebuy) VALUES (@0, @1, @2, @3)", name, urlcode, number, rebuy);
+                name = null;
+            }
+            else if (Request["delete"] == "delete")
+            {
+                db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", Request.Form["rownameform"], urlcode);
+            }
         }
-        else if (Request["delete"] == "delete")
-        {
-            db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", Request.Form["rownameform"], urlcode);
-        }
-        else if (Request["Proceed"] == "Proceed")
+        if (Request["Proceed"] == "Proceed")
         {
             Shuffle shuffle = new Shuffle();
             shuffle.ShuffleTable(db, urlcode);
@@ -38,32 +47,68 @@
     }
 
 }
+<head>
+    <style>
+        .validation-summary-errors {
+            color: red;
+            font-weight: bold;
+        }
 
-<form method="post">
-    <input type="text" name="name" placeholder="Input name here..." />
-    <input type="submit" name="AddName" value="Add" />
-</form>
+        .field-validation-error {
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+</head>
 
-<table>
-    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", urlcode))
-    {
-        string rownameform = (string)row.Name;
-        <tr>
-            <td>
-                @row.Name
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <form method="post">
-                    <button type="submit" name="delete" value="delete">X</button>
-                    @Html.Hidden("rownameform", rownameform)
-                </form>
+    <div class="py-5 text-center">
+        <div class="container">
+            <div class="row">
+                <div class="mx-auto col-lg-6 col-10">
+                    <h1>Add players</h1>
+                    <span class="help-block">
+                        @Html.ValidationSummary()
+                    </span>
+                    <form method="post">
+                        
+                            <div class="form-group"> <input name="name" type="text" class="form-control" placeholder="Enter player name" id="form1" required autofocus> </div>
+                            <div class="form-group"> <button type="submit" name="AddName" value="Add" class="btn btn-primary">Add</button> </div>
+                            
+                    </form>
 
-            </td>
-        </tr>
-    }
-</table>
-<form method="post">
-    <button type="submit" name="Proceed" value="Proceed">Proceed</button>
-</form>
+                    <div style="padding: 15px 0px 0px 0px" class="col-md-12">
+                        <div class="table-responsive">
+
+                            <table class="table">
+                                <tbody>
+                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", urlcode))
+                                    {
+                                        string rownameform = (string)row.Name;
+                                        <tr>
+                                            <td>
+                                                @row.Name
+                                            </td>
+                                            <td>
+                                                <form method="post">
+                                                    <button type="submit" name="delete" value="delete" class="btn btn-outline-secondary">X</button>
+                                                    @Html.Hidden("rownameform", rownameform)
+                                                </form>
+                                            </td>
+                                        </tr>
+
+                                    }
+                                </tbody>
+                            </table>
+                            <form method="post">
+                                <div>
+                                    <button type="submit" name="Proceed" value="Proceed" class="btn btn-primary">Proceed</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>                    
+
+

@@ -10,7 +10,11 @@
     string urlcode = url.Substring(url.Length - 7);
 
     //Get the round_time
+<<<<<<< HEAD
     var selectTimer = db.QuerySingle("SELECT Round_Time FROM Room WHERE Room_Code = @0", Request.QueryString["roomcode"].AsInt());
+=======
+    var selectTimer = db.QuerySingle("SELECT Round_Time FROM Room WHERE Room_Code = @0", Request["roomcode"].AsInt(), Request["table"].AsInt());
+>>>>>>> master
     Response.Write(selectTimer.Round_Time);
 
 }

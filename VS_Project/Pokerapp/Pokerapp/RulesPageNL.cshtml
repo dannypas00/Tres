@@ -1,0 +1,251 @@
+﻿@using WebMatrix.Data
+@{
+    Layout = "~/_Layout.cshtml";
+    Page.Title = "Spelregels";
+
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+
+    string provider = "System.Data.SqlClient";
+
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+
+    string prelink = Request.Url.AbsoluteUri;
+    string[] link = prelink.Split('/');
+    string linked = link[0] + "//" + link[2] + "/Players/" + link[4];
+    int urlcode = int.Parse(link[4]);
+
+    var chips = db.QuerySingle("SELECT Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth FROM Room WHERE  Room_Code=@0", urlcode);
+
+    int chip1 = chips.Chip_1_Worth;
+    int chip2 = chips.Chip_2_Worth;
+    int chip3 = chips.Chip_3_Worth;
+    int chip4 = chips.Chip_4_Worth;
+    int chip5 = chips.Chip_5_Worth;
+
+
+
+}
+
+<div id="begin" class="page-wrapper chiller-theme toggled">
+    <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
+        <i class="fas fa-bars"></i>
+    </a>
+    <!--Sidebar start-->
+    <nav id="sidebar" class="sidebar-wrapper">
+        <div class="sidebar-content">
+            <div class="sidebar-header">
+                <div class="user-pic">
+                    <img class="img-responsive img-rounded" src="~/assets/logo.png"
+                         alt="Tres Logo">
+                </div>
+                <div id="close-sidebar" style="float:right">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <!-- TOC start -->
+            <div class="sidebar-menu">
+                <ul>
+                    <li> <a href="#begin">Top</a> </li>
+                    <li> <a href="#test">Doel van Texas Holdem</a> </li>
+                    <li> <a href="#test2">Kaartvolgorde</a> </li>
+                    <li> <a href="#test3">Spelverloop</a> </li>
+                    <li> <a href="#test4">Blinds</a> </li>
+                    <li> <a href="#test5">Preflop</a> </li>
+                    <li> <a href="#test6">De Flop</a> </li>
+                    <li> <a href="#test7">De Turn</a> </li>
+                    <li> <a href="#test8">De River</a> </li>
+                    <li> <a href="#test9">Split Pot</a> </li>
+                    <li> <a href="#test10">Poker Jargon</a></li>
+                    <li style="visibility:hidden"> -----------------------</li>
+                    <li> <a href="@linked">Players View</a></li>
+                </ul>
+            </div>
+            <!-- TOC end -->
+        </div>
+        <!-- Footer with chip values start -->
+        <div class="sidebar-footer">
+            <a>
+                <span style="color:darkblue">@chip1 </span>
+            </a>
+            <a>
+                <span style="color:darkred">@chip2</span>
+            </a>
+            <a>
+                <span style="color:darkgreen">@chip3</span>
+            </a>
+            <a>
+                <span style="color:ghostwhite">@chip4</span>
+            </a>
+            <a>
+                <span style="color:black">@chip5</span>
+            </a>
+        </div>
+        <!-- Footer with chip values end -->
+    </nav>
+    <!-- Sidebar end-->
+    <!-- Page content start-->
+    <main class="page-content">
+        <div class="header">
+            <div style="cursor:pointer; float:right; margin-right:30px" class="btn btn-primary clickableBtn" data-href="@linked">
+                Players View
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-9">
+
+                    <div>
+                        <h2 id="test">Doel van Texas Holdem</h2>
+                        <p>
+                            Je bent beginnend pokerspeler en je weet nog niet hoe alles precies werkt, om je op weg
+                            te helpen krijg je zoveel mogelijk informatie over het spelen van poker en
+                            zaken die daar mee te maken hebben. Uiteraard
+                            moet je de spelregels kennen, om te beginnen die van de populairste variant Texas
+                            hold’em.
+                        </p>
+                        <p>
+                            Er wordt
+                            gespeeld met 2 tot 10 mensen en een deck van 52 kaarten. Elke ronde krijgt je net als de andere spelers 2 kaarten die alleen voor jezelf zichtbaar
+                            zijn. In de loop van de spelronde worden er 5 kaarten open op tafel gelegd die
+                            voor iedereen zichtbaar zijn, de speler die overblijft met de beste hand wint.
+                        </p>
+                        <p>
+
+                            Laat na de uitleg van de pokerregels alles rustig op je inwerken en probeer niet alles meteen te begrijpen. Pak een spel kaarten om de verschillende combinaties die we in het artikel hieronder noemen uit te proberen. Zodra je denk dat je de poker spelregels volledig hebt begrepen kan je beginnen met spelen.
+                        </p>
+                    </div>
+                    <div>
+                        <h2 id="test2">Kaartvolgorde</h2>
+                        <p><b>Onderdeel van poker&nbsp; is begrip van de handranking.</b></p><p><b></b>Dit is een soort van puntentelling om te weten of je een sterke kaart hebt. Iedere speler wil graag de hoogste kaart combinatie in een hand van vijf kaarten, we noemen hier de volgorde van hoog naar laag. Wie aan het einde van een ronde nog in het spel zit en de beste pokerhand heeft is winnaar en krijgt de pot die op tafel ligt.</p><p><img alt="hps-11jpg" src="//d2f0ora2gkri0g.cloudfront.net/e2/41/e241fff2-8649-436e-8143-100924ddc50d.jpg"><br></p><p><strong>Royal Flush</strong>&nbsp;Aas, Koning, Vrouw, Boer, 10 van gelijk teken is de hoogst mogelijke pokerhand.<br><strong>Straight Flush</strong>&nbsp;Vijf opeenvolgende kaarten van gelijke teken. De Aas kan zowel voor de twee als na de Koning. Bij meerdere Straight Flush-handen beslist de hoogste kaart.<br><strong>Four of a kind</strong>&nbsp;Vier gelijkwaardige kaarten in dit geval vier boeren. Een Four of a Kind-hand is in bijna alle gevallen de winnaar.<br><strong>Full house</strong>&nbsp;Combinatie van Three of a kind en een One pair. Soms komt er in dezelfde ronde twee of meer keer Full House op tafel. Dan beslist de hoogste Three of a Kind, is deze gelijk dan is het pair beslissend.<br><strong>Flush</strong>&nbsp;Vijf willekeurige kaarten van gelijke teken. Bij twee of meer Flush-handen beslist de hoogste kaart, daarna de volgende in de reeks.<br><strong>Straight</strong>&nbsp;Opeenvolgende kaarten van verschillende tekens. De Aas kan voor de twee en na de Koning. De laagst mogelijke straat is A2345, de hoogste is TJVKA. Bij meerdere Straight-handen beslist de hoogste kaart.<br><strong>Three of a kind</strong>&nbsp;Drie gelijkwaardige kaarten, in dit geval drie koningen. Deze hand is vaak genoeg om de pot te winnen.<br><strong>Two pair</strong>&nbsp;Verschillende paren. Bij meer Two Pair-handen is de waarde van het hoogste paar beslissend. Is die gelijk, dan beslist de waarde van het volgende paar of van de 5e kaart.<br><strong>One pair</strong>&nbsp;Bij gelijke combinaties beslist de hoogte van de volgende kaart<br><strong>High card</strong>&nbsp;Vijf verschillende kaarten zonder een combinatie. Eerst kijk je natuurlijk wie de hoogste kaart heeft. Is die gelijk dan beslist de tweede kaart, is die ook gelijk dan gaat het om de waarde van de volgende.</p>
+
+                    </div>
+                    <div>
+                        <h2 id="test3">Spelverloop</h2>
+                        <p>
+                            Een zogenaamde dealer button geeft aan wie dat spel de dealer is; dit fiche schuift telkens een plaats op. Het inzetten begint met een small blind en een big blind.
+                            Dat zijn inzetten die. de spelers verplicht moeten links van hem doet de big blind. Vervolgens zet iedereen in de gebruikelijke volgorde in. Als je op internet speelt
+                            wordt het delen zelf voor je gedaan, maar ook dan wordt de dealer button getoond aan tafel.
+                        </p>
+                    </div>
+                    <div>
+                        <h2 id="test4">De Blinds</h2>
+                        <p>
+                            Voordat we echt beginnen te spelen is de eerste speler
+                            links van de dealer verplicht om blind een vooraf afgesproken bedrag in te zetten (small blind), waarna de speler links van deze small blind op zijn beurt de big blind zet,
+                            die in de meeste gevallen twee keer zo hoog is als de small blind. De hoogte hangt af van de gespeelde limiet. Bij online poker gaat het allemaal automatisch.
+                        </p>
+                    </div>
+                    <div>
+                        <h2 id="test5">Eerste inzetronde: Preflop</h2>
+                        <p>
+                            De speler aan de linkerkant van de Big Blind is als eerste aan de beurt. Hij of zij heeft drie opties: Call, Raise of Fold. Bij Call zet de speler het zelfde bedrag in als de Big Blind,
+                            bij Raise zet deze pokerspeler een extra bedrag in. Bij Fold is deze ronde voor hem ten einde, je speelt niet meer mee om de pot, maar het kost hem ook geen inzet. Bijkomende optie
+                            is Re-raise, een extra verhoging na een Raise.
+                        </p>
+                        <ul>
+                            <li><b>Call:</b> Je gaat mee met de inzet van de big blind en legt hetzelfde aantal fiches in.</li>
+                            <li><b>Raise:</b> Je verhoogt de inzet en legt dus meer in dan de big blind.</li>
+                            <li><b>Fold:</b> Je kaarten zijn te slecht om te spelen. Je gooit ze weg. (Mucken)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2 id="test6">Tweede inzetronde: De Flop</h2>
+                        <p>
+                            Er komen 3 kaarten op tafel die voor iedereen zichtbaar zijn. Deze drie kaarten vormen de Flop en elke speler gebruikt ze om samen met z’n handkaarten een combinatie van vijf
+                            kaarten te maken. Behalve Call, Raise of ReRaise kun je ook Checken. Je mag gratis doorspelen tot de volgende beurt. Als er een inzet voor je is gedaan, kun je Callen voor dat
+                            bedrag of het bedrag verhogen (Raise).
+                        </p>
+                    </div>
+                    <div>
+                        <h2 id="test7">Derde inzetronde: De Turn</h2>
+                        <p>
+                            Na de tweede inzetronde, wordt de volgende kaart open gelegd. Dit is de Turn kaart. Deze kaart
+                            is weer een aanvulling op de handkaarten van de spelers om een pokerhand van vijf kaarten te maken. Spelers kunnen weer checken, betten, callen, raisen en natuurlijk folden.
+                        </p>
+                    </div>
+                    <div>
+                        <h2 id="test8">Laatste inzettronde: De River</h2>
+                        <p>
+                            Na de derde inzetronde wordt de vijfde en laatste gemeenschappelijke kaart open gelegd. Dit is de River kaart. Nu volgt de laatste inzetronde. Deze gaat vooraf aan de Showdown.
+                            Dat is het moment dat iedereen die nog in het spel zit de kaarten moeten openleggen. Winnaar is degene met de hoogste kaart, hij of zij krijgt de pot. Bij gelijke kaarten wordt er gedeeld.
+                        </p>
+                    </div>
+                    <div>
+                        <h2 id="test9">Split Pot</h2>
+                        <p>
+                            Wanneer er twee dezelfde winnende handen zijn, is het split pot. Kan de pot niet precies worden verdeeld en is er sprake van een overblijvende chip, dan
+                            gaat deze naar de speler die de laatste inzet of verhoging heeft gedaan. Is dat ook onbeslist dan gaat de chip naar de speler links van de dealer.
+                        </p>
+                    </div>
+                    <div>
+                        <h2 id="test10">Poker Jargon</h2>
+                        <p>Hieronder hebben we een aantal pokertermen met hun betekenis vermeld. Deze kunnen duidelijkheid bieden bij het leren van de poker regels.</p>
+                        <p>
+                            <b>All in: </b>Speler die al zijn geld in de pot heeft zitten.<br />
+                            <b>Bet: </b>Een inzet plaatsen voordat iemand anders een inzet heeft geplaatst in een bepaalde ronde.<br />
+                            <b>Blind:</b> Verplichte inzet die spelers moeten inzetten voordat de dichte kaarten gedeeld worden. De blinds schuiven met de klok mee na elke speelronde.<br />
+                            <b>Bluff:</b> Een bet of een raise van een speler die denkt dat hij niet de beste hand heeft.<br />
+                            <b>Board:</b> De open kaarten die op tafel liggen.<br />
+                            <b>Button</b>: Meestal een ronde schijf van plastic die bij de deler ligt. Zo kan iedereen aan tafel zien wie de deler is. De schijf schuift elke beurt met de deler mee.<br />
+                            <b>Buy in:</b> Het in te leggen geld in een toernooi of een cash game.<br />
+                            <b>Call:</b> Net zoveel inzetten als een eerder geplaatste inzet.<br />
+                            <b>Caller:</b> Speler die een bet of een raise called.<br />
+                            <b>Check:</b> Niks inzetten en de beurt doorgeven aan de volgende speler.<br />
+                            <b>Check-raise:</b> Eerst checken en wanneer een andere speler vervolgens bet, deze bet raisen.<br />
+                            <b>Chip:</b> Een ronde munt in verschillende kleuren die geld representeert.<br />
+                            <b>Chipstack:</b> Totaal aantal chips die een speler bezit.<br />
+                            <b>Family pot:</b> Speelronde waarbij de meeste spelers meespelen voor de flop.<br />
+                            <b>Flop:</b> De eerste drie kaarten die open op tafel komen na de eerste inzetronde.<br />
+                            <b>Flush:</b> Vijf willekeurige kaarten van dezelfde soort (harten, ruiten, schoppen of klaveren).<br />
+                            <b>Fold:</b> Je kaarten weggooien en niet meer meespelen.<br />
+                            <b>Four-of-a-kind:</b> Vier dezelfde kaarten (soort maakt niet uit). Bijvoorbeeld vier boeren.<br />
+                            <b>Full House:</b> Drie om twee dezelfde kaarten (soort maakt niet uit). Bijvoorbeeld drie azen en twee boeren.<br />
+                            <b>Heads up:</b> Spel tussen twee (overgebleven) spelers.<br />
+                            <b>Kicker: </b>Kaart die niet meetelt in de gemaakte combinatie. Zie hoofdstuk uitzonderlijke situaties.<br />
+                            <b>Late positie:</b> Positie van een speler wanneer hij de button heeft (en dus deler is) of vlak voor de button zit. Dit betekent dat bijna alle andere spelers eerst wat moeten doen voordat hij aan de beurt is. Meest favoriete positie, omdat je nu kunt kijken wat andere spelers inzetten voordat je zelf iets hoeft in te zetten.<br />
+                            <b>Limit:</b> Maximale bedrag dat een speler in mag zetten tijdens een inzetronde.<br />
+                            <b>Midden positie:</b> Positie van een speler wanneer hij ongeveer in het midden van alle spelers zit. Dit betekent dat er ongeveer net zoveel spelers voor als achter hem zitten in deze spelronde.<br />
+                            <b>Muck:</b> Het bakje waarin de kaarten verdwijnen als ze niet meer gebruikt worden. Wanneer iemand zijn hand ‘muckt’, gooit hij zijn kaarten weg en fold hij.<br />
+                            <b>Nuts:</b> De beste hand mogelijk. Wanneer een speler de nuts heeft, kan hij dus niet verliezen.<br />
+                            <b>Off-suit:</b> Kaarten die niet van dezelfde soort (suit) zijn. Dus bijvoorbeeld een harten en een schoppen.<br />
+                            <b>Overcard:</b> Kaart die een speler in zijn hand heeft en die hoger is dan alle kaarten die open op tafel liggen.<br />
+                            <b>Overpair:</b> Een paar die een speler in zijn hand heeft en die hoger is dan alle open kaarten die op tafel liggen.<br />
+                            <b>Pair:</b> Twee dezelfde kaarten. Bijvoorbeeld twee vrouwen.<br />
+                            <b>Position:</b> Positie van een speler waarbij gelet wordt op het moment van inzetten. Zie ook vroege, midden en late positie.<br />
+                            <b>Pot:</b> Totale hoeveelheid geld dat in het midden van de tafel ligt.<br />
+                            <b>Raise:</b> Een extra inzet plaatsen bovenop een al eerder geplaatste inzet.<br />
+                            <b>Raiser:</b> Speler die een raise plaatst.<br />
+                            <b>Rake:</b> Bedrag uit elke pot dat betaalt moet worden aan het casino wanneer men in een casino speelt.<br />
+                            <b>Reraise:</b> Een raise plaatsen wanneer een andere speler ook al geraised heeft.<br />
+                            <b>River:</b> De vijfde en laatste open kaart op tafel.<br />
+                            <b>Royal flush:</b> De vijf hoogste kaarten van elke soort (harten, schoppen, klaveren en ruiten). Dus tien, boer, vrouw, heer en aas van dezelfde soort. Hoogste mogelijke hand haalbaar met poker.<br />
+                            <b>Side pot:</b> Een tweede pot wanneer een van de spelers all-in is en de andere actieve spelers nog meer inzetten.<br />
+                            <b>Straight:</b> Vijf opeenvolgende kaarten (soort maakt niet uit). Bijvoorbeeld negen, tien, boer, vrouw, heer.<br />
+                            <b>Straight flush:</b> Vijf opeenvolgende kaarten van dezelfde soort. Bijvoorbeeld negen, tien, boer, vrouw, heer van de soort harten.<br />
+                            <b>Suited:</b> Kaarten die van dezelfde soort (suit) zijn.<br />
+                            <b>Three of a kind:</b> Drie dezelfde kaarten (soort maakt niet uit). Bijvoorbeeld drie vrouwen.<br />
+                            <b>Top pair:</b> Een paar met de hoogste kaart die open op tafel ligt.<br />
+                            <b>Turn:</b> De vierde open kaart op tafel.<br />
+                            <b>Vroege positie:</b> Positie van een speler wanneer hij in de blinds of vlak achter de blinds zit. Dit betekent dat hij moet inzetten voordat de meeste andere spelers iets gedaan hebben in deze spelronde.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+    <!-- Page content end -->
+</div>
+<script src="~/js/smooth-scroll.js"></script>
+<script src="~/js/sidebarmenu.js"></script>
+<script src="~/js/jquery.ba-outside-events.min.js"></script>
+<script>
+    jQuery(document).ready(function ($) {
+        $(".clickableBtn").click(function () {
+            window.location = $(this).data("href");
+        });
+    });
+</script>
+<!-- page-wrapper -->
+

@@ -4,14 +4,18 @@
 ﻿@using WebMatrix.Data
 
 @{
+    Layout = "~/_Layout.cshtml";
+    Page.Title = "Select Game";
+
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-    string url = Request.Url.AbsolutePath;
-    string[] urlCode = url.Split('/');
-    string table = urlCode[3];
-    string roomCode = urlCode[2];
+
+    int roomCode = Request.QueryString["roomcode"].AsInt();
+    int table = Request.QueryString["table"].AsInt();
+    string Url = "RulesPageNL/" + roomCode;
+    string urlBack = "Players/" + roomCode;
 
     int table = Convert.ToInt32(Session["tablenumber"]);
 
@@ -25,6 +29,12 @@
     {
         tweede = eerste;
     }
+    //if (aantal > 10)    //Haal max spelers uit database
+    //{
+    //    string Url = "Players.cshtml/" + roomCode;
+    //    Response.Redirect("~/" + Url);
+    //}
+
 
     if (IsPost && !Request["blindnext"].IsEmpty())
     {
@@ -32,45 +42,68 @@
         int new_Round = current_Round + 1;
         db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", new_Round, roomCode);
         <script>
+            //$(document).ready(function() {
             alert("The blind has been raised!");
+            //})
         </script>
     }
-
     int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
     var blind_id = db.Query("SELECT Top (@0) ID FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
-
-    var small_blind = db.Query("SELECT TOP (@0) Value FROM Blinds WHERE Room_Code = @1 AND S_B = 's' ORDER BY ID ASC", id, roomCode);
+    int min_size = db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", roomCode);
+    var small_blind = db.Query("SELECT TOP (@0) ValueSB FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
     int small = 0;
     foreach (var a in small_blind)
     {
-        if (a.Value > small)
+        if (a.ValueSB > small)
         {
-            small = a.Value;
+            small = a.ValueSB;
         }
     }
-    var big_blind = db.Query("SELECT TOP (@0) Value FROM Blinds WHERE Room_Code = @1 AND S_B = 'b' ORDER BY ID ASC", id, roomCode);
+    var big_blind = db.Query("SELECT TOP (@0) ValueBB FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
     int big = 0;
     foreach (var a in big_blind)
     {
-        if (a.Value > big)
+        if (a.ValueBB > big)
         {
-            big = a.Value;
+            big = a.ValueBB;
         }
     }
 
-    if (!IsPost)
+    db.Execute("UPDATE Room SET Small_Blind = @0, Big_Blind = @1 WHERE Room_Code = @2", small, big, roomCode);
+    int players = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
+    if (min_size >= players)
     {
-        db.Execute("UPDATE Room SET Small_Blind = @0, Big_Blind = @1 WHERE Room_Code = @2", small, big, roomCode);
+        <script>
+            alert("The minimum size has been reached!");
+        </script>
+        Shuffle shuffle = new Shuffle();
+        shuffle.ShuffleTable(db, roomCode);
+        Url = "Players.cshtml/" + roomCode;
+        Response.Redirect("~/" + Url);
     }
+
+
 }
 
-<h1>Table @table</h1>
-<br />
-<div>
-    @{
+        <div class="header">
+            <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
+                Rules
+            </div>
+            <div style="cursor:pointer; float:right; margin-top:40px;margin-right:10px" class="btn btn-primary clickableBtn" data-href="@urlBack">
+                Back
+            </div>
+        </div>
+<div class="py-5">
 
-        //Jorit, fix je code, het werkt voor geen meter.
+    <div class="container">
+        <div class="col-md-12 text-center">
+            <h1>Table @table</h1>
+        </div>
+        <div class="col-md-12 text-center">
+            <div id="roomCode" style="display:none;">@roomCode</div>
+            <div id="table" style="display:none;">@table</div>
 
+<<<<<<< HEAD
         @*foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, roomCode, table))
         {
             player++;
@@ -105,3 +138,158 @@
     }
 </div>
 >>>>>>> merge-tableview
+=======
+            <div name="timer" class="timer"></div>
+            <div class="round">This is round: <span id="rnumber"></span></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <p>Small blind: @small</p>
+                <p>Big blind: @big</p>
+                <form method="post">
+                    <input class="btn btn-outline-secondary" type="submit" name="blindnext" value="Raise blinds" />
+                </form>
+            </div>
+            <div class="gridd">
+                <div class="white"></div>
+                <div class="white2"></div>
+                <div class="white3"></div>
+                <div class="white4"></div>
+                @if (aantal <= 7)
+                {
+                    foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", roomCode, table, tweede))
+                    {
+                        <div class="chair2">
+                            <img src="~/stoel.png" alt="chair" style="width:75px;height:75px" />
+                            <b>@a.Name</b>
+                        </div>
+                    }
+
+                    foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, roomCode, table))
+                    {
+
+                        <div class="chair">
+                            <img src="~/stoel.png" alt="chair" style="width:75px;height:75px" />
+                            <b>@a.Name</b>
+                        </div>
+                    }
+                }
+                @if (aantal > 7)
+                {
+                    foreach (var a in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name ASC", roomCode, table))
+                    {
+                        <div class="chair">
+                            <img src="stoel.png" alt="chair" style="width:75px;height:75px" />
+                            <b>@a.Name</b>
+                        </div>
+                    }
+                }
+
+                <div class="table">
+                    <img src="~/tafel.png" name="pokertable" style="height:250px; width:100%" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    jQuery(document).ready(function ($) {
+        $(".clickableBtn").click(function () {
+            window.location = $(this).data("href");
+        });
+    });
+
+$(document).ready(function () {
+            var roomcode = $("#roomCode").html();
+            $("#roomCode").remove();
+
+            var table = $("#table").html();
+            $("#table").remove();
+
+            console.log("roomcode" + roomcode);
+            console.log("table" + table);
+            //Ajax connect with url Timer get the data roomcode
+            $.ajax({
+                url: "Timer.cshtml",
+                type: "get",
+                data: {
+                    roomCode: @roomCode,
+                    table: @table,
+                },
+                success: function (response) {
+                    startTimer(response); // Returns timer from db
+                }
+            });
+
+
+            function startTimer(timer) {
+                var timer = timer.split(":"); // Split timer
+
+                var targetHours = parseInt(timer[0]); // Parse hours to int
+                var targetMinutes = parseInt(timer[1]);
+                var targetSeconds = parseInt(timer[2]);
+
+                var currentHours = 0;
+                var currentMinutes = 0;
+                var currentSeconds = 0;
+
+                var displayHours;
+                var displayMinutes;
+                var displaySeconds;
+
+                var round = 1;
+                document.querySelector('#rnumber').innerHTML = round;
+
+                //Increment timer
+                setInterval(function () {
+                    var displayHours = currentHours;
+                    var displayMinutes = currentMinutes;
+                    var displaySeconds = currentSeconds;
+
+                    sessionStorage.setItem("timer", displayHours);
+
+
+                    if (currentHours.toString().length < 2) {
+                        displayHours = "0" + currentHours;
+                    }
+
+                    if (currentMinutes.toString().length < 2) {
+                        displayMinutes = "0" + currentMinutes;
+                    }
+
+                    if (currentSeconds.toString().length < 2) {
+                        displaySeconds = "0" + currentSeconds;
+                    }
+
+                    document.querySelector('.timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
+
+
+                    // if condition is met round + 1
+                    if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
+                        round++;
+                        document.querySelector('#rnumber').innerHTML = round;
+
+                        currentHours = 0;
+                        currentMinutes = 0;
+                        currentSeconds = 0;
+                    }
+
+                    currentSeconds++;
+
+                    if (currentSeconds == 60) {
+                        currentMinutes++;
+                        currentSeconds = 0;
+                    }
+
+                    if (currentMinutes == 60) {
+                        currentHours++;
+                        currentMinutes = 0;
+                    }
+                }, 1000);
+            }
+        });</script>
+>>>>>>> master

@@ -1,6 +1,11 @@
 ﻿@using WebMatrix.Data
+
 @{
-    //Database connection
+    //load loadout
+    Layout = "~/_Layout.cshtml";
+    Page.Title = "Settings";
+
+    //database connection
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
@@ -11,69 +16,93 @@
     int code = Convert.ToInt32(urlcode);
 
     #region Validators
+    //check if cookie is still valid
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
         Response.Redirect("~/Login.cshtml");
     }
 
-    //Mogen comments bij
-    Validation.Add("round_time", Validator.StringLength(8, 8, "MESSAGE"));
-    Validation.Add("pause_time", Validator.StringLength(8, 0, "MESSAGE"));
-    Validation.Add("blind_time", Validator.StringLength(8, 0, "MESSAGE"));
-    Validation.Add("min_table", Validator.StringLength(2, 1, "MESSAGE"));
-    Validation.Add("max_table", Validator.StringLength(2, 1, "MESSAGE"));
-    Validation.Add("start_value", Validator.StringLength(3, 1, "MESSAGE"));
-    Validation.Add("table_amount", Validator.StringLength(2, 1, "MESSAGE"));
-    Validation.Add("rebuy", Validator.StringLength(1, 1, "MESSAGE"));
-    Validation.Add("chip1", Validator.StringLength(3, 1, "MESSAGE"));
-    Validation.Add("chip2", Validator.StringLength(3, 1, "MESSAGE"));
-    Validation.Add("chip3", Validator.StringLength(3, 1, "MESSAGE"));
-    Validation.Add("chip4", Validator.StringLength(3, 1, "MESSAGE"));
-    Validation.Add("chip5", Validator.StringLength(3, 1, "MESSAGE"));
+    //Validation for input
+    Validation.Add("room_name", Validator.StringLength(30, 1, "Name has to between 1-30 characters"));
+    Validation.Add("round_time", Validator.StringLength(8, 8, "Incorrect format for round time please use hh:mm:ss"));
+    Validation.Add("pause_time", Validator.StringLength(8, 8, "Incorrect format for pause time please use hh:mm:ss"));
+    Validation.Add("blind_time", Validator.StringLength(8, 8, "Incorrect format for blind time please use hh:mm:ss"));
+    Validation.Add("min_table", Validator.Range(2, 99, "Minimum amount is 2 players per table"));
+    Validation.Add("max_table", Validator.Range(2, 10, "Maximum amount of players per table is 10"));
+    Validation.Add("start_value", Validator.Range(1, 999999, "The range of the start value is 1 - 9.999.999"));
+    Validation.Add("tbl_amount", Validator.Range(1, 99, "Please set a realistic amount of tables"));
+    Validation.Add("rebuy", Validator.Range(0, 999, "Rebuy has to be 0 or higher"));
+    Validation.Add("chip1", Validator.Range(1, 999999, "Chip 1 has to have a value of at least 1"));
+    Validation.Add("chip2", Validator.Range(1, 999999, "Chip 2 has to have a value of at least 1"));
+    Validation.Add("chip3", Validator.Range(1, 999999, "Chip 3 has to have a value of at least 1"));
+    Validation.Add("chip4", Validator.Range(1, 999999, "Chip 4 has to have a value of at least 1"));
+    Validation.Add("chip5", Validator.Range(1, 999999, "Chip 5 has to have a value of at least 1"));
     #endregion
 
     #region Setting default
-    var round_time = "00:30:00";
-    var pause_time = "00:00:00";
-    var blind_time = "00:00:00";
-    int min_table = 4;
-    int max_table_amount = 6;
-    int start_value = 10;
-    int table_amount = 1;
-    int rebuy = 0;
+    //on first load settings
+    string room_name = "";
+    TimeSpan round_time = new TimeSpan(00,30,00);
+    TimeSpan pause_time = new TimeSpan(00,30,00);
+    TimeSpan blind_time = new TimeSpan(00,05,00);
+    int min_table = 2;
+    int max_table_amount = 8;
+    int start_value = 1000;
+    int table_amount = 3;
+    int rebuy = 3;
     int chip_worth1 = 1;
     int chip_worth2 = 2;
-    int chip_worth3 = 3;
-    int chip_worth4 = 4;
-    int chip_worth5 = 5;
+    int chip_worth3 = 5;
+    int chip_worth4 = 10;
+    int chip_worth5 = 25;
+    DateTime today = DateTime.Now;
     #endregion
 
     #region Retrieving from database
-    dynamic room = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
-    if (room == code)
+    //check for correct roomcode
+    // dynamic room = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
+    dynamic room = db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", code);
+    if (room != null && room.Room_Code == code)
     {
+        room_name = room.Room_Name;
+        round_time = room.Round_Time;
+        pause_time = room.Pause_Time;
+        blind_time = room.Blind_Time;
+        min_table = room.Tbl_Min_Size;
+        max_table_amount = room.Tbl_Max_Size;
+        start_value = room.Start_Value;
+        table_amount = room.Tbl_Amount;
+        rebuy = room.Allow_Rebuy;
+        chip_worth1 = room.Chip_1_Worth;
+        chip_worth2 = room.Chip_2_Worth;
+        chip_worth3 = room.Chip_3_Worth;
+        chip_worth4 = room.Chip_4_Worth;
+        chip_worth5 = room.Chip_5_Worth;
+
         //Comments plz
         //Haal de object "room" op uit de database en haal daar alle waardes uit. Is minder resource intensive
-        round_time = Convert.ToString(db.QueryValue("SELECT Round_Time FROM Room WHERE Room_Code = @0", code));
-        pause_time = Convert.ToString(db.QueryValue("SELECT Pause_Time FROM Room WHERE Room_Code = @0", code));
-        blind_time = Convert.ToString(db.QueryValue("SELECT Blind_Time FROM Room WHERE Room_Code = @0", code));
-        min_table = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", code));
-        max_table_amount = Convert.ToInt32(db.QueryValue("SELECT Tbl_Max_Size FROM Room WHERE Room_Code = @0", code));
-        start_value = Convert.ToInt32(db.QueryValue("SELECT Start_Value FROM Room WHERE Room_Code = @0", code));
-        table_amount = Convert.ToInt32(db.QueryValue("SELECT Tbl_Amount FROM Room WHERE Room_Code = @0", code));
-        rebuy = Convert.ToInt32(db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", code));
-        chip_worth1 = Convert.ToInt32(db.QueryValue("SELECT Chip_1_Worth FROM Room WHERE Room_Code = @0", code));
-        chip_worth2 = Convert.ToInt32(db.QueryValue("SELECT Chip_2_Worth FROM Room WHERE Room_Code = @0", code));
-        chip_worth3 = Convert.ToInt32(db.QueryValue("SELECT Chip_3_Worth FROM Room WHERE Room_Code = @0", code));
-        chip_worth4 = Convert.ToInt32(db.QueryValue("SELECT Chip_4_Worth FROM Room WHERE Room_Code = @0", code));
-        chip_worth5 = Convert.ToInt32(db.QueryValue("SELECT Chip_5_Worth FROM Room WHERE Room_Code = @0", code));
+        //room_name = Convert.ToString(db.QueryValue("SELECT Room_Name FROM Room WHERE Room_Code = @0", code));
+        //round_time = Convert.ToString(db.QueryValue("SELECT Round_Time FROM Room WHERE Room_Code = @0", code));
+        //pause_time = Convert.ToString(db.QueryValue("SELECT Pause_Time FROM Room WHERE Room_Code = @0", code));
+        //blind_time = Convert.ToString(db.QueryValue("SELECT Blind_Time FROM Room WHERE Room_Code = @0", code));
+        //min_table = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", code));
+        //max_table_amount = Convert.ToInt32(db.QueryValue("SELECT Tbl_Max_Size FROM Room WHERE Room_Code = @0", code));
+        //start_value = Convert.ToInt32(db.QueryValue("SELECT Start_Value FROM Room WHERE Room_Code = @0", code));
+        //table_amount = Convert.ToInt32(db.QueryValue("SELECT Tbl_Amount FROM Room WHERE Room_Code = @0", code));
+        //rebuy = Convert.ToInt32(db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", code));
+        //chip_worth1 = Convert.ToInt32(db.QueryValue("SELECT Chip_1_Worth FROM Room WHERE Room_Code = @0", code));
+        //chip_worth2 = Convert.ToInt32(db.QueryValue("SELECT Chip_2_Worth FROM Room WHERE Room_Code = @0", code));
+        //chip_worth3 = Convert.ToInt32(db.QueryValue("SELECT Chip_3_Worth FROM Room WHERE Room_Code = @0", code));
+        //chip_worth4 = Convert.ToInt32(db.QueryValue("SELECT Chip_4_Worth FROM Room WHERE Room_Code = @0", code));
+        //chip_worth5 = Convert.ToInt32(db.QueryValue("SELECT Chip_5_Worth FROM Room WHERE Room_Code = @0", code));
     }
     #endregion
 
     #region Saving logic
+    //updates or adds all the values
     void Save()
     {
-        int players = Convert.ToInt32(Request["nr_players"]);
+        string roomname = Request["Room_Name"];
         var time = Request["round_time"];
         int min_table_size = Convert.ToInt32(Request["min_table"]);
         int max_table_size = Convert.ToInt32(Request["max_table"]);
@@ -91,93 +120,100 @@
         int blind_round = 1;
         int small = 0;
         int big = 0;
+        today = DateTime.Now;
 
         var check = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
         if (check == code)
         {
-            db.Execute("UPDATE Room SET Room_Code = @0, Tbl_Min_Size = @1, Started = @2, Chip_1_Worth = @3, Chip_2_Worth = @4, Chip_3_Worth = @5, Chip_4_Worth = @6, Chip_5_Worth = @7, Round_Time = @8, Pause_Time = @9, Blind_Time = @10, Allow_Rebuy = @11, Start_Value = @12, Tbl_Amount = @13, Tbl_Max_Size = @14, Blind_Round = 1, Small_Blind = 0, Big_Blind = 0 WHERE Room_Code = @0"
-            , code, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size);
+            db.Execute("UPDATE Room SET Room_Code = @0, Room_Name = @1, Tbl_Min_Size = @2, Started = @3, Chip_1_Worth = @4, Chip_2_Worth = @5, Chip_3_Worth = @6, Chip_4_Worth = @7, Chip_5_Worth = @8, Round_Time = @9, Pause_Time = @10, Blind_Time = @11, Allow_Rebuy = @12, Start_Value = @13, Tbl_Amount = @14, Tbl_Max_Size = @15, Blind_Round = 1, Small_Blind = 0, Big_Blind = 0, Room_Create_Date = @16 WHERE Room_Code = @0"
+            , code, roomname, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, today);
         }
         else
         {
-            db.Execute("INSERT INTO Room (Room_Code, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Blind_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size, Blind_Round, Small_Blind, Big_Blind)" +
-            "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17)", code, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, blind_round, small, big);
+            db.Execute("INSERT INTO Room (Room_Code, Room_Name, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Blind_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size, Blind_Round, Small_Blind, Big_Blind, Room_Create_Date)" +
+            "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17, @18, @19)", code, roomname, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, blind_round, small, big, today);
         }
     }
     #endregion
 
-    if (IsPost && Validation.IsValid() && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
+    //continues to next page
+    if (IsPost && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {
-        if (Request["Proceed"] == "Proceed")
+        if (Validation.IsValid())
         {
-            Save();
-            Response.Redirect("~/AdminPage.cshtml/" + code);
-        }
-        else if (Request["save"] == "Save")
-        {
-            Save();
-        }
-        else
-        {
-            Response.Redirect("~/Login.cshtml");
+            if (Request["Proceed"] == "Proceed")
+            {
+                Save();
+                Response.Redirect("~/Blinds.cshtml/" + code);
+            }
+            else
+            {
+                Response.Redirect("~/Login.cshtml");
+            }
         }
     }
 }
 
-<h1>Settings</h1>
-<form name="Settings" method="post">
-    <p>Start value</p>
-    <input type="number" name="start_value" value="@start_value" /><br />
-    <br />
-    @Html.ValidationMessage("start_value")
-    <p>Time per round</p>
-    <input type="text" name="round_time" value="@round_time" /><br />
-    <br />
-    @Html.ValidationMessage("round_time")
-    <p>Time for pause</p>
-    <input type="text" name="pause_time" value="@pause_time" /><br />
-    <br />
-    @Html.ValidationMessage("pause_time")
-    <p>Time for blind</p>
-    <input type="text" name="blind_time" value="@blind_time" /><br />
-    <br />
-    @Html.ValidationMessage("blind_time")
-    <p>Minimum players per table</p>
-    <input type="number" name="min_table" value="@min_table" /><br />
-    <br />
-    @Html.ValidationMessage("min_table")
-    <p>Maximum players per table</p>
-    <input type="number" name="max_table" value="@max_table_amount" /><br />
-    <br />
-    @Html.ValidationMessage("max_table")
-    <p>Amount of tables</p>
-    <input type="number" name="tbl_amount" value="@table_amount" /><br />
-    <br />
-    @Html.ValidationMessage("table_amount")
-    <p>Allow rebuy</p>
-    <input type="text" name="rebuy" value="@rebuy" /><br />
-    <br />
-    @Html.ValidationMessage("rebuy")
-    <p>Chipworth chip 1</p>
-    <input type="number" name="chip1" value="@chip_worth1" /><br />
-    <br />
-    @Html.ValidationMessage("chip1")
-    <p>Chipworth chip 2</p>
-    <input type="number" name="chip2" value="@chip_worth2" /><br />
-    <br />
-    @Html.ValidationMessage("chip2")
-    <p>Chipworth chip 3</p>
-    <input type="number" name="chip3" value="@chip_worth3" /><br />
-    <br />
-    @Html.ValidationMessage("chip3")
-    <p>Chipworth chip 4</p>
-    <input type="number" name="chip4" value="@chip_worth4" /><br />
-    <br />
-    @Html.ValidationMessage("chip4")
-    <p>Chipworth chip 5</p>
-    <input type="number" name="chip5" value="@chip_worth5" /><br />
-    <br /><br />
-    @Html.ValidationMessage("chip5")
-    <input type="submit" name="Proceed" value="Proceed" />
-    <br />
-</form>
+
+<head>
+    <style>
+        .validation-summary-errors {
+            color: red;
+            font-weight: bold;
+        }
+
+        .field-validation-error {
+            font-weight: bold;
+            color: red;
+        }
+        .help-block ul {
+            list-style-type: none;
+        }
+    </style>
+</head>
+
+
+<div class="py-5 text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Settings</h3>
+                <span class="help-block">
+                    @Html.ValidationSummary()
+                </span>
+                    <form style="display: inline-block" name="Settings" method="post">
+                        <div class="form-row">
+                            <div class="form-group col-md-6"> <label for="form2">Room name</label> <input type="text" class="form-control" id="form2" placeholder="Room name" name="room_name" value="@room_name" required> </div>
+                            <div class="form-group col-md-6"> <label for="form3">Start value</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form3" placeholder="Start value" name="start_value" value="@start_value" required> </div>
+
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6"> <label for="form4">Time per round</label> <input type="text" class="form-control" id="form4" placeholder="9001" name="round_time" value="@round_time" required> </div>
+                            <div class="form-group col-md-6"> <label for="form5">Duration of pauses</label> <input type="text" class="form-control" id="form5" placeholder="9001" name="pause_time" value="@pause_time"required> </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6"> <label for="form6">Interval for blinds</label> <input type="text" class="form-control" id="form6" placeholder="9001" name="blind_time" value="@blind_time"> </div>
+                            <div class="form-group col-md-6"> <label for="form7">Minimum players per table</label> <input type="number" step="1" min="2" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form7" placeholder="3" name="min_table" value="@min_table"required> </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6"> <label for="form8">Maximum players per table</label> <input type="number" step="1" min="3" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form8" placeholder="9001" name="max_table" value="@max_table_amount"required> </div>
+                            <div class="form-group col-md-6"> <label for="form9">Amount of tables</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form9" placeholder="9001" name="tbl_amount" value="@table_amount"required> </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6"> <label for="form10">Amount of rebuys</label> <input type="number" step="1" min="0" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form10" placeholder="9001" name="rebuy" value="@rebuy"required> </div>
+                            <div class="form-group col-md-6"> <label for="form11">Value chip 1</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form11" placeholder="9001" name="chip1" value="@chip_worth1"required> </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6"> <label for="form12">Value chip 2</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form12" placeholder="9001" name="chip2" value="@chip_worth2"required> </div>
+                            <div class="form-group col-md-6"> <label for="form13">Value chip 3</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form13" placeholder="9001" name="chip3" value="@chip_worth3"required> </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6"> <label for="form14">Value chip 4</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form14" placeholder="9001" name="chip4" value="@chip_worth4"required> </div>
+                            <div class="form-group col-md-6"> <label for="form15">Value chip 5</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form15" placeholder="9001" name="chip5" value="@chip_worth5"required> </div>
+                        </div>
+                        <input class="btn btn-primary" type="submit" name="Proceed" value="Proceed" />
+                    </form>
+            </div>
+        </div>
+    </div>
+</div>
