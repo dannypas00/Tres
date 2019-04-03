@@ -23,6 +23,11 @@
     Validation.Add("name", Validator.StringLength(40, 1, "Name has to between 1 - 40"));
     Validation.RequireField("name", "A name is Required");
 
+    if (db.QueryValue("SELECT Name FROM Players WHERE Room_Code = @0", roomCode) == null)
+    {
+        Response.Redirect("~/Gameselect/");
+    }
+
     if (IsPost)
     {
 
