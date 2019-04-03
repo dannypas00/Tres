@@ -15,34 +15,57 @@
     }
 
     //Gather roomcode
-    int urlcode = Convert.ToInt32(Request.Url.AbsolutePath.Split('/')[2]);
+    int roomCode = Convert.ToInt32(Request.Url.AbsolutePath.Split('/')[2]);
 
     int number = 1;         //later toevoegen table number
     int rebuy = 0;          //aantal rebuys standaard op 0
-
+    string error = "";
     Validation.Add("name", Validator.StringLength(40, 1, "Name has to between 1 - 40"));
-    Validation.RequireField("name", "A name is Required");
+
+
+
 
     if (IsPost)
     {
-        if (Validation.IsValid())
+        dynamic room = db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode);
+        double maxplayerstable = room.Tbl_Max_Size;
+        double minplayerstable = room.Tbl_Min_Size;
+        double maxtables = room.Tbl_Amount;
+        double maxplayerstotal = maxplayerstable * maxtables;
+        int playercount = db.QueryValue("SELECT Count(Name) FROM Players WHERE Room_Code = @0", roomCode);
+
+
+        string name = Request["name"];
+        if (Validation.IsValid() && Request["AddName"] == "Add" && db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1", name, roomCode) is null)
         {
-            string name = Request["name"];
-            if (Request["AddName"] == "Add" && db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1", name, urlcode) is null)
+            if (playercount < maxplayerstotal)
             {
-                db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr, Rebuy) VALUES (@0, @1, @2, @3)", name, urlcode, number, rebuy);
+                db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr, Rebuy) VALUES (@0, @1, @2, @3)", name, roomCode, number, rebuy);
                 name = null;
             }
-            else if (Request["delete"] == "delete")
+            else
             {
-                db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", Request.Form["rownameform"], urlcode);
+                error = "You cant add more then " + maxplayerstotal + " players";
             }
         }
+
+        if (Request["delete"] == "delete")
+        {
+            db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", Request.Form["rownameform"], roomCode);
+        }
+
         if (Request["Proceed"] == "Proceed")
         {
-            Shuffle shuffle = new Shuffle();
-            shuffle.ShuffleTable(db, urlcode);
-            Response.Redirect("~/PlayingAdmin/" + urlcode);
+            if(playercount > 2 && playercount <= maxplayerstotal)
+            {
+                Shuffle shuffle = new Shuffle();
+                shuffle.ShuffleTable(db, roomCode);
+                Response.Redirect("~/PlayingAdmin/" + roomCode);
+            }
+            else
+            {
+                error = "Add atleast 3 players!";
+            }
         }
     }
 
@@ -68,6 +91,7 @@
                     <h1>Add players</h1>
                     <span class="help-block">
                         @Html.ValidationSummary()
+                        <strong style="color:red;">@error</strong>
                     </span>
                     <form method="post">
                         
@@ -81,7 +105,7 @@
 
                             <table class="table">
                                 <tbody>
-                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", urlcode))
+                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", roomCode))
                                     {
                                         string rownameform = (string)row.Name;
                                         <tr>
