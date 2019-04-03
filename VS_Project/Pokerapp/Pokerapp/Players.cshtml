@@ -3,29 +3,31 @@
 @{
 
     Layout = "~/_Layout.cshtml";
-    Page.Title = "Add Players";
+    Page.Title = "Players";
 
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
+
+    string prelink = Request.Url.AbsoluteUri;
+    string[] link = prelink.Split('/');
+    int urlcode = Convert.ToInt32(link[4]);
 
     if (Request.Cookies["LoginCookie"].Value != "true")
     {
         Response.Redirect("~/Login.cshtml");
     }
 
-    string url = Request.Url.AbsolutePath;
-    string urlcode = url.Substring(url.Length - 7);
     int amount = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
-    for (int i = 1; i <= amount; i++)
-    {
-        if (IsPost && Convert.ToInt32(Request["table"]) == i)
-        {
-            string table = i.ToString();
-            string Url = "Tableview.cshtml?roomcode=" + urlcode + "&table=" + table;
-            Response.Redirect("~/" + Url);
-        }
-    }
+    //for (int i = 1; i <= amount; i++)
+    //{
+    //    if (IsPost && Convert.ToInt32(Request["table"]) == i)
+    //    {
+    //        string table = i.ToString();
+    //        string Url = "Tableview.cshtml?roomcode=" + urlcode + "&table=" + table;
+    //        Response.Redirect("~/" + Url);
+    //    }
+    //}
 }
 
 
@@ -33,30 +35,39 @@
 <div class="py-5">
     <div class="container">
         <div class="row">
+            <div class="col-md-12 text-center">
+                <h1>Tables</h1>
+            </div>
+        </div>
+        <div class="col-md-6">
             @for (int i = 0; i < amount; i++)
             {
                 int tbl_nr = i + 1;
-                <div class="row" id="names">
-                    <div class="col">
-                        <img src="~/tafel.png" style="height:200px;width:300px" />
-                    </div>
-                    <div class="col" id="namelist">
-                        <ul style="list-style-type:none">
+                string table = i.ToString();
+                string Url = link[0] + "//" + link[2] + "/" + "Tableview.cshtml?roomcode=" + link[4] + "&table=" + tbl_nr;
+
+                <form method="post">
+                    <div class="clickable row" style="cursor:pointer; padding-top:2em">
+                        <div class="col-md-9">
+                            <div style="background-image: url(/tafel.png) ;height:200px;width:100%"></div>
+                        </div>
+                        <div class="col-md-3 d-flex flex-column align-items-start justify-content-center order-1 order-lg-2">
+                            <p><b>Table @tbl_nr</b></p>
                             @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
                             {
-                                <li>@row.Name</li>
+                                <p>@row.Name</p>
                             }
 
-                            <li>
-                                <form method="post">
-                                    <input type="hidden" name="roomcode" value=@urlcode />
-                                    <input type="submit" name="table" value=@tbl_nr />
 
-                                </form>
-                            </li>
-                        </ul>
+
+                            <input type="hidden" name="roomcode" value=@urlcode />
+                            <a href=@Url></a>
+
+
+
+                        </div>
                     </div>
-                </div>
+                </form>
             }
         </div>
     </div>

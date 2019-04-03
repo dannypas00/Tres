@@ -33,11 +33,10 @@ CREATE TABLE Room
 );
 
 DROP TABLE Blinds;
-CREATE TABLE Blinds
-(
-[Room_Code] INT NOT NULL,
-[ID] INT NOT NULL,
-[S_B] CHAR(1) NOT NULL,
-[Value] INT NOT NULL,
-PRIMARY KEY ([Room_Code],[ID], [S_B]), 
+CREATE TABLE [dbo].[Blinds] (
+    [Room_Code] INT      NOT NULL,
+    [ID]        INT      NOT NULL,
+    [ValueSB]     INT      NOT NULL,
+    [ValueBB] INT NOT NULL, 
+    PRIMARY KEY CLUSTERED ([Room_Code] ASC, [ID] ASC)
 );

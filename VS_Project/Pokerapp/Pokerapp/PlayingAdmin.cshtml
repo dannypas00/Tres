@@ -7,19 +7,24 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
+    string prelink = Request.Url.AbsoluteUri;
+    string[] link = prelink.Split('/');
+    string linked = link[0] + "//" + link[2] + "/Players/" + link[4];
+    int urlcode = Convert.ToInt32(link[4]);
+
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
         Response.Redirect("~/Login.cshtml");
     }
 
-    string url = Request.Url.AbsolutePath;
-    int urlcode = Convert.ToInt32(url.Substring(url.Length - 7));
     int tables = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
     if (IsPost && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {
         switch (Request.Form["submit"])
         {
-  
+            case "pauze":
+                //pauze logic//
+                break;
             case "shuffle":
                 Shuffle shuffle = new Shuffle();
                 shuffle.ShuffleTable(db, urlcode);
@@ -32,70 +37,53 @@
                 break;
         }
     }
-    string prelink = Request.Url.AbsoluteUri;
-    string[] link = prelink.Split('/');
-    prelink = link[0] + "//" + link[2];
-    string linked = prelink + "/Players/" + urlcode;
 }
 
-<div>
-    <header>
-        <h1>Game in progress</h1>
-    </header>
-    <div class="playingBody">
-        <div id="demo">
-            <button type="button" value="pauze" onclick="loadDoc()">Pause</button>
+<div class="py-5">
+    <div class="container">
+        <div class="col-md-12 text-center">
+            <header>
+                <h1>Game in progress</h1>
+            </header>
+            <div class="col-md-12 text-center">
+                <div class="row" style="justify-content:center">
+                    <form name="updateSettings" method="post">
+                        <button class="btn btn-primary" type="submit" value="pauze" name="submit">Pause the game</button>
+                        <button class="btn btn-primary" type="submit" value="shuffle" name="submit">Shuffle all players</button>
+                        <button class="btn btn-primary" type="submit" value="manage" name="submit">Add/remove players</button>
+                    </form>
+
+                </div>
+                <div class="row"></div>
+                <div style="justify-content:center; padding-top:20px" class="row"><p>Share this link: <a href=@linked>@linked</a></p></div>
+            </div>
+                <div class="col-md-12" style="justify-content:center">
+                    <div class="row">
+                        @for (int i = 0; i < tables; i++)
+                        {
+                            int tbl_Nr = i + 1;
+                            <div style="width:200px; padding-left:20px; padding-top:30px" class="table-responsive">
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <th>Table @tbl_Nr</th>
+                                        </tr>
+                                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_Nr))
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <p>@row.Name</p>
+                                                </td>
+                                            </tr>
+
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+            </div>
         </div>
-        <form name="updateSettings" method="post">
-            <button type="submit" value="shuffle" name="submit">Shuffle all players</button>
-            <button type="submit" value="manage" name="submit">Add/remove players</button>
-        </form>
-        @for (int i = 0; i < tables; i++)
-        {
-            int tbl_Nr = i + 1;
-            <ul class="singleTableList" style="display: block; float:right; border: 3px solid gray;">
-                <h2>Table @tbl_Nr</h2>
-                @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_Nr))
-                {
-                    <li class="singlePlayer">@row.Name</li>
-                }
-            </ul>
-        }
-        </ul>
     </div>
-</div>
-<br />
-<a href=@linked>@linked</a>
-<script>
-    function loadDoc() {
-        let xhr = new XMLHttpRequest();
-
-        // 2. Configure it: GET-request for the URL /article/.../load
-        xhr.open('GET',  );
-
-        // 3. Send the request over the network
-        xhr.send();
-
-        // 4. This will be called after the response is received
-        xhr.onload = function () {
-            if (xhr.status != 200) { // analyze HTTP status of the response
-                alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
-            } else { // show the result
-                alert(`Done, got ${xhr.response.length} bytes`); // responseText is the server
-            }
-        };
-
-        xhr.onprogress = function (event) {
-            if (event.lengthComputable) {
-                alert(`Received ${event.loaded} of ${event.total} bytes`);
-            } else {
-                alert(`Received ${event.loaded} bytes`); // no Content-Length
-            }
-
-        };
-
-        xhr.onerror = function () {
-            alert("Request failed");
-        };
-    }
-</script>
