@@ -28,10 +28,10 @@
     if (IsPost)
     {
         dynamic room = db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode);
-        double maxplayerstable = room.Tbl_Max_Size;
-        double minplayerstable = room.Tbl_Min_Size;
-        double maxtables = room.Tbl_Amount;
-        double maxplayerstotal = maxplayerstable * maxtables;
+        int maxplayerstable = room.Tbl_Max_Size;
+        int minplayerstable = room.Tbl_Min_Size;
+        int maxtables = room.Tbl_Amount;
+        int maxplayerstotal = maxplayerstable * maxtables;
         int playercount = db.QueryValue("SELECT Count(Name) FROM Players WHERE Room_Code = @0", roomCode);
 
 
