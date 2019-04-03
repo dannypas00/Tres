@@ -24,7 +24,9 @@
         {
             case "pauze":
                 //pauze logic//
-                    db.Execute("UPDATE Room SET Started_Time = @0, Started = 0 WHERE Room_Code = @1", DateTime.Now, roomCode);   
+                dynamic startTime = db.QuerySingle("SELECT Started_Time FROM Room WHERE Room_Code = @0", roomCode);
+                TimeSpan timePassed = DateTime.Now - startTime.Started_Time;
+                db.Execute("UPDATE Room SET Started_Time = @0, Time_Passed = @1, Started = 0 WHERE Room_Code = @2", DateTime.Now, DateTime.Now - startTime.Started_Time, roomCode);
                 break;
             case "shuffle":
                 Shuffle shuffle = new Shuffle();
@@ -35,7 +37,7 @@
                 Response.Redirect("~/AdminPage.cshtml/" + roomCode);
                 break;
             case "start":
-                    db.Execute("UPDATE Room SET Started_Time = @0, Started = 1 WHERE Room_Code = @1", DateTime.Now, roomCode);
+                db.Execute("UPDATE Room SET Started_Time = @0, Started = 1 WHERE Room_Code = @1", DateTime.Now, roomCode);
                 break;
             default:
                 break;

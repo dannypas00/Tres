@@ -76,16 +76,24 @@
         Url = "Players.cshtml/" + roomCode;
         Response.Redirect("~/" + Url);
     }
+
     dynamic room = db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode);
     TimeSpan startTime;
-    if (room.Started_Time != null)
+    //if (room.Started_Time != null)
+    //{
+    //    startTime = DateTime.Now - room.Started_Time;
+    //}
+    //else
+    //{
+    if (room.Started == 1 && room.Time_Passed != null)
     {
-        startTime = DateTime.Now - room.Started_Time;
+        startTime = DateTime.Now - room.Started_Time + room.Time_Passed;
     }
     else
     {
         startTime = TimeSpan.Zero;
     }
+    //}
     DateTime pauzeTime = DateTime.Now + room.Pause_Time;
     DateTime blindTime = DateTime.Now + room.Blind_Time;
     //startTime.AddHours(Convert.ToInt32(DateTime.Now.Date - startTime.Date) * 24);
@@ -94,9 +102,8 @@
     int mns = startTime.Minutes;
     int scs = startTime.Seconds;
 
-    dynamic started = db.QuerySingle("SELECT Started FROM Room WHERE Room_Code = @0", roomCode);
     int started = room.Started;
-}
+    }
 
         <div class="header">
             <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
@@ -256,7 +263,7 @@
     
     
             // if condition is met round + 1
-            if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
+            if (currentHours >= targetHours && currentMinutes >= targetMinutes && currentSeconds >= targetSeconds) {
                 round++;
                 document.querySelector('#rnumber').innerHTML = round;
     

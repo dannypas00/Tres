@@ -10,7 +10,27 @@
     string urlcode = url.Substring(url.Length - 7);
 
     //Get the round_time
-    var selectTimer = db.QuerySingle("SELECT Round_Time FROM Room WHERE Room_Code = @0", Request["roomcode"].AsInt(), Request["table"].AsInt());
-    Response.Write(selectTimer.Round_Time);
+    var selectTimer = db.QuerySingle("SELECT Round_Time, Time_Passed FROM Room WHERE Room_Code = @0", Request["roomcode"].AsInt(), Request["table"].AsInt());
+
+    //start
+    //current time passed
+
+    //PAUSE BUTTON
+
+    //datetime.now - starttime = time passed.
+
+    TimeSpan time;
+
+    if(selectTimer.Time_Passed.ToString() != "0")
+    {
+        //Response.Write(selectTimer.Round_time + "<br />Subtracting: ");
+        //Response.Write(selectTimer.Time_Passed + "<br/>");
+
+        time = selectTimer.Round_time.Subtract(selectTimer.Time_Passed);
+    } else
+    {
+        time = selectTimer.Round_Time;
+    }
+    Response.Write(time);
 
 }
