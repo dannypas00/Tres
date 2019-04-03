@@ -124,7 +124,6 @@
                                                         <th>Round</th>
                                                         <th>Small</th>
                                                         <th>Big</th>
-                                                        <th><button class="btn btn-outline-primary" type="submit" name="edit" value="edit">Edit</button></th>
                                                     </tr>
                                                     @foreach (var row in db.Query("SELECT ValueSB, ValueBB, ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID ASC", urlcode))
                                                     {

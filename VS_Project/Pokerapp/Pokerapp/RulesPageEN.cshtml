@@ -9,15 +9,15 @@
 
     Database db = Database.OpenConnectionString(connectionString, provider);
 
+    int urlcode = 8975521;
 
+    var chips = db.QuerySingle("SELECT Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth FROM Room WHERE  Room_Code=@0", urlcode);
 
-    int chip1 = 0;
-    int chip2 = 0;
-    int chip3 = 0;
-    int chip4 = 0;
-    int chip5 = 0;
-
-
+    int chip1 = chips.Chip_1_Worth;
+    int chip2 = chips.Chip_2_Worth;
+    int chip3 = chips.Chip_3_Worth;
+    int chip4 = chips.Chip_4_Worth;
+    int chip5 = chips.Chip_5_Worth;
 
 }
 

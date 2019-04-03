@@ -19,52 +19,59 @@
     }
 
     int amount = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
-    //for (int i = 1; i <= amount; i++)
-    //{
-    //    if (IsPost && Convert.ToInt32(Request["table"]) == i)
-    //    {
-    //        string table = i.ToString();
-    //        string Url = "Tableview.cshtml?roomcode=" + urlcode + "&table=" + table;
-    //        Response.Redirect("~/" + Url);
-    //    }
-    //}
+
+    string Url = link[0] + "//" + link[2] + "/" + "RulesPageNL/" + link[4];
 }
+<style>
+    .centered {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+</style>
 
-
-
+<div class="header">
+    <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
+        Rules
+    </div>
+</div>
 <div class="py-5">
+
     <div class="container">
         <div class="row">
             <div class="col-md-12 text-center">
                 <h1>Tables</h1>
             </div>
         </div>
+
         <div class="col-md-6">
             @for (int i = 0; i < amount; i++)
             {
                 int tbl_nr = i + 1;
                 string table = i.ToString();
-                string Url = link[0] + "//" + link[2] + "/" + "Tableview.cshtml?roomcode=" + link[4] + "&table=" + tbl_nr;
+                Url = link[0] + "//" + link[2] + "/" + "Tableview.cshtml?roomcode=" + link[4] + "&table=" + tbl_nr;
 
                 <form method="post">
-                    <div class="clickable row" style="cursor:pointer; padding-top:2em">
-                        <div class="col-md-9">
-                            <div style="background-image: url(/tafel.png) ;height:200px;width:100%"></div>
-                        </div>
-                        <div class="col-md-3 d-flex flex-column align-items-start justify-content-center order-1 order-lg-2">
-                            <p><b>Table @tbl_nr</b></p>
-                            @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
-                            {
-                                <p>@row.Name</p>
-                            }
+                    <div class="row">
+                        <div class="col-md-12 clickable" style="background-image: url(/tafel.png);cursor:pointer; width:400px;height:100%; margin-top:15px">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="text-center" style="justify-content:center; margin-top: 40%"><h3><b>Table @tbl_nr</b></h3></div>
+                                </div>
+                                <div class="col d-flex flex-column align-items-start justify-content-center order-1 order-lg-2" style="padding-top:5px">
 
 
+                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
+                                    {
+                                        <div class="flex-column"><p><b>@row.Name </b></p></div>
+                                    }
 
-                            <input type="hidden" name="roomcode" value=@urlcode />
-                            <a href=@Url></a>
 
-
-
+                                    <input type="hidden" name="roomcode" value=@urlcode />
+                                    <a href=@Url></a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -77,6 +84,11 @@
     jQuery(document).ready(function ($) {
         $(".clickable").click(function () {
             window.location = $(this).find("a:first").attr("href");
+        });
+    });
+    jQuery(document).ready(function ($) {
+        $(".clickableBtn").click(function () {
+            window.location = $(this).data("href");
         });
     });
 </script>
