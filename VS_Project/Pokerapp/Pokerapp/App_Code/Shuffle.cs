@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using WebMatrix.Data;
 
 /// <summary>
@@ -34,13 +32,13 @@ public class Shuffle
                 playerInTable = 0;
             }
         }
+        //Errors if entering wrong player count//
 
         Random rnd = new Random();
         Tbl_Numberarray = Tbl_Numberarray.OrderBy(x => rnd.Next()).ToArray();
         int counting = 0;
         foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", urlcode))
         {
-
             db.Execute("UPDATE Players SET Tbl_nr = @0 WHERE Name = @1", Tbl_Numberarray[counting], row.Name);
             counting++;
         }
