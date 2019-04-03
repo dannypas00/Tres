@@ -15,7 +15,7 @@
     }
 
     //Gather roomcode
-    int urlcode = Convert.ToInt32(Request.Url.AbsolutePath.Split('/')[2]);
+    int roomCode = Convert.ToInt32(Request.Url.AbsolutePath.Split('/')[2]);
 
     int number = 1;         //later toevoegen table number
     int rebuy = 0;          //aantal rebuys standaard op 0
@@ -25,24 +25,26 @@
 
     if (IsPost)
     {
+
         if (Validation.IsValid())
         {
             string name = Request["name"];
-            if (Request["AddName"] == "Add" && db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1", name, urlcode) is null)
+            if (Request["AddName"] == "Add" && db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1", name, roomCode) is null)
             {
-                db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr, Rebuy) VALUES (@0, @1, @2, @3)", name, urlcode, number, rebuy);
+                db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr, Rebuy) VALUES (@0, @1, @2, @3)", name, roomCode, number, rebuy);
                 name = null;
             }
             else if (Request["delete"] == "delete")
             {
-                db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", Request.Form["rownameform"], urlcode);
+                db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", Request.Form["rownameform"], roomCode);
             }
         }
         if (Request["Proceed"] == "Proceed")
         {
             Shuffle shuffle = new Shuffle();
-            shuffle.ShuffleTable(db, urlcode);
-            Response.Redirect("~/PlayingAdmin/" + urlcode);
+            shuffle.ShuffleTable(db, roomCode);
+            db.Execute("UPDATE Room SET Started_Time = @0 WHERE Room_Code = @1", DateTime.Now, roomCode);
+            Response.Redirect("~/PlayingAdmin/" + roomCode);
         }
     }
 
@@ -78,10 +80,9 @@
 
                     <div style="padding: 15px 0px 0px 0px" class="col-md-12">
                         <div class="table-responsive">
-
                             <table class="table">
                                 <tbody>
-                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", urlcode))
+                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", roomCode))
                                     {
                                         string rownameform = (string)row.Name;
                                         <tr>
@@ -95,7 +96,6 @@
                                                 </form>
                                             </td>
                                         </tr>
-
                                     }
                                 </tbody>
                             </table>

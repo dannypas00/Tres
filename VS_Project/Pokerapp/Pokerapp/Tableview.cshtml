@@ -37,9 +37,9 @@
         int new_Round = current_Round + 1;
         db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", new_Round, roomCode);
         <script>
-            //$(document).ready(function() {
-            alert("The blind has been raised!");
-            //})
+            $(document).ready(function() {
+                alert("The blind has been raised!");
+            })
         </script>
     }
     int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
@@ -68,15 +68,34 @@
     int players = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     if (min_size >= players)
     {
-        <script>
+    <script>
+        $(document).ready(function () {
             alert("The minimum size has been reached!");
-        </script>
+        })
+    </script>
         Shuffle shuffle = new Shuffle();
         shuffle.ShuffleTable(db, roomCode);
         Url = "Players.cshtml/" + roomCode;
         Response.Redirect("~/" + Url);
     }
-
+    dynamic room = db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode);
+    TimeSpan startTime;
+    if (room.Started_Time != null)
+    {
+        startTime = DateTime.Now - room.Started_Time;
+    }
+    else
+    {
+        startTime = TimeSpan.Zero;
+    }
+    DateTime pauzeTime = DateTime.Now + room.Pause_Time;
+    DateTime blindTime = DateTime.Now + room.Blind_Time;
+    //startTime.AddHours(Convert.ToInt32(DateTime.Now.Date - startTime.Date) * 24);
+    //startTime.AddDays(-Convert.ToInt32(DateTime.Now.Date - startTime.Date));
+    int hrs = startTime.Hours;
+    int mns = startTime.Minutes;
+    int scs = startTime.Seconds;
+}
 
 }
 
@@ -89,7 +108,7 @@
             </div>
         </div>
 <div class="py-5">
-
+    <div class="hidden"><p id="Hours">@hrs</p><p id="Minutes">@mns</p><p id="Seconds">@scs</p></div>
     <div class="container">
         <div class="col-md-12 text-center">
             <h1>Table @table</h1>
@@ -98,7 +117,7 @@
             <div id="roomCode" style="display:none;">@roomCode</div>
             <div id="table" style="display:none;">@table</div>
 
-            <div name="timer" class="timer"></div>
+            <div name="timer" class="timer">loading timer...</div>
             <div class="round">This is round: <span id="rnumber"></span></div>
         </div>
         <div class="row">
@@ -154,100 +173,96 @@
 
 
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script
+  src="https://code.jquery.com/jquery-3.3.1.js"
+  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  crossorigin="anonymous"></script>
 <script>
-    jQuery(document).ready(function ($) {
-        $(".clickableBtn").click(function () {
-            window.location = $(this).data("href");
-        });
+    var roomcode = $("#roomCode").html();
+    $("#roomCode").remove();
+    
+    var table = $("#table").html();
+    $("#table").remove();
+
+    var hrs = $('#Hours').html();
+    var mns = $('#Minutes').html();
+    var scs = $('#Seconds').html();
+    
+    console.log("roomcode" + roomcode);
+    console.log("table" + table);
+    //Ajax connect with url Timer get the data roomcode
+    $.ajax({
+        url: "Timer.cshtml",
+        type: "get",
+        data: {
+            roomCode: roomcode,
+            table: table
+        },
+        success: function (response) {
+            startTimer(response); // Returns timer from db
+        }
     });
-
-$(document).ready(function () {
-            var roomcode = $("#roomCode").html();
-            $("#roomCode").remove();
-
-            var table = $("#table").html();
-            $("#table").remove();
-
-            console.log("roomcode" + roomcode);
-            console.log("table" + table);
-            //Ajax connect with url Timer get the data roomcode
-            $.ajax({
-                url: "Timer.cshtml",
-                type: "get",
-                data: {
-                    roomCode: @roomCode,
-                    table: @table,
-                },
-                success: function (response) {
-                    startTimer(response); // Returns timer from db
-                }
-            });
-
-
-            function startTimer(timer) {
-                var timer = timer.split(":"); // Split timer
-
-                var targetHours = parseInt(timer[0]); // Parse hours to int
-                var targetMinutes = parseInt(timer[1]);
-                var targetSeconds = parseInt(timer[2]);
-
-                var currentHours = 0;
-                var currentMinutes = 0;
-                var currentSeconds = 0;
-
-                var displayHours;
-                var displayMinutes;
-                var displaySeconds;
-
-                var round = 1;
-                document.querySelector('#rnumber').innerHTML = round;
-
-                //Increment timer
-                setInterval(function () {
-                    var displayHours = currentHours;
-                    var displayMinutes = currentMinutes;
-                    var displaySeconds = currentSeconds;
-
-                    sessionStorage.setItem("timer", displayHours);
-
-
-                    if (currentHours.toString().length < 2) {
-                        displayHours = "0" + currentHours;
-                    }
-
-                    if (currentMinutes.toString().length < 2) {
-                        displayMinutes = "0" + currentMinutes;
-                    }
-
-                    if (currentSeconds.toString().length < 2) {
-                        displaySeconds = "0" + currentSeconds;
-                    }
-
-                    document.querySelector('.timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
-
-
-                    // if condition is met round + 1
-                    if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
-                        round++;
-                        document.querySelector('#rnumber').innerHTML = round;
-
-                        currentHours = 0;
-                        currentMinutes = 0;
-                        currentSeconds = 0;
-                    }
-
-                    currentSeconds++;
-
-                    if (currentSeconds == 60) {
-                        currentMinutes++;
-                        currentSeconds = 0;
-                    }
-
-                    if (currentMinutes == 60) {
-                        currentHours++;
-                        currentMinutes = 0;
-                    }
-                }, 1000);
+    
+    
+    function startTimer(timer) {
+        var timer = timer.split(":"); // Split timer
+    
+        var targetHours = parseInt(timer[0]); // Parse hours to int
+        var targetMinutes = parseInt(timer[1]);
+        var targetSeconds = parseInt(timer[2]);
+    
+        var currentHours = hrs;
+        var currentMinutes = mns;
+        var currentSeconds = scs;
+    
+        var round = 1;
+        document.querySelector('#rnumber').innerHTML = round;
+    
+        //Increment timer
+        setInterval(function () {
+            var displayHours = currentHours;
+            var displayMinutes = currentMinutes;
+            var displaySeconds = currentSeconds;
+    
+            sessionStorage.setItem("timer", displayHours);
+    
+    
+            if (currentHours.toString().length < 2) {
+                displayHours = "0" + currentHours;
             }
-        });</script>
+    
+            if (currentMinutes.toString().length < 2) {
+                displayMinutes = "0" + currentMinutes;
+            }
+    
+            if (currentSeconds.toString().length < 2) {
+                displaySeconds = "0" + currentSeconds;
+            }
+    
+            document.querySelector('.timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
+    
+    
+            // if condition is met round + 1
+            if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
+                round++;
+                document.querySelector('#rnumber').innerHTML = round;
+    
+                currentHours = 0;
+                currentMinutes = 0;
+                currentSeconds = 0;
+            }
+    
+            currentSeconds++;
+    
+            if (currentSeconds == 60) {
+                currentMinutes++;
+                currentSeconds = 0;
+            }
+    
+            if (currentMinutes == 60) {
+                currentHours++;
+                currentMinutes = 0;
+            }
+        }, 1000);
+    }
+</script>
