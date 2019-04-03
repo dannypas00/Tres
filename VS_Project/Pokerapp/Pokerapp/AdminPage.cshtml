@@ -56,15 +56,19 @@
 
         if (Request["Proceed"] == "Proceed")
         {
-            if(playercount > 2 && playercount <= maxplayerstotal)
+            if(playercount > minplayerstable && playercount <= maxplayerstotal)
             {
                 Shuffle shuffle = new Shuffle();
                 shuffle.ShuffleTable(db, roomCode);
                 Response.Redirect("~/PlayingAdmin/" + roomCode);
             }
-            else
+            else if(playercount < minplayerstable)
             {
-                error = "Add atleast 3 players!";
+                error = "Add atleast "+ (minplayerstable+1) + " players!";
+            }
+            else if(playercount > maxplayerstotal)
+            {
+                error = "You can't have more than " + maxplayerstotal + " players, because you only have " + maxtables + " tables and a maximum of " + maxplayerstable + " players per table";
             }
         }
     }

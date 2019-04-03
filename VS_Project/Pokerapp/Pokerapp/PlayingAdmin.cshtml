@@ -10,14 +10,14 @@
     string prelink = Request.Url.AbsoluteUri;
     string[] link = prelink.Split('/');
     string linked = link[0] + "//" + link[2] + "/Players/" + link[4];
-    int urlcode = Convert.ToInt32(link[4]);
+    int roomCode = Convert.ToInt32(link[4]);
 
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
         Response.Redirect("~/Login.cshtml");
     }
 
-    int tables = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
+    int tables = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", roomCode);
     if (IsPost && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {
         switch (Request.Form["submit"])
@@ -27,15 +27,19 @@
                 break;
             case "shuffle":
                 Shuffle shuffle = new Shuffle();
-                shuffle.ShuffleTable(db, urlcode);
+                shuffle.ShuffleTable(db, roomCode);
                 //Update tables with AJAX//
                 break;
             case "manage":
-                Response.Redirect("~/AdminPage.cshtml/" + urlcode);
+                Response.Redirect("~/AdminPage.cshtml/" + roomCode);
+                break;
+            case "start":
+                db.Execute("UPDATE Room SET Started_Time = @0 WHERE Room_Code = @1", DateTime.Now, roomCode);
                 break;
             default:
                 break;
         }
+
     }
 }
 
@@ -51,6 +55,7 @@
                         <button class="btn btn-primary" type="submit" value="pauze" name="submit">Pause the game</button>
                         <button class="btn btn-primary" type="submit" value="shuffle" name="submit">Shuffle all players</button>
                         <button class="btn btn-primary" type="submit" value="manage" name="submit">Add/remove players</button>
+                        <button class="btn btn-primary" type="submit" name="submit" value="start">Start</button>
                     </form>
 
                 </div>
@@ -68,7 +73,7 @@
                                         <tr>
                                             <th>Table @tbl_Nr</th>
                                         </tr>
-                                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_Nr))
+                                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, tbl_Nr))
                                         {
                                             <tr>
                                                 <td>
