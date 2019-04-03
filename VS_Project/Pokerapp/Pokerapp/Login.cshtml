@@ -14,13 +14,11 @@
         //check if name and password are correct
         if (Request.Form["name"] == "TimoSchraa" && Request.Form["password"] == "password")
         {
-<<<<<<< HEAD
-            Html.Hidden("adminLogin", "true");
-=======
+
             //turn on a cookie for 3 hours
             Response.Cookies["LoginCookie"].Value = "true";
             Response.Cookies["LoginCookie"].Expires = DateTime.Now.AddHours(3);
->>>>>>> master
+
             Response.Redirect("~/Gameselect.cshtml");
         }
         else
@@ -47,16 +45,7 @@
     </style>
 </head>
 
-<<<<<<< HEAD
-<div id="login">
-    <form method="post" name="login" action="" accept-charset="utf-8">
-        <label for="name">Username:</label><br />
-        <input type="text" name="name" placeholder="Username" /><br /><br />
-        <label for="password">Password:</label><br />
-        <input type="password" name="password" placeholder="Password" /><br /><br />
-        <input type="submit" name="Login" value="Login"><br />
-    </form>
-=======
+
 <div class="py-5 text-center">
     <div class="container">
         <div class="row">
@@ -74,5 +63,5 @@
             </div>
         </div>
     </div>
->>>>>>> master
+
 </div>

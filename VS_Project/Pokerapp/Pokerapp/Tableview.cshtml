@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-﻿
-=======
 ﻿@using WebMatrix.Data
 
 @{
@@ -103,42 +100,6 @@
             <div id="roomCode" style="display:none;">@roomCode</div>
             <div id="table" style="display:none;">@table</div>
 
-<<<<<<< HEAD
-        @*foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, roomCode, table))
-        {
-            player++;
-        }
-        if (min_size >= player)
-        {
-            <script>
-                alert("The minimum size has been reached!");
-            </script>
-            Shuffle shuffle = new Shuffle();
-            shuffle.ShuffleTable(db, roomCode);
-            string Url = "Players.cshtml/" + roomCode;
-            Response.Redirect("~/" + Url);
-        }*@
-    }
-<h1>Table @table</h1>
-<br />
-<div>
-    @foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, urlcode, table))
-    {
-        <img src="~/stoel.png" name="chair" />
-    }
-</div><br />
-<div>
-    <img src="~/tafel.png" name="pokertable" />
-</div>
-<br /><div>
-    @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", urlcode, table, tweede))
-    {
-        <img src="~/stoel.png" name="chair" />
-        @a.Name
-    }
-</div>
->>>>>>> merge-tableview
-=======
             <div name="timer" class="timer"></div>
             <div class="round">This is round: <span id="rnumber"></span></div>
         </div>
@@ -292,4 +253,4 @@ $(document).ready(function () {
                 }, 1000);
             }
         });</script>
->>>>>>> master
+
