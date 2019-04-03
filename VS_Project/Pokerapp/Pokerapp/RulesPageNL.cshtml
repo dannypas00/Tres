@@ -1,7 +1,7 @@
 ﻿@using WebMatrix.Data
 @{
     Layout = "~/_Layout.cshtml";
-    Page.Title = "Rules";
+    Page.Title = "Spelregels";
 
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
 
@@ -10,12 +10,18 @@
     Database db = Database.OpenConnectionString(connectionString, provider);
 
 
+    string prelink = Request.Url.AbsoluteUri;
+    string[] link = prelink.Split('/');
+    string linked = link[0] + "//" + link[2] + "/Players/" + link[4];
+    int urlcode = int.Parse(link[4]);
 
-    int chip1 = 0;
-    int chip2 = 0;
-    int chip3 = 0;
-    int chip4 = 0;
-    int chip5 = 0;
+    var chips = db.QuerySingle("SELECT Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth FROM Room WHERE  Room_Code=@0", urlcode);
+
+    int chip1 = chips.Chip_1_Worth;
+    int chip2 = chips.Chip_2_Worth;
+    int chip3 = chips.Chip_3_Worth;
+    int chip4 = chips.Chip_4_Worth;
+    int chip5 = chips.Chip_5_Worth;
 
 
 
@@ -51,6 +57,8 @@
                     <li> <a href="#test8">De River</a> </li>
                     <li> <a href="#test9">Split Pot</a> </li>
                     <li> <a href="#test10">Poker Jargon</a></li>
+                    <li style="visibility:hidden"> -----------------------</li>
+                    <li> <a href="@linked">Players View</a></li>
                 </ul>
             </div>
             <!-- TOC end -->
@@ -78,6 +86,11 @@
     <!-- Sidebar end-->
     <!-- Page content start-->
     <main class="page-content">
+        <div class="header">
+            <div style="cursor:pointer; float:right; margin-right:30px" class="btn btn-primary clickableBtn" data-href="@linked">
+                Players View
+            </div>
+        </div>
         <div class="container">
             <div class="row">
                 <div class="col-md-9">
@@ -227,5 +240,12 @@
 <script src="~/js/smooth-scroll.js"></script>
 <script src="~/js/sidebarmenu.js"></script>
 <script src="~/js/jquery.ba-outside-events.min.js"></script>
+<script>
+    jQuery(document).ready(function ($) {
+        $(".clickableBtn").click(function () {
+            window.location = $(this).data("href");
+        });
+    });
+</script>
 <!-- page-wrapper -->
 

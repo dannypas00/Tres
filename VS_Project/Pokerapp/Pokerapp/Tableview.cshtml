@@ -11,6 +11,8 @@
 
     int roomCode = Request.QueryString["roomcode"].AsInt();
     int table = Request.QueryString["table"].AsInt();
+    string Url = "RulesPageNL/" + roomCode;
+    string urlBack = "Players/" + roomCode;
 
     var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     int aantal = namen.Count();
@@ -71,13 +73,23 @@
         </script>
         Shuffle shuffle = new Shuffle();
         shuffle.ShuffleTable(db, roomCode);
-        string Url = "Players.cshtml/" + roomCode;
+        Url = "Players.cshtml/" + roomCode;
         Response.Redirect("~/" + Url);
     }
+
+
 }
 
-
+        <div class="header">
+            <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
+                Rules
+            </div>
+            <div style="cursor:pointer; float:right; margin-top:40px;margin-right:10px" class="btn btn-primary clickableBtn" data-href="@urlBack">
+                Back
+            </div>
+        </div>
 <div class="py-5">
+
     <div class="container">
         <div class="col-md-12 text-center">
             <h1>Table @table</h1>
@@ -144,6 +156,12 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
+    jQuery(document).ready(function ($) {
+        $(".clickableBtn").click(function () {
+            window.location = $(this).data("href");
+        });
+    });
+
 $(document).ready(function () {
             var roomcode = $("#roomCode").html();
             $("#roomCode").remove();
