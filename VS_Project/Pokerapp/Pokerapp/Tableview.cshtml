@@ -8,7 +8,6 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-
     int roomCode = Request.QueryString["roomcode"].AsInt();
     int table = Request.QueryString["table"].AsInt();
     string Url = "RulesPageNL/" + roomCode;
@@ -30,7 +29,6 @@
     //    Response.Redirect("~/" + Url);
     //}
 
-
     if (IsPost && !Request["blindnext"].IsEmpty())
     {
         int current_Round = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
@@ -38,8 +36,8 @@
         db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", new_Round, roomCode);
         <script>
             $(document).ready(function() {
-                alert("The blind has been raised!");
-            })
+            alert("The blind has been raised!");
+        })
         </script>
     }
     int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
@@ -95,8 +93,9 @@
     int hrs = startTime.Hours;
     int mns = startTime.Minutes;
     int scs = startTime.Seconds;
-}
 
+    dynamic started = db.QuerySingle("SELECT Started FROM Room WHERE Room_Code = @0", roomCode);
+    int started = room.Started;
 }
 
         <div class="header">
@@ -113,13 +112,27 @@
         <div class="col-md-12 text-center">
             <h1>Table @table</h1>
         </div>
-        <div class="col-md-12 text-center">
-            <div id="roomCode" style="display:none;">@roomCode</div>
-            <div id="table" style="display:none;">@table</div>
+        @if (started == 0) {
 
-            <div name="timer" class="timer">loading timer...</div>
-            <div class="round">This is round: <span id="rnumber"></span></div>
-        </div>
+            <div class="col-md-12 text-center">
+                <div id="roomCode" style="display:none;">@roomCode</div>
+                <div id="table" style="display:none;">@table</div>
+                
+                <div name="timerPaused" class="timerPaused">Paused timer...</div>
+                <div class="round">This is round: <span id="rnumber"></span></div>
+            </div>
+        }
+        else if (started == 1)
+        {
+                <div class="col-md-12 text-center">
+                <div id="roomCode" style="display:none;">@roomCode</div>
+                <div id="table" style="display:none;">@table</div>
+               
+                <div name="timer" class="timer">loading timer...</div>
+                <div class="round">This is round: <span id="rnumber"></span></div>
+            </div>
+        }
+
         <div class="row">
             <div class="col-md-2">
                 <p>Small blind: @small</p>
