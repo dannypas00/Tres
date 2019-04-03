@@ -8,12 +8,13 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-
+    //Gets roomcode
     int roomCode = Request.QueryString["roomcode"].AsInt();
     int table = Request.QueryString["table"].AsInt();
     string Url = "RulesPageNL/" + roomCode;
     string urlBack = "Players/" + roomCode;
 
+    //Splits number of names in two 
     var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     int aantal = namen.Count();
     double gedeeld = aantal / 2;
@@ -30,7 +31,7 @@
     //    Response.Redirect("~/" + Url);
     //}
 
-
+    //Raises the current blinds
     if (IsPost && !Request["blindnext"].IsEmpty())
     {
         int current_Round = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
@@ -64,7 +65,10 @@
         }
     }
 
+    //Updats blinds
     db.Execute("UPDATE Room SET Small_Blind = @0, Big_Blind = @1 WHERE Room_Code = @2", small, big, roomCode);
+
+    //If minimum size is reached reshuffle names by tables
     int players = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     if (min_size >= players)
     {
@@ -78,6 +82,8 @@
         Url = "Players.cshtml/" + roomCode;
         Response.Redirect("~/" + Url);
     }
+
+    //Synchronizes the timer with the database timer
     dynamic room = db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode);
     TimeSpan startTime;
     if (room.Started_Time != null)
