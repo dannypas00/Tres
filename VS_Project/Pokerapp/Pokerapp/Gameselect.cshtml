@@ -41,13 +41,15 @@
                     <div class="table-responsive">
                         <table class="table">
                             <tbody>
-                                @foreach (var row in db.Query("SELECT Room_Code FROM Room"))
+                                @foreach (var row in db.Query("SELECT Room_Code, Room_Name, Room_Create_Date FROM Room ORDER BY Room_Create_Date DESC"))
                                 {
+                                    
                                     string code = Convert.ToString((int)row.Room_Code);
                                     string Url = "Settings.cshtml/" + code;
                                     <tr style="cursor:pointer" class="clickable" data-href="@Url">
                                         <td>
-                                            <h3>@row.Room_Code</h3>
+                                            <h3>@row.Room_Name</h3>
+                                            <small>@row.Room_Code - @row.Room_Create_Date</small>
                                         </td>
                                     </tr>
 

@@ -92,10 +92,12 @@
     //startTime.AddDays(-Convert.ToInt32(DateTime.Now.Date - startTime.Date));
     int hrs = startTime.Hours;
     int mns = startTime.Minutes;
+    int scs = startTime.Seconds;
 }
 
 
 <div class="py-5">
+    <div class="hidden"><p id="Hours">@hrs</p><p id="Minutes">@mns</p><p id="Seconds">@scs</p></div>
     <div class="container">
         <div class="col-md-12 text-center">
             <h1>Table @table</h1>
@@ -104,7 +106,7 @@
             <div id="roomCode" style="display:none;">@roomCode</div>
             <div id="table" style="display:none;">@table</div>
 
-            <div name="timer" class="timer"></div>
+            <div name="timer" class="timer">loading timer...</div>
             <div class="round">This is round: <span id="rnumber"></span></div>
         </div>
         <div class="row">
@@ -165,12 +167,15 @@
   integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
   crossorigin="anonymous"></script>
 <script>
-$(document).ready(function () {
     var roomcode = $("#roomCode").html();
     $("#roomCode").remove();
     
     var table = $("#table").html();
     $("#table").remove();
+
+    var hrs = $('#Hours').html();
+    var mns = $('#Minutes').html();
+    var scs = $('#Seconds').html();
     
     console.log("roomcode" + roomcode);
     console.log("table" + table);
@@ -179,11 +184,8 @@ $(document).ready(function () {
         url: "Timer.cshtml",
         type: "get",
         data: {
-            roomCode: @roomCode,
-            table: @table,
-            start: @startTime,
-            pauze: @pauzeTime,
-            blind: @blindTime
+            roomCode: roomcode,
+            table: table
         },
         success: function (response) {
             startTimer(response); // Returns timer from db
@@ -198,9 +200,9 @@ $(document).ready(function () {
         var targetMinutes = parseInt(timer[1]);
         var targetSeconds = parseInt(timer[2]);
     
-        var currentHours = 
-        var currentMinutes = 
-        var currentSeconds = 
+        var currentHours = hrs;
+        var currentMinutes = mns;
+        var currentSeconds = scs;
     
         var round = 1;
         document.querySelector('#rnumber').innerHTML = round;
@@ -252,4 +254,4 @@ $(document).ready(function () {
             }
         }, 1000);
     }
-});</script>
+</script>
