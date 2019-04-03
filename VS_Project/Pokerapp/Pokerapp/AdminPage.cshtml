@@ -15,34 +15,61 @@
     }
 
     //Gather roomcode
-    int urlcode = Convert.ToInt32(Request.Url.AbsolutePath.Split('/')[2]);
+    int roomCode = Convert.ToInt32(Request.Url.AbsolutePath.Split('/')[2]);
 
     int number = 1;         //later toevoegen table number
     int rebuy = 0;          //aantal rebuys standaard op 0
-
+    string error = "";
     Validation.Add("name", Validator.StringLength(40, 1, "Name has to between 1 - 40"));
-    Validation.RequireField("name", "A name is Required");
+
+
+
 
     if (IsPost)
     {
-        if (Validation.IsValid())
+        dynamic room = db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode);
+        int maxplayerstable = room.Tbl_Max_Size;
+        int minplayerstable = room.Tbl_Min_Size;
+        int maxtables = room.Tbl_Amount;
+        int maxplayerstotal = maxplayerstable * maxtables;
+        int playercount = db.QueryValue("SELECT Count(Name) FROM Players WHERE Room_Code = @0", roomCode);
+
+
+        string name = Request["name"];
+        if (Validation.IsValid() && Request["AddName"] == "Add" && db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1", name, roomCode) is null)
         {
-            string name = Request["name"];
-            if (Request["AddName"] == "Add" && db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1", name, urlcode) is null)
+            if (playercount < maxplayerstotal)
             {
-                db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr, Rebuy) VALUES (@0, @1, @2, @3)", name, urlcode, number, rebuy);
+                db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr, Rebuy) VALUES (@0, @1, @2, @3)", name, roomCode, number, rebuy);
                 name = null;
             }
-            else if (Request["delete"] == "delete")
+            else
             {
-                db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", Request.Form["rownameform"], urlcode);
+                error = "You cant add more then " + maxplayerstotal + " players";
             }
         }
+
+        if (Request["delete"] == "delete")
+        {
+            db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", Request.Form["rownameform"], roomCode);
+        }
+
         if (Request["Proceed"] == "Proceed")
         {
-            Shuffle shuffle = new Shuffle();
-            shuffle.ShuffleTable(db, urlcode);
-            Response.Redirect("~/PlayingAdmin/" + urlcode);
+            if(playercount > minplayerstable && playercount <= maxplayerstotal)
+            {
+                Shuffle shuffle = new Shuffle();
+                shuffle.ShuffleTable(db, roomCode);
+                Response.Redirect("~/PlayingAdmin/" + roomCode);
+            }
+            else if(playercount < minplayerstable)
+            {
+                error = "Add atleast "+ (minplayerstable+1) + " players!";
+            }
+            else if(playercount > maxplayerstotal)
+            {
+                error = "You can't have more than " + maxplayerstotal + " players, because you only have " + maxtables + " tables and a maximum of " + maxplayerstable + " players per table";
+            }
         }
     }
 
@@ -68,21 +95,20 @@
                     <h1>Add players</h1>
                     <span class="help-block">
                         @Html.ValidationSummary()
+                        <strong style="color:red;">@error</strong>
                     </span>
                     <form method="post">
-                        <div class="form-group"> <input name="name" type="text" class="form-control" placeholder="Enter player name" id="form1" required> </div>
-                        <button type="submit" name="AddName" value="Add" class="btn btn-primary">Add</button>
                         
+                            <div class="form-group"> <input name="name" type="text" class="form-control" placeholder="Enter player name" id="form1" required autofocus> </div>
+                            <div class="form-group"> <button type="submit" name="AddName" value="Add" class="btn btn-primary">Add</button> </div>
+                            
                     </form>
-                    <form method="post">
-                        <button type="submit" name="Proceed" value="Proceed" class="btn btn-primary">Proceed</button>
-                    </form>
+
                     <div style="padding: 15px 0px 0px 0px" class="col-md-12">
                         <div class="table-responsive">
-
                             <table class="table">
                                 <tbody>
-                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", urlcode))
+                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", roomCode))
                                     {
                                         string rownameform = (string)row.Name;
                                         <tr>
@@ -96,11 +122,14 @@
                                                 </form>
                                             </td>
                                         </tr>
-
                                     }
                                 </tbody>
                             </table>
-
+                            <form method="post">
+                                <div>
+                                    <button type="submit" name="Proceed" value="Proceed" class="btn btn-primary">Proceed</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

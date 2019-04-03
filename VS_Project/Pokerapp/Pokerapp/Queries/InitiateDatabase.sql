@@ -8,11 +8,12 @@ CREATE TABLE Players
     PRIMARY KEY ([Name],[Room_Code]), 
 )
 
-
 DROP TABLE Room;
 CREATE TABLE Room
 (
     [Room_Code] INT NOT NULL PRIMARY KEY,
+	[Room_Name] NVARCHAR(50) NOT NULL ,
+	[Room_Create_Date] DATETIME NOT NULL,
     [Tbl_Min_Size] INT NOT NULL,
     [Started] CHAR(1) NOT NULL,
     [Chip_1_Worth] INT NOT NULL,
@@ -23,6 +24,7 @@ CREATE TABLE Room
     [Round_Time] TIME NOT NULl,
     [Pause_Time] TIME NULL,
 	[Blind_Time] TIME NULL,
+	[Started_Time] DATETIME NULL,
     [Allow_Rebuy] INT NOT NULL,
     [Start_Value] INT NOT NULL,
     [Tbl_Amount] INT NOT NULL,
