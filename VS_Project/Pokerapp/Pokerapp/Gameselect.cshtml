@@ -14,16 +14,17 @@
     }
 
     Random r = new Random();
-    var linkcode = r.Next(1000000, 9999999);
+    var roomCode = r.Next(1000000, 9999999);
 
     var selectQuery = "SELECT * FROM Room WHERE Room_Code = @0";
-    var selectRoomcodes = db.QuerySingle(selectQuery, linkcode);
+    var selectRoomcodes = db.QuerySingle(selectQuery, roomCode);
 
     if (selectRoomcodes == null)
     {
-        if (IsPost && linkcode != selectRoomcodes)
+        if (IsPost && roomCode != selectRoomcodes)
         {
-            string Url = "Settings.cshtml/" + linkcode;
+            
+            string Url = "Settings.cshtml/" + roomCode;
             Response.Redirect("~/" + Url);
         }
         else if (IsPost)
@@ -78,7 +79,7 @@
 </script>
 <form method="post">
     <div class="footer">
-        <input type="hidden" name="linkcode" value="@linkcode" />
-        <button class="btn btn-outline-primary" type="submit">Generate Linkcode</button>
+        <input type="hidden" name="roomCode" value="@roomCode" />
+        <button class="btn btn-outline-primary" type="submit">Generate roomCode</button>
     </div>
 </form>

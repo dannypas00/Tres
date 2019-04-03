@@ -10,14 +10,14 @@
     string prelink = Request.Url.AbsoluteUri;
     string[] link = prelink.Split('/');
     string linked = link[0] + "//" + link[2] + "/Players/" + link[4];
-    int urlcode = Convert.ToInt32(link[4]);
+    int roomCode = Convert.ToInt32(link[4]);
 
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
         Response.Redirect("~/Login.cshtml");
     }
 
-    int tables = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
+    int tables = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", roomCode);
     if (IsPost && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {
         switch (Request.Form["submit"])
@@ -36,11 +36,14 @@
                 break;
             case "shuffle":
                 Shuffle shuffle = new Shuffle();
-                shuffle.ShuffleTable(db, urlcode);
+                shuffle.ShuffleTable(db, roomCode);
                 //Update tables with AJAX//
                 break;
             case "manage":
-                Response.Redirect("~/AdminPage.cshtml/" + urlcode);
+                Response.Redirect("~/AdminPage.cshtml/" + roomCode);
+                break;
+            case "start":
+                db.Execute("UPDATE Room SET Started_Time = @0 WHERE Room_Code = @1", DateTime.Now, roomCode);
                 break;
             default:
                 break;
@@ -48,6 +51,7 @@
                 //pop-up with confirmation -> db.Execute(DELETE * FROM Blinds, Players, Room WHERE Room_Code=@0, urlcode);
                 break;
         }
+
     }
     }
 
@@ -104,7 +108,6 @@
                                                 <p>@row.Name</p>
                                             </td>
                                         </tr>
-
                                     }
                                 </tbody>
                             </table>
