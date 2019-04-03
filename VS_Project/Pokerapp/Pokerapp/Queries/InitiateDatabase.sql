@@ -14,6 +14,7 @@ CREATE TABLE Room
 (
     [Room_Code] INT NOT NULL PRIMARY KEY,
 	[Room_Name] NVARCHAR(50) NOT NULL ,
+	[Room_Create_Date] DATETIME NOT NULL,
     [Tbl_Min_Size] INT NOT NULL,
     [Started] CHAR(1) NOT NULL,
     [Chip_1_Worth] INT NOT NULL,
