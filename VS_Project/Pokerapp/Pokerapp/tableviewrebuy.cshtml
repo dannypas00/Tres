@@ -1,8 +1,6 @@
 ﻿@using WebMatrix.Data
 
 @{
-    /**/
-
 
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
@@ -32,17 +30,23 @@
     }
 
     int maxrebuy = (int)db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", urlcode);
-    int activeupdate = 0;
+    int updaterebuy = 0;
     string olaftry2 = Request["Name"];
+    //string olaftry2 = "Baap";
+    int rebuyyy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", olaftry2, urlcode, table);
 
 
-    if (olaftry2 != null)
+    if (olaftry2 != null && rebuyyy < maxrebuy)
     {
-        activeupdate = db.Execute("UPDATE Players SET Active = 0 WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", olaftry2, urlcode, table);
-        int activeforplayer = db.QueryValue("SELECT Active FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", olaftry2, urlcode, table);
-        <h5>@olaftry2 your activity is now @activeforplayer.</h5>
+
+        updaterebuy = db.Execute("UPDATE Players SET Rebuy = @0, Active = 1 WHERE Name = @1 AND Room_Code = @2 AND Tbl_nr = @3", rebuyyy + 1, olaftry2, urlcode, table);
+        int rebuyyyafterupdate = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", olaftry2, urlcode, table);
+        <h5>@olaftry2 You are now at @rebuyyyafterupdate / @maxrebuy rebuys.</h5>
     }
 
-    var spelerinactive = db.Query("SELECT Name FROM Players WHERE ACTIVE = 0 AND Room_Code = @0", urlcode);
-
+    if (olaftry2 != null && rebuyyy == maxrebuy)
+    {
+        <h5>Reached maximum amount of @maxrebuy rebuys!</h5>
+    }
 }
+

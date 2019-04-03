@@ -82,6 +82,7 @@ stopTimer(function () {
     currentMinutes = 0;
     currentSeconds = 0;
 
+    clearInterval(setInterval);
     alert("hoi");
 
 });

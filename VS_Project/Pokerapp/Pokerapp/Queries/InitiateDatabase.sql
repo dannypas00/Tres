@@ -5,6 +5,7 @@ CREATE TABLE Players
     [Room_Code] INT NOT NULL, 
     [Tbl_nr] INT NULL, 
     [Rebuy] INT NULL,
+	[Active] INT NULL,
     PRIMARY KEY ([Name],[Room_Code]), 
 )
 
