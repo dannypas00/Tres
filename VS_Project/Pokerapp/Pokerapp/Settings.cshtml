@@ -40,6 +40,7 @@
 
     #region Setting default
     //on first load settings
+    string room_name = "";
     var round_time = "00:30:00";
     var pause_time = "00:30:00";
     var blind_time = "00:05:00";
@@ -53,6 +54,7 @@
     int chip_worth3 = 5;
     int chip_worth4 = 10;
     int chip_worth5 = 25;
+    DateTime today = DateTime.Now;
     #endregion
 
     #region Retrieving from database
@@ -62,6 +64,7 @@
     {
         //Comments plz
         //Haal de object "room" op uit de database en haal daar alle waardes uit. Is minder resource intensive
+        room_name = Convert.ToString(db.QueryValue("SELECT Room_Name FROM Room WHERE Room_Code = @0", code));
         round_time = Convert.ToString(db.QueryValue("SELECT Round_Time FROM Room WHERE Room_Code = @0", code));
         pause_time = Convert.ToString(db.QueryValue("SELECT Pause_Time FROM Room WHERE Room_Code = @0", code));
         blind_time = Convert.ToString(db.QueryValue("SELECT Blind_Time FROM Room WHERE Room_Code = @0", code));
@@ -82,7 +85,7 @@
     //updates or adds all the values
     void Save()
     {
-
+        string roomname = Request["Room_Name"];
         var time = Request["round_time"];
         int min_table_size = Convert.ToInt32(Request["min_table"]);
         int max_table_size = Convert.ToInt32(Request["max_table"]);
@@ -100,17 +103,18 @@
         int blind_round = 1;
         int small = 0;
         int big = 0;
+        today = DateTime.Now;
 
         var check = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
         if (check == code)
         {
-            db.Execute("UPDATE Room SET Room_Code = @0, Tbl_Min_Size = @1, Started = @2, Chip_1_Worth = @3, Chip_2_Worth = @4, Chip_3_Worth = @5, Chip_4_Worth = @6, Chip_5_Worth = @7, Round_Time = @8, Pause_Time = @9, Blind_Time = @10, Allow_Rebuy = @11, Start_Value = @12, Tbl_Amount = @13, Tbl_Max_Size = @14, Blind_Round = 1, Small_Blind = 0, Big_Blind = 0 WHERE Room_Code = @0"
-            , code, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size);
+            db.Execute("UPDATE Room SET Room_Code = @0, Room_Name = @1, Tbl_Min_Size = @2, Started = @3, Chip_1_Worth = @4, Chip_2_Worth = @5, Chip_3_Worth = @6, Chip_4_Worth = @7, Chip_5_Worth = @8, Round_Time = @9, Pause_Time = @10, Blind_Time = @11, Allow_Rebuy = @12, Start_Value = @13, Tbl_Amount = @14, Tbl_Max_Size = @15, Blind_Round = 1, Small_Blind = 0, Big_Blind = 0, Room_Create_Date = @16 WHERE Room_Code = @0"
+            , code, roomname, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, today);
         }
         else
         {
-            db.Execute("INSERT INTO Room (Room_Code, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Blind_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size, Blind_Round, Small_Blind, Big_Blind)" +
-            "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17)", code, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, blind_round, small, big);
+            db.Execute("INSERT INTO Room (Room_Code, Room_Name, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Blind_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size, Blind_Round, Small_Blind, Big_Blind, Room_Create_Date)" +
+            "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17, @18, @19)", code, roomname, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, blind_round, small, big, today);
         }
     }
     #endregion
@@ -162,31 +166,33 @@
                 </span>
                     <form style="display: inline-block" name="Settings" method="post">
                         <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form2">Start value</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric"class="form-control" id="form2" placeholder="Start value" name="start_value" value="@start_value"> </div>
+                            <div class="form-group col-md-6"> <label for="form2">Room name</label> <input type="text" class="form-control" id="form2" placeholder="Room name" name="room_name" value="@room_name"> </div>
+                            <div class="form-group col-md-6"> <label for="form3">Start value</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form3" placeholder="Start value" name="start_value" value="@start_value"> </div>
+
                         </div>
                         <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form3">Time per round</label> <input type="text" class="form-control" id="form3" placeholder="9001" name="round_time" value="@round_time"> </div>
-                            <div class="form-group col-md-6"> <label for="form4">Duration of pauses</label> <input type="text" class="form-control" id="form4" placeholder="9001" name="pause_time" value="@pause_time"> </div>
+                            <div class="form-group col-md-6"> <label for="form4">Time per round</label> <input type="text" class="form-control" id="form4" placeholder="9001" name="round_time" value="@round_time"> </div>
+                            <div class="form-group col-md-6"> <label for="form5">Duration of pauses</label> <input type="text" class="form-control" id="form5" placeholder="9001" name="pause_time" value="@pause_time"> </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form5">Interval for blinds</label> <input type="text" class="form-control" id="form5" placeholder="9001" name="blind_time" value="@blind_time"> </div>
-                            <div class="form-group col-md-6"> <label for="form6">Minimum players per table</label> <input type="number" step="1" min="2" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form6" placeholder="3" name="min_table" value="@min_table"> </div>
+                            <div class="form-group col-md-6"> <label for="form6">Interval for blinds</label> <input type="text" class="form-control" id="form6" placeholder="9001" name="blind_time" value="@blind_time"> </div>
+                            <div class="form-group col-md-6"> <label for="form7">Minimum players per table</label> <input type="number" step="1" min="2" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form7" placeholder="3" name="min_table" value="@min_table"> </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form7">Maximum players per table</label> <input type="number" step="1" min="3" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form7" placeholder="9001" name="max_table" value="@max_table_amount"> </div>
-                            <div class="form-group col-md-6"> <label for="form8">Amount of tables</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form8" placeholder="9001" name="tbl_amount" value="@table_amount"> </div>
+                            <div class="form-group col-md-6"> <label for="form8">Maximum players per table</label> <input type="number" step="1" min="3" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form8" placeholder="9001" name="max_table" value="@max_table_amount"> </div>
+                            <div class="form-group col-md-6"> <label for="form9">Amount of tables</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form9" placeholder="9001" name="tbl_amount" value="@table_amount"> </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form9">Amount of rebuys</label> <input type="number" step="1" min="0" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form9" placeholder="9001" name="rebuy" value="@rebuy"> </div>
-                            <div class="form-group col-md-6"> <label for="form10">Value chip 1</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form10" placeholder="9001" name="chip1" value="@chip_worth1"> </div>
+                            <div class="form-group col-md-6"> <label for="form10">Amount of rebuys</label> <input type="number" step="1" min="0" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form10" placeholder="9001" name="rebuy" value="@rebuy"> </div>
+                            <div class="form-group col-md-6"> <label for="form11">Value chip 1</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form11" placeholder="9001" name="chip1" value="@chip_worth1"> </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form11">Value chip 2</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form11" placeholder="9001" name="chip2" value="@chip_worth2"> </div>
-                            <div class="form-group col-md-6"> <label for="form12">Value chip 3</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form12" placeholder="9001" name="chip3" value="@chip_worth3"> </div>
+                            <div class="form-group col-md-6"> <label for="form12">Value chip 2</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form12" placeholder="9001" name="chip2" value="@chip_worth2"> </div>
+                            <div class="form-group col-md-6"> <label for="form13">Value chip 3</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form13" placeholder="9001" name="chip3" value="@chip_worth3"> </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form13">Value chip 4</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form13" placeholder="9001" name="chip4" value="@chip_worth4"> </div>
-                            <div class="form-group col-md-6"> <label for="form14">Value chip 5</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form14" placeholder="9001" name="chip5" value="@chip_worth5"> </div>
+                            <div class="form-group col-md-6"> <label for="form14">Value chip 4</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form14" placeholder="9001" name="chip4" value="@chip_worth4"> </div>
+                            <div class="form-group col-md-6"> <label for="form15">Value chip 5</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form15" placeholder="9001" name="chip5" value="@chip_worth5"> </div>
                         </div>
                         <input class="btn btn-primary" type="submit" name="Proceed" value="Proceed" />
                     </form>
