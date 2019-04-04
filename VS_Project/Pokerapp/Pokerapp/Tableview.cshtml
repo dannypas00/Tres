@@ -1,16 +1,14 @@
 ﻿@using WebMatrix.Data
-
 @{
     Layout = "~/_Layout.cshtml";
     int roomCode = Request.QueryString["roomcode"].AsInt();
     int table = Request.QueryString["table"].AsInt();
+    int? blindsIndex = Request.QueryString["blindsIndex"].AsInt();
     Page.Title = "Table" + table;
 
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
-
-
 
     string Url = "RulesPageNL/" + roomCode;
     string urlBack = "Players/" + roomCode;
@@ -25,49 +23,35 @@
     {
         tweede = eerste;
     }
-    //if (aantal > 10)    //Haal max spelers uit database
-    //{
-    //    string Url = "Players.cshtml/" + roomCode;
-    //    Response.Redirect("~/" + Url);
-    //}
 
+    int bigBlind = 0;
+    int smallBlind = 0;
 
-    if (IsPost && !Request["blindnext"].IsEmpty())
+    if (blindsIndex != null)
     {
-        int current_Round = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
-        int new_Round = current_Round + 1;
-        db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", new_Round, roomCode);
+        int index = (int)blindsIndex;
+        db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", index, roomCode);
+        dynamic blind = db.Query("SELECT * FROM Blinds WHERE Room_Code = @0", roomCode);
+        if (blindsIndex + 2 < blind.Count)
+        {
+            blindsIndex++;
+        }
+
+        smallBlind = blind[index].ValueSB;
+        bigBlind = blind[index].ValueBB;
         <script>
             $(document).ready(function () {
-                alert("The blind has been raised!");
-            })
+                alert("The blinds have been raised!\nThe values are now Small Blind: {%s} and Big Blind: {%s}" + @smallBlind + @bigBlind);
+            });
         </script>
     }
-    int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
-    var blind_id = db.Query("SELECT Top (@0) ID FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
-    int min_size = db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", roomCode);
-    var small_blind = db.Query("SELECT TOP (@0) ValueSB FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
-    int small = 0;
-    foreach (var a in small_blind)
+    else
     {
-        if (a.ValueSB > small)
-        {
-            small = a.ValueSB;
-        }
-    }
-    var big_blind = db.Query("SELECT TOP (@0) ValueBB FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
-    int big = 0;
-    foreach (var a in big_blind)
-    {
-        if (a.ValueBB > big)
-        {
-            big = a.ValueBB;
-        }
+        blindsIndex = (int) db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
     }
 
-    db.Execute("UPDATE Room SET Small_Blind = @0, Big_Blind = @1 WHERE Room_Code = @2", small, big, roomCode);
     int players = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
-    if (min_size >= players)
+    /*if (min_size >= players)
     {
         <script>
             $(document).ready(function () {
@@ -78,7 +62,8 @@
         shuffle.ShuffleTable(db, roomCode);
         Url = "Players.cshtml/" + roomCode;
         Response.Redirect("~/" + Url);
-    }
+    }*/
+
     dynamic room = db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode);
     TimeSpan startTime;
     if (room.Started_Time != null)
@@ -90,12 +75,11 @@
         startTime = TimeSpan.Zero;
     }
     DateTime pauzeTime = DateTime.Now + room.Pause_Time;
-    DateTime blindTime = DateTime.Now + room.Blind_Time;
-    //startTime.AddHours(Convert.ToInt32(DateTime.Now.Date - startTime.Date) * 24);
-    //startTime.AddDays(-Convert.ToInt32(DateTime.Now.Date - startTime.Date));
+    TimeSpan blindTime = room.Blind_Time;
     int hrs = startTime.Hours;
     int mns = startTime.Minutes;
     int scs = startTime.Seconds;
+    int started = Convert.ToInt32(room.Started);
 }
 <div class="header">
     <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
@@ -106,7 +90,17 @@
     </div>
 </div>
 <div class="py-5">
-    <div style="display: none;"><p id="Hours">@hrs</p><p id="Minutes">@mns</p><p id="Seconds">@scs</p></div>
+    <!--Filling JS variables-->
+    <div style="display: none;">
+        <p id="Hours">@hrs</p>
+        <p id="Minutes">@mns</p>
+        <p id="Seconds">@scs</p>
+        <p id="Blinds">@blindTime.TotalSeconds</p>
+        <p id="Pauze">@pauzeTime.TimeOfDay</p>
+        <p id="Started">@started</p>
+        <p id="BlindsIndex">@blindsIndex</p>
+    </div>
+    <!--Start the page-->
     <div class="container">
         <div class="col-md-12 text-center">
             <h1>Table @table</h1>
@@ -114,21 +108,21 @@
         <div class="col-md-12 text-center">
             <div id="roomCode" style="display:none;">@roomCode</div>
             <div id="table" style="display:none;">@table</div>
-            @*@if (startTime == TimeSpan.Zero || startTime == null)
+            @if (startTime == TimeSpan.Zero || startTime == null)
             {
                 <div name=timer class="timer">Game not started yet</div>
             }
             else
             {
                 <div name=timer class="timer">loading timer...</div>
-            }*@
+            }
             <div name="timer" class="timer"></div>
             <div class="round">This is round: <span id="rnumber"></span></div>
         </div>
         <div class="row">
             <div class="col-md-2">
-                <p>Small blind: @small</p>
-                <p>Big blind: @big</p>
+                <p id="small">Small blind: @smallBlind.ToString()</p>
+                <p id="big">Big blind: @bigBlind.ToString()</p>
                 <form method="post">
                     <input class="btn btn-outline-secondary" type="submit" name="blindnext" value="Raise blinds" />
                 </form>
@@ -183,18 +177,23 @@
         crossorigin="anonymous"></script>
 <script>
     var roomcode = $("#roomCode").html();
-    $("#roomCode").remove();
 
     var table = $("#table").html();
-    $("#table").remove();
 
     var hrs = $('#Hours').html();
     var mns = $('#Minutes').html();
     var scs = $('#Seconds').html();
     var round = 1;
-
+    var blind = $('#Blinds').html();
+    var pauze = $('#Pauze').html();
+    var started = $('#Started').html();
+    var blindsIndex = $('#BlindsIndex').html();
     console.log("roomcode" + roomcode);
     console.log("table" + table);
+    console.log("blind" + blind);
+    console.log("pauze" + pauze);
+    console.log("started" + started);
+
     //Ajax connect with url Timer get the data roomcode
     $.ajax({
         url: "Timer.cshtml",
@@ -209,13 +208,12 @@
         }
     });
 
-
     function startTimer(timer) {
-        var timer = timer.split(":"); // Split timer
+        timer = timer.split(":"); // Split timer
 
-        var targetHours = parseInt(timer[0]); // Parse hours to int
-        var targetMinutes = parseInt(timer[1]);
-        var targetSeconds = parseInt(timer[2]);
+        var roundHours = parseInt(timer[0]); // Parse hours to int
+        var roundMinutes = parseInt(timer[1]);
+        var roundSeconds = parseInt(timer[2]);
 
         var currentHours = hrs;
         var currentMinutes = mns;
@@ -226,6 +224,12 @@
 
         //Increment timer
         setInterval(function () {
+            var totalSecs = currentSeconds + (currentMinutes * 60) + (currentHours * 1440);
+
+            console.log("Timer: " + timer[0] + ":" + timer[1] + ":" + timer[2]);
+            console.log("Blind: " + blind);
+            console.log("Blind Modulus " + parseInt(totalSecs % blind));
+            console.log(totalSecs);
             var displayHours = currentHours;
             var displayMinutes = currentMinutes;
             var displaySeconds = currentSeconds;
@@ -247,9 +251,20 @@
 
             document.querySelector('.timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
 
+            if (totalSecs % blind == 0) {   
+                $.ajax({
+                    url: "Tableview.cshtml",
+                    type: "get",
+                    data: {
+                        table: table,
+                        roomCode: roomcode,
+                        blindsIndex: blindsIndex
+                    }
+                })
+            }
 
             // if condition is met round + 1
-            if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
+            if (currentHours == roundHours && currentMinutes == roundMinutes && currentSeconds == roundSeconds) {
                 round++;
                 document.querySelector('#rnumber').innerHTML = round;
                 currentHours = 0;

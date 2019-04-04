@@ -13,11 +13,6 @@
     string[] link = prelink.Split('/');
     int urlcode = Convert.ToInt32(link[4]);
 
-    if (Request.Cookies["LoginCookie"].Value != "true")
-    {
-        Response.Redirect("~/Login.cshtml");
-    }
-
     int amount = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
 
     string Url = link[0] + "//" + link[2] + "/" + "RulesPageNL/" + link[4];

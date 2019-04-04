@@ -13,24 +13,17 @@
         Response.Redirect("~/Login.cshtml");
     }
 
+    int? roomCode = null;
+
     Random r = new Random();
-    var roomCode = r.Next(1000000, 9999999);
-
-    var selectQuery = "SELECT * FROM Room WHERE Room_Code = @0";
-    var selectRoomcodes = db.QuerySingle(selectQuery, roomCode);
-
-    if (selectRoomcodes == null)
+    do
     {
-        if (IsPost && roomCode != selectRoomcodes)
-        {
-            
-            string Url = "Settings.cshtml/" + roomCode;
-            Response.Redirect("~/" + Url);
-        }
-        else if (IsPost)
-        {
-            Response.Write("Probeer het nog eens...");
-        }
+        roomCode = r.Next(1000000, 9999999);
+    } while (db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode) != null);
+    if (IsPost && Request.Form["new"] == "submit")
+    {
+        string Url = "Settings.cshtml/" + roomCode;
+        Response.Redirect("~/" + Url);
     }
 }
 
@@ -80,6 +73,6 @@
 <form method="post">
     <div class="footer">
         <input type="hidden" name="roomCode" value="@roomCode" />
-        <button class="btn btn-outline-primary" type="submit">New Game</button>
+        <button class="btn btn-outline-primary" name="new" type="submit">New Game</button>
     </div>
 </form>
