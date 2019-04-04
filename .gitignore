@@ -371,9 +371,6 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 
-<<<<<<< HEAD
-# End of https://www.gitignore.io/api/windows,visualstudio
-=======
 # End of https://www.gitignore.io/api/windows,visualstudio
 
 App_Data/Database*

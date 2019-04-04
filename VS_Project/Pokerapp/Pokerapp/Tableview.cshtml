@@ -6,6 +6,8 @@
     int table = Request.QueryString["table"].AsInt();
     Page.Title = "Table" + table;
 
+    Session["roomcode"] = roomCode;
+
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);

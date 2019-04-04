@@ -8,7 +8,7 @@
 
     string url = Request.Url.AbsolutePath;
     //string roomCode = url.Substring(url.Length - 7);
-    int roomCode = 1234567;
+    int roomCode = (int)Session["roomcode"];
 
     string olaftry2 = Request["Name"];
     int table = db.QueryValue("SELECT Tbl_nr FROM Players WHERE Name = @0 AND Room_Code = @1", olaftry2, roomCode);
@@ -88,7 +88,7 @@
 
     <br />
     <div>
-        <img class="table" src="~/assets/Tableview/Pokertable.png" />
+        <img id="pokertable" class="table" src="~/assets/Tableview/Pokertable.png" />
     </div>
     <br />
     @foreach (var a in db.Query("SELECT TOP (@2) Name, Rebuy FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1 ORDER BY Name DESC", roomCode, table, tweede, tweede))

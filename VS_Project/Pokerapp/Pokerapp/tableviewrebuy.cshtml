@@ -8,7 +8,8 @@
 
     string url = Request.Url.AbsolutePath;
     //string roomCode = url.Substring(url.Length - 7);
-    int roomCode = 1234567;
+    int roomCode = (int)Session["roomcode"];
+
 
     string olaftry2 = Request["Name"];
     int table = db.QueryValue("SELECT Tbl_nr FROM Players WHERE Name = @0 AND Room_Code = @1", olaftry2, roomCode);
