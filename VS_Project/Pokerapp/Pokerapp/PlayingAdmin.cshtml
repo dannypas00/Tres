@@ -32,10 +32,10 @@
                 Response.Redirect("~/Gameselect.cshtml/");
                 break;
             case "settings":
-                Response.Redirect("~/Settings/" + urlcode);
+                Response.Redirect("~/Settings/" + roomCode);
                 break;
             case "blinds":
-                Response.Redirect("~/Blinds/" + urlcode);
+                Response.Redirect("~/Blinds/" + roomCode);
                 break;
             case "shuffle":
                 Shuffle shuffle = new Shuffle();
@@ -104,7 +104,7 @@
                                     <tr>
                                         <th>Table @tbl_Nr</th>
                                     </tr>
-                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_Nr))
+                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, tbl_Nr))
                                     {
                                         <tr>
                                             <td>

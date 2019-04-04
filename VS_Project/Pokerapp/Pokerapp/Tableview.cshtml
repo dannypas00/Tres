@@ -32,6 +32,9 @@
     //    Response.Redirect("~/" + Url);
     //}
 
+    //Gets startvalue
+    int startvalue = db.QueryValue("SELECT Start_Value FROM Room WHERE Room_Code = @0", roomCode);
+
     //Raises the current blinds
     if (IsPost && !Request["blindnext"].IsEmpty())
     {
@@ -126,6 +129,7 @@
         </div>
         <div class="row">
             <div class="col-md-2">
+                <p>Starting capital: @startvalue</p>
                 <p>Small blind: @small</p>
                 <p>Big blind: @big</p>
                 <form method="post">
