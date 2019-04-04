@@ -41,7 +41,7 @@
 
                 //    }
 
-                //Compares values, if values are lower then last value it will not be added to the database
+                //Compares values, if values are lower than last value it will not be added to the database
                 if ((small_blind <= small) && (big_blind <= big))
                 {
                     int id_old = Convert.ToInt32(db.QueryValue("SELECT ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID DESC", urlcode));
