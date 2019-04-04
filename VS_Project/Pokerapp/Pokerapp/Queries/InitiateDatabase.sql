@@ -31,7 +31,7 @@ CREATE TABLE [Room] (
     [Blind_Round]      INT           NOT NULL,
     [Small_Blind]      INT           NOT NULL,
     [Big_Blind]        INT           NOT NULL,
-    [Time_Passed]      TIME (7)      NOT NULL DEFAULT 0,
+    [Time_Passed]      TIME (7)      NOT NULL,
     PRIMARY KEY CLUSTERED ([Room_Code] ASC)
 );
 

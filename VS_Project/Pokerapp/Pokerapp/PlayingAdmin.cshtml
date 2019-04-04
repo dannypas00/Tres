@@ -1,6 +1,7 @@
 ﻿@using WebMatrix.Data
 
 @{
+
     Page.Title = "Game running";
     Layout = "~/_Layout.cshtml";
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
@@ -11,6 +12,11 @@
     string[] link = prelink.Split('/');
     string linked = link[0] + "//" + link[2] + "/Players/" + link[4];
     int roomCode = Convert.ToInt32(link[4]);
+
+
+    dynamic room = db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode);
+
+    int started = room.Started;
 
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
@@ -24,9 +30,7 @@
         {
             case "pauze":
                 //pauze logic//
-                dynamic startTime = db.QuerySingle("SELECT Started_Time FROM Room WHERE Room_Code = @0", roomCode);
-                TimeSpan timePassed = DateTime.Now - startTime.Started_Time;
-                db.Execute("UPDATE Room SET Started_Time = @0, Time_Passed = @1, Started = 0 WHERE Room_Code = @2", DateTime.Now, DateTime.Now - startTime.Started_Time, roomCode);
+                db.Execute("UPDATE Room SET Started_Time = @0, Started = 0 WHERE Room_Code = @1", DateTime.Now, roomCode);
                 break;
             case "shuffle":
                 Shuffle shuffle = new Shuffle();
@@ -49,9 +53,18 @@
 <div class="py-5">
     <div class="container">
         <div class="col-md-12 text-center">
-            <header>
-                <h1>Game in progress</h1>
-            </header>
+            @if (started == 0)
+            {
+                <header>
+                    <h1>Game in pauze</h1>
+                </header>
+            }
+            else if (started == 1)
+            {
+                <header>
+                    <h1>Game in progress</h1>
+                </header>
+            }
             <div class="col-md-12 text-center">
                 <div class="row" style="justify-content:center">
                     <form name="updateSettings" method="post">
@@ -65,33 +78,33 @@
                 <div class="row"></div>
                 <div style="justify-content:center; padding-top:20px" class="row"><p>Share this link: <a href=@linked>@linked</a></p></div>
             </div>
-                <div class="col-md-12" style="justify-content:center">
-                    <div class="row">
-                        @for (int i = 0; i < tables; i++)
-                        {
-                            int tbl_Nr = i + 1;
-                            <div style="width:200px; margin-right:10px" class="table-responsive flex-column">
-                                <table class="table" style="width:200px; padding-left:20px">
-                                    <tbody>
+            <div class="col-md-12" style="justify-content:center">
+                <div class="row">
+                    @for (int i = 0; i < tables; i++)
+                    {
+                        int tbl_Nr = i + 1;
+                        <div style="width:200px; margin-right:10px" class="table-responsive flex-column">
+                            <table class="table" style="width:200px; padding-left:20px">
+                                <tbody>
+                                    <tr>
+                                        <th>Table @tbl_Nr</th>
+                                    </tr>
+                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, tbl_Nr))
+                                    {
                                         <tr>
-                                            <th>Table @tbl_Nr</th>
+                                            <td>
+                                                <p>@row.Name</p>
+                                            </td>
                                         </tr>
-                                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, tbl_Nr))
-                                        {
-                                            <tr>
-                                                <td>
-                                                    <p>@row.Name</p>
-                                                </td>
-                                            </tr>
 
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                    </div>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
                 </div>
-
             </div>
+
         </div>
     </div>
+</div>
