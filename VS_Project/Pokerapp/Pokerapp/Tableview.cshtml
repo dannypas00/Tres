@@ -2,15 +2,16 @@
 
 @{
     Layout = "~/_Layout.cshtml";
-    Page.Title = "Select Game";
+    int roomCode = Request.QueryString["roomcode"].AsInt();
+    int table = Request.QueryString["table"].AsInt();
+    Page.Title = "Table" + table;
 
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
 
-    int roomCode = Request.QueryString["roomcode"].AsInt();
-    int table = Request.QueryString["table"].AsInt();
+
     string Url = "RulesPageNL/" + roomCode;
     string urlBack = "Players/" + roomCode;
 
@@ -98,9 +99,6 @@
 
     int maxrebuy = (int)db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", roomCode);
 }
-
-
-
 <div class="header">
     <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
         Rules
@@ -110,7 +108,7 @@
     </div>
 </div>
 <div class="py-5">
-    <div class="hidden"><p id="Hours">@hrs</p><p id="Minutes">@mns</p><p id="Seconds">@scs</p></div>
+    <div style="display: none;"><p id="Hours">@hrs</p><p id="Minutes">@mns</p><p id="Seconds">@scs</p></div>
     <div class="container">
         <div class="col-md-12 text-center">
             <h1>Table @table</h1>
@@ -118,8 +116,15 @@
         <div class="col-md-12 text-center">
             <div id="roomCode" style="display:none;">@roomCode</div>
             <div id="table" style="display:none;">@table</div>
-
-            <div name="timer" class="timer">loading timer...</div>
+            @*@if (startTime == TimeSpan.Zero || startTime == null)
+            {
+                <div name=timer class="timer">Game not started yet</div>
+            }
+            else
+            {
+                <div name=timer class="timer">loading timer...</div>
+            }*@
+            <div name="timer" class="timer"></div>
             <div class="round">This is round: <span id="rnumber"></span></div>
         </div>
         <div class="row">

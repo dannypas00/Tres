@@ -14,5 +14,5 @@
     var selectTimer = db.QuerySingle("SELECT Round_Time FROM Room WHERE Room_Code = @0", Request["roomcode"].AsInt(), Request["table"].AsInt());
 
     Response.Write(selectTimer.Round_Time);
-
+    Response.Write(Request.QueryString["round"]);
 }

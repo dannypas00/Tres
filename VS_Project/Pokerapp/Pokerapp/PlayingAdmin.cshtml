@@ -10,14 +10,13 @@
     string prelink = Request.Url.AbsoluteUri;
     string[] link = prelink.Split('/');
     string linked = link[0] + "//" + link[2] + "/Players/" + link[4];
-    int urlcode = Convert.ToInt32(link[4]);
+    int roomCode = Convert.ToInt32(link[4]);
 
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
         Response.Redirect("~/Login.cshtml");
     }
-
-    int tables = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
+    int tables = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", roomCode);
     if (IsPost && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {
         switch (Request.Form["submit"])
@@ -25,19 +24,41 @@
             case "pauze":
                 //pauze logic//
                 break;
+            case "select":
+                Response.Redirect("~/Gameselect.cshtml/");
+                break;
+            case "settings":
+                Response.Redirect("~/Settings/" + roomCode);
+                break;
+            case "blinds":
+                Response.Redirect("~/Blinds/" + roomCode);
+                break;
             case "shuffle":
                 Shuffle shuffle = new Shuffle();
-                shuffle.ShuffleTable(db, urlcode);
+                shuffle.ShuffleTable(db, roomCode);
                 //Update tables with AJAX//
                 break;
             case "manage":
-                Response.Redirect("~/AdminPage.cshtml/" + urlcode);
+                Response.Redirect("~/AdminPage.cshtml/" + roomCode);
+                break;
+            case "start":
+                db.Execute("UPDATE Room SET Started_Time = @0 WHERE Room_Code = @1", DateTime.Now, roomCode);
+                    break;
+            case "delete":
+                <script>
+                    $(document).ready(function () {
+                    if (confirm("Do you really want to delete this room? This is irreversible!")) {
+                        @*db.Execute("DELETE * FROM Blinds, Players, Room WHERE Room_Code=@0", roomCode);*@ 
+                        }
+                    })
+                </script>
                 break;
             default:
                 break;
         }
+
     }
-}
+    }
 
 <div class="py-5">
     <div class="container">
@@ -48,42 +69,65 @@
             <div class="col-md-12 text-center">
                 <div class="row" style="justify-content:center">
                     <form name="updateSettings" method="post">
-                        <button class="btn btn-primary" type="submit" value="pauze" name="submit">Pause the game</button>
-                        <button class="btn btn-primary" type="submit" value="shuffle" name="submit">Shuffle all players</button>
-                        <button class="btn btn-primary" type="submit" value="manage" name="submit">Add/remove players</button>
+                        <div class="form-row" style="justify-content:center">
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="submit" value="pauze" name="submit">Pause</button>
+                            </div>
+                            <div class="form-group">
+                            <button class="btn btn-primary" type="submit" name="submit" value="start">Start</button>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="submit" value="select" name="submit">Select Game</button>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="submit" value="settings" name="submit">Settings</button>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="submit" value="blinds" name="submit">Blinds</button>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="submit" value="shuffle" name="submit">Shuffle all</button>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-outline-primary" type="submit" value="manage" name="submit">Change Players</button>
+                            </div>
+                        </div>
                     </form>
 
                 </div>
                 <div class="row"></div>
                 <div style="justify-content:center; padding-top:20px" class="row"><p>Share this link: <a href=@linked>@linked</a></p></div>
             </div>
-                <div class="col-md-12" style="justify-content:center">
-                    <div class="row">
-                        @for (int i = 0; i < tables; i++)
-                        {
-                            int tbl_Nr = i + 1;
-                            <div style="width:200px; margin-right:10px" class="table-responsive flex-column">
-                                <table class="table" style="width:200px; padding-left:20px">
-                                    <tbody>
+            <div class="col-md-12" style="justify-content:center">
+                <div class="row">
+                    @for (int i = 0; i < tables; i++)
+                    {
+                        int tbl_Nr = i + 1;
+                        <div style="width:200px; margin-right:10px" class="table-responsive flex-column">
+                            <table class="table" style="width:200px; padding-left:20px">
+                                <tbody>
+                                    <tr>
+                                        <th>Table @tbl_Nr</th>
+                                    </tr>
+                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, tbl_Nr))
+                                    {
                                         <tr>
-                                            <th>Table @tbl_Nr</th>
+                                            <td>
+                                                <p>@row.Name</p>
+                                            </td>
                                         </tr>
-                                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_Nr))
-                                        {
-                                            <tr>
-                                                <td>
-                                                    <p>@row.Name</p>
-                                                </td>
-                                            </tr>
-
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                    </div>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
                 </div>
-
+                <form method="post">
+                    <button class="btn btn-warning" type="submit" value="delete" name="submit">Delete game</button>
+                </form>
+            </div>
             </div>
         </div>
     </div>
