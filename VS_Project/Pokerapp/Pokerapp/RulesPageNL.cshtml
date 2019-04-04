@@ -9,12 +9,14 @@
 
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-
+    //Gets roomcode from url
     string prelink = Request.Url.AbsoluteUri;
     string[] link = prelink.Split('/');
     string linked = link[0] + "//" + link[2] + "/Players/" + link[4];
     int urlcode = int.Parse(link[4]);
 
+
+    //Gets the chipworths 
     var chips = db.QuerySingle("SELECT Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth FROM Room WHERE  Room_Code=@0", urlcode);
 
     int chip1 = chips.Chip_1_Worth;
