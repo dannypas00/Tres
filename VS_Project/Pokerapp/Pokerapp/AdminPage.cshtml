@@ -59,7 +59,7 @@
                 shuffle.ShuffleTable(db, roomCode);
                 Response.Redirect("~/PlayingAdmin/" + roomCode);
             }
-            else if (playercount < minplayerstable)
+            else if (playercount <= minplayerstable)
             {
                 error = "Add atleast " + (minplayerstable + 1) + " players!";
             }
@@ -90,7 +90,7 @@
                     <h1>Add players</h1>
                     <span class="help-block">
                         @Html.ValidationSummary()
-                        <strong style="color:red;">@error</strong>
+                        <strong style="color:red;"><b>@error</b></strong>
                     </span>
                     <form method="post">
 
