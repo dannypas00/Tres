@@ -19,32 +19,62 @@
 
     int number = 1;         //later toevoegen table number
     int rebuy = 0;          //aantal rebuys standaard op 0
-
+    string error = "";
     Validation.Add("name", Validator.StringLength(40, 1, "Name has to between 1 - 40"));
-    Validation.RequireField("name", "A name is Required");
+
+
+
+
+    if (db.QueryValue("SELECT Name FROM Players WHERE Room_Code = @0", roomCode) == null)
+    {
+        Response.Redirect("~/Gameselect/");
+    }
 
     if (IsPost)
     {
+        dynamic room = db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode);
+        int maxplayerstable = room.Tbl_Max_Size;
+        int minplayerstable = room.Tbl_Min_Size;
+        int maxtables = room.Tbl_Amount;
+        int maxplayerstotal = maxplayerstable * maxtables;
+        int playercount = db.QueryValue("SELECT Count(Name) FROM Players WHERE Room_Code = @0", roomCode);
 
-        if (Validation.IsValid())
+
+        string name = Request["name"];
+        if (Validation.IsValid() && Request["AddName"] == "Add" && db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1", name, roomCode) is null)
         {
-            string name = Request["name"];
-            if (Request["AddName"] == "Add" && db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1", name, roomCode) is null)
+            if (playercount < maxplayerstotal)
             {
                 db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr, Rebuy) VALUES (@0, @1, @2, @3)", name, roomCode, number, rebuy);
                 name = null;
             }
-            else if (Request["delete"] == "delete")
+            else
             {
-                db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", Request.Form["rownameform"], roomCode);
+                error = "You cant add more then " + maxplayerstotal + " players";
             }
         }
+
+        if (Request["delete"] == "delete")
+        {
+            db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", Request.Form["rownameform"], roomCode);
+        }
+
         if (Request["Proceed"] == "Proceed")
         {
-            Shuffle shuffle = new Shuffle();
-            shuffle.ShuffleTable(db, roomCode);
-            db.Execute("UPDATE Room SET Started_Time = @0 WHERE Room_Code = @1", DateTime.Now, roomCode);
-            Response.Redirect("~/PlayingAdmin/" + roomCode);
+            if(playercount > minplayerstable && playercount <= maxplayerstotal)
+            {
+                Shuffle shuffle = new Shuffle();
+                shuffle.ShuffleTable(db, roomCode);
+                Response.Redirect("~/PlayingAdmin/" + roomCode);
+            }
+            else if(playercount < minplayerstable)
+            {
+                error = "Add atleast "+ (minplayerstable+1) + " players!";
+            }
+            else if(playercount > maxplayerstotal)
+            {
+                error = "You can't have more than " + maxplayerstotal + " players, because you only have " + maxtables + " tables and a maximum of " + maxplayerstable + " players per table";
+            }
         }
     }
 
@@ -70,6 +100,7 @@
                     <h1>Add players</h1>
                     <span class="help-block">
                         @Html.ValidationSummary()
+                        <strong style="color:red;">@error</strong>
                     </span>
                     <form method="post">
                         

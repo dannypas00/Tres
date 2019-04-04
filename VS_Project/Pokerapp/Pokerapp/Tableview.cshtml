@@ -2,15 +2,16 @@
 
 @{
     Layout = "~/_Layout.cshtml";
-    Page.Title = "Select Game";
+    //Gets roomcode and tablenumber
+    int roomCode = Request.QueryString["roomcode"].AsInt();
+    int table = Request.QueryString["table"].AsInt();
+    Page.Title = "Table" + table;
 
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-    //Gets roomcode
-    int roomCode = Request.QueryString["roomcode"].AsInt();
-    int table = Request.QueryString["table"].AsInt();
+    //Creates roomcode
     string Url = "RulesPageNL/" + roomCode;
     string urlBack = "Players/" + roomCode;
 
@@ -102,9 +103,6 @@
     int mns = startTime.Minutes;
     int scs = startTime.Seconds;
 }
-
-}
-
         <div class="header">
             <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
                 Rules
@@ -271,4 +269,17 @@
             }
         }, 1000);
     }
+
+</script>
+<script>
+    jQuery(document).ready(function ($) {
+        $(".clickable").click(function () {
+            window.location = $(this).find("a:first").attr("href");
+        });
+    });
+    jQuery(document).ready(function ($) {
+        $(".clickableBtn").click(function () {
+            window.location = $(this).data("href");
+        });
+    });
 </script>

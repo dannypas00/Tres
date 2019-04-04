@@ -67,7 +67,9 @@
 
                                     @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
                                     {
-                                        <div class="flex-column"><p><b>@row.Name </b></p></div>
+                                    <div class="flex-column">
+                                        <p><b>@row.Name </b></p>
+                                    </div>
                                     }
 
 
