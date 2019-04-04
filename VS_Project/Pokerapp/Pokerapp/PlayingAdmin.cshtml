@@ -25,25 +25,10 @@
     {
         switch (Request.Form["submit"])
         {
-            case "pauze":
-                //pauze logic//
-                break;
-            case "select":
-                Response.Redirect("~/Gameselect.cshtml/");
-                break;
-            case "settings":
-                Response.Redirect("~/Settings/" + roomCode);
-                break;
-            case "blinds":
-                Response.Redirect("~/Blinds/" + roomCode);
-                break;
             case "shuffle":
                 Shuffle shuffle = new Shuffle();
                 shuffle.ShuffleTable(db, roomCode);
                 //Update tables with AJAX//
-                break;
-            case "manage":
-                Response.Redirect("~/AdminPage.cshtml/" + roomCode);
                 break;
             case "start":
                 db.Execute("UPDATE Room SET Started_Time = @0 WHERE Room_Code = @1", DateTime.Now, roomCode);
