@@ -52,8 +52,8 @@
                 <script>
                     $(document).ready(function () {
                     if (confirm("Do you really want to delete this room? This is irreversible!")) {
-                        @{db.Execute("DELETE FROM Room, Players, Blinds WHERE Room_Code = @0", roomCode);}
-                        @{Response.Redirect("~/Gameselect.cshtml");}
+                        @{db.Execute("DELETE FROM Room WHERE Room_Code = @0", roomCode);
+                        Response.Redirect("~/Gameselect.cshtml");}
                         }
                     })
                 </script>
@@ -63,7 +63,7 @@
         }
 
     }
-    }
+}
 
 <div class="py-5">
     <div class="container">
