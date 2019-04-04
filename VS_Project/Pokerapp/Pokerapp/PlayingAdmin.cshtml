@@ -18,7 +18,7 @@
     int min_size = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", roomCode));
     if (players < (min_size + 1))
     {
-        Response.Redirect("~/Login.cshtml");
+        Response.Redirect("~/AdminPage.cshtml");
     }
 
     //Gets the chipworths 
