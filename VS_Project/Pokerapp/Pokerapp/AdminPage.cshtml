@@ -53,17 +53,17 @@
 
         if (Request["Proceed"] == "Proceed")
         {
-            if(playercount > minplayerstable && playercount <= maxplayerstotal)
+            if (playercount > minplayerstable && playercount <= maxplayerstotal)
             {
                 Shuffle shuffle = new Shuffle();
                 shuffle.ShuffleTable(db, roomCode);
                 Response.Redirect("~/PlayingAdmin/" + roomCode);
             }
-            else if(playercount < minplayerstable)
+            else if (playercount < minplayerstable)
             {
-                error = "Add atleast "+ (minplayerstable+1) + " players!";
+                error = "Add atleast " + (minplayerstable + 1) + " players!";
             }
-            else if(playercount > maxplayerstotal)
+            else if (playercount > maxplayerstotal)
             {
                 error = "You can't have more than " + maxplayerstotal + " players, because you only have " + maxtables + " tables and a maximum of " + maxplayerstable + " players per table";
             }
@@ -83,7 +83,6 @@
         }
     </style>
 </head>
-
     <div class="py-5 text-center">
         <div class="container">
             <div class="row">
@@ -94,16 +93,22 @@
                         <strong style="color:red;">@error</strong>
                     </span>
                     <form method="post">
-                        
-                            <div class="form-group"> <input name="name" type="text" class="form-control" placeholder="Enter player name" id="form1" required autofocus> </div>
-                            <div class="form-group"> <button type="submit" name="AddName" value="Add" class="btn btn-primary">Add</button> </div>
-                            
+
+                        <div class="form-group"> <input name="name" type="text" class="form-control" placeholder="Enter player name" id="form1" required autofocus> </div>
+                        <div class="form-group"> <button type="submit" name="AddName" value="Add" class="btn btn-primary">Add</button> </div>
+
                     </form>
 
-                    <div style="padding: 15px 0px 0px 0px" class="col-md-12">
-                        <div class="table-responsive">
-                            <table class="table">
+                    <div style="padding: 15px 0px 0px 0px; text-align: center" class="col-md-12">
+                        <div class="table-responsive" style="display: inline-block; top:0; width:350px;">
+                            <table class="table serial">
                                 <tbody>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Players</th>
+                                        <th></th>
+                                    </tr>
+                                    <!--Places every name in a table-->
                                     @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", roomCode))
                                     {
                                         string rownameform = (string)row.Name;
@@ -113,7 +118,7 @@
                                             </td>
                                             <td>
                                                 <form method="post">
-                                                    <button type="submit" name="delete" value="delete" class="btn btn-outline-secondary">X</button>
+                                                    <button type="submit" name="delete" value="delete" style="width:75px; float:right" class="btn btn-outline-secondary">X</button>
                                                     @Html.Hidden("rownameform", rownameform)
                                                 </form>
                                             </td>
@@ -131,6 +136,17 @@
                 </div>
             </div>
         </div>
-    </div>                    
+    </div>
 
+<script>
+    //Automatically numbered column
+    function addRowCount(tableAttr) {
+        $(tableAttr).each(function () {
+            $('td:first-child', this).each(function (i) {
+                $(this).before('<td>' + (i + 1) + '</td>');
+            });
+        });
+    }
+    addRowCount('.serial');
+</script>
 
