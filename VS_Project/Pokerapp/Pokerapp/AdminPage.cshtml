@@ -25,6 +25,11 @@
 
 
 
+    if (db.QueryValue("SELECT Name FROM Players WHERE Room_Code = @0", roomCode) == null)
+    {
+        Response.Redirect("~/Gameselect/");
+    }
+
     if (IsPost)
     {
         dynamic room = db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode);
