@@ -29,6 +29,15 @@
 
 }
 
+<style>
+    .chipcentered {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+</style>
+
 <div id="begin" class="page-wrapper chiller-theme toggled">
     <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
         <i class="fas fa-bars"></i>
@@ -68,20 +77,25 @@
         <!-- Footer with chip values start -->
         <div class="sidebar-footer">
             <a>
-                <span style="color:darkblue">@chip1 </span>
+                <img src="~/Chip_White.png" alt="chip1" style="width:50px;height:50px" />
+                <strong><span class="chipcentered" style="color:black">@chip1 </span></strong>
             </a>
             <a>
-                <span style="color:darkred">@chip2</span>
-            </a>
+                <img src="~/Chip_Red.png" alt="chip2" style="width:50px;height:50px" />
+                <strong><span class="chipcentered" style="color:black">@chip2</span></strong>
+</a>
             <a>
-                <span style="color:darkgreen">@chip3</span>
-            </a>
+                <img src="~/Chip_Blue.png" alt="chip3" style="width:50px;height:50px" />
+                <strong><span class="chipcentered" style="color:black">@chip3</span></strong>
+</a>
             <a>
-                <span style="color:ghostwhite">@chip4</span>
-            </a>
+                <img src="~/Chip_Green.png" alt="chip4" style="width:50px;height:50px" />
+                <strong><span class="chipcentered" style="color:black">@chip4</span></strong>
+</a>
             <a>
-                <span style="color:black">@chip5</span>
-            </a>
+                <img src="~/Chip_Black.png" alt="chip5" style="width:50px;height:50px" />
+                <strong><span class="chipcentered" style="color:black">@chip5</span></strong>
+</a>
         </div>
         <!-- Footer with chip values end -->
     </nav>

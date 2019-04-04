@@ -22,6 +22,7 @@
     int Blind_Round = (db.QueryValue("SELECT COUNT(ValueSB) FROM Blinds WHERE Room_Code = @0", urlcode));
     if (IsPost && Validation.IsValid())
     {
+
         //Add blindvalues to blinds
         if (Request["AddBlinds"] == "Add" && (!Request["small"].IsEmpty() && !Request["big"].IsEmpty()))
         {
