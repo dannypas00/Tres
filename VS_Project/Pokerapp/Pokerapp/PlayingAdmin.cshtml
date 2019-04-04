@@ -43,11 +43,17 @@
                 break;
             case "start":
                 db.Execute("UPDATE Room SET Started_Time = @0 WHERE Room_Code = @1", DateTime.Now, roomCode);
+                    break;
+            case "delete":
+                <script>
+                    $(document).ready(function () {
+                    if (confirm("Do you really want to delete this room? This is irreversible!")) {
+                        @*db.Execute("DELETE * FROM Blinds, Players, Room WHERE Room_Code=@0", roomCode);*@ 
+                        }
+                    })
+                </script>
                 break;
             default:
-                break;
-            case "delete":
-                //pop-up with confirmation -> db.Execute(DELETE * FROM Blinds, Players, Room WHERE Room_Code=@0, urlcode);
                 break;
         }
 
@@ -118,7 +124,9 @@
                         </div>
                     }
                 </div>
-                <button class="btn btn-warning" type="submit" value="delete" name="submit">Delete game</button>
+                <form method="post">
+                    <button class="btn btn-warning" type="submit" value="delete" name="submit">Delete game</button>
+                </form>
             </div>
             </div>
         </div>
