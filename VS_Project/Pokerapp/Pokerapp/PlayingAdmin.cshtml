@@ -29,10 +29,10 @@
                 Response.Redirect("~/Gameselect.cshtml/");
                 break;
             case "settings":
-                Response.Redirect("~/Settings/" + urlcode);
+                Response.Redirect("~/Settings/" + roomCode);
                 break;
             case "blinds":
-                Response.Redirect("~/Blinds/" + urlcode);
+                Response.Redirect("~/Blinds/" + roomCode);
                 break;
             case "shuffle":
                 Shuffle shuffle = new Shuffle();
@@ -45,10 +45,16 @@
             case "start":
                 db.Execute("UPDATE Room SET Started_Time = @0 WHERE Room_Code = @1", DateTime.Now, roomCode);
                 break;
-            default:
-                break;
             case "delete":
-                //pop-up with confirmation -> db.Execute(DELETE * FROM Blinds, Players, Room WHERE Room_Code=@0, urlcode);
+                <script>
+                    $(document).ready(function () {
+                    if (confirm("Do you really want to delete this room? This is irreversible!")) {
+                        @*db.Execute("DELETE * FROM Blinds, Players, Room WHERE Room_Code=@0", roomCode);*@ 
+                        }
+                    })
+                </script>
+                break;
+            default:
                 break;
         }
 
@@ -101,7 +107,7 @@
                                     <tr>
                                         <th>Table @tbl_Nr</th>
                                     </tr>
-                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_Nr))
+                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, tbl_Nr))
                                     {
                                         <tr>
                                             <td>
@@ -114,7 +120,9 @@
                         </div>
                     }
                 </div>
-                <button class="btn btn-warning" type="submit" value="delete" name="submit">Delete game</button>
+                <form method="post">
+                    <button class="btn btn-warning" type="submit" value="delete" name="submit">Delete game</button>
+                </form>
             </div>
             </div>
         </div>
