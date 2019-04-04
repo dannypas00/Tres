@@ -21,6 +21,7 @@
     var selectQuery = "SELECT * FROM Room WHERE Room_Code = @0";
     var selectRoomcodes = db.QuerySingle(selectQuery, roomCode);
 
+
     if (selectRoomcodes == null)
     {
         if (IsPost && roomCode != selectRoomcodes)
@@ -44,6 +45,7 @@
                     <div class="table-responsive">
                         <table class="table">
                             <tbody>
+                                <!--Shows games that have been made-->
                                 @foreach (var row in db.Query("SELECT Room_Code, Room_Name, Room_Create_Date FROM Room ORDER BY Room_Create_Date DESC"))
                                 {
 
@@ -73,12 +75,14 @@
     </div>
 </div>
 <script>
+    //Makes the whole row clickable
     jQuery(document).ready(function ($) {
         $(".clickable").click(function () {
             window.location = $(this).data("href");
         });
     });
 </script>
+<!--Footer for the "New Game"-->
 <form method="post">
     <div class="footer">
         <input type="hidden" name="roomCode" value="@roomCode" />
