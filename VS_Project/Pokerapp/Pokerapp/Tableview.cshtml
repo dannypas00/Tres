@@ -96,16 +96,6 @@
     int hrs = startTime.Hours;
     int mns = startTime.Minutes;
     int scs = startTime.Seconds;
-
-    string timerMessage;
-    if(startTime == TimeSpan.Zero || startTime == null)
-    {
-        timerMessage = "Game not started yet";
-    }
-    else
-    {
-        timerMessage = "loading timer...";
-    }
 }
 <div class="header">
     <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
@@ -124,8 +114,15 @@
         <div class="col-md-12 text-center">
             <div id="roomCode" style="display:none;">@roomCode</div>
             <div id="table" style="display:none;">@table</div>
-
-            <div name="timer" class="timer">@timerMessage</div> 
+            @*@if (startTime == TimeSpan.Zero || startTime == null)
+            {
+                <div name=timer class="timer">Game not started yet</div>
+            }
+            else
+            {
+                <div name=timer class="timer">loading timer...</div>
+            }*@
+            <div name="timer" class="timer"></div>
             <div class="round">This is round: <span id="rnumber"></span></div>
         </div>
         <div class="row">
@@ -194,12 +191,13 @@
     var hrs = $('#Hours').html();
     var mns = $('#Minutes').html();
     var scs = $('#Seconds').html();
+    var round = 1;
 
     console.log("roomcode" + roomcode);
     console.log("table" + table);
     //Ajax connect with url Timer get the data roomcode
     $.ajax({
-        url: "_Timer.cshtml",
+        url: "Timer.cshtml",
         type: "get",
         data: {
             roomCode: roomcode,
@@ -223,7 +221,7 @@
         var currentMinutes = mns;
         var currentSeconds = scs;
 
-        var round = 1;
+        round = 1;
         document.querySelector('#rnumber').innerHTML = round;
 
         //Increment timer
