@@ -26,11 +26,6 @@
     {
         tweede = eerste;
     }
-    //if (aantal > 10)    //Haal max spelers uit database
-    //{
-    //    string Url = "Players.cshtml/" + roomCode;
-    //    Response.Redirect("~/" + Url);
-    //}
 
     //Gets startvalue
     int startvalue = db.QueryValue("SELECT Start_Value FROM Room WHERE Room_Code = @0", roomCode);
