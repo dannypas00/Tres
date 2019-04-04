@@ -13,6 +13,15 @@
     string linked = link[0] + "//" + link[2] + "/Players/" + link[4];
     int roomCode = Convert.ToInt32(link[4]);
 
+    //Gets the chipworths 
+    var chips = db.QuerySingle("SELECT Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth FROM Room WHERE  Room_Code=@0", roomCode);
+
+    int chip1 = chips.Chip_1_Worth;
+    int chip2 = chips.Chip_2_Worth;
+    int chip3 = chips.Chip_3_Worth;
+    int chip4 = chips.Chip_4_Worth;
+    int chip5 = chips.Chip_5_Worth;
+
     //Looks if user logged in
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
@@ -49,6 +58,15 @@
 
     }
     }
+                <!--Styling for the chips-->
+                <style>
+                    .chipcentered {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                    }
+                </style>
 <div id="begin" class="page-wrapper chiller-theme toggled">
     <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
         <i class="fas fa-bars"></i>
@@ -100,19 +118,24 @@
         <!-- Footer with chip values start -->
         <div class="sidebar-footer">
             <a>
-                <span style="color:darkblue"> </span>
+                <img src="~/Chip_White.png" alt="chip1" style="width:50px;height:50px" />
+                <strong><span class="chipcentered" style="color:black">@chip1 </span></strong>
             </a>
             <a>
-                <span style="color:darkred"></span>
+                <img src="~/Chip_Red.png" alt="chip2" style="width:50px;height:50px" />
+                <strong><span class="chipcentered" style="color:black">@chip2</span></strong>
             </a>
             <a>
-                <span style="color:darkgreen"></span>
+                <img src="~/Chip_Blue.png" alt="chip3" style="width:50px;height:50px" />
+                <strong><span class="chipcentered" style="color:black">@chip3</span></strong>
             </a>
             <a>
-                <span style="color:ghostwhite"></span>
+                <img src="~/Chip_Green.png" alt="chip4" style="width:50px;height:50px" />
+                <strong><span class="chipcentered" style="color:black">@chip4</span></strong>
             </a>
             <a>
-                <span style="color:black"></span>
+                <img src="~/Chip_Black.png" alt="chip5" style="width:50px;height:50px" />
+                <strong><span class="chipcentered" style="color:black">@chip5</span></strong>
             </a>
         </div>
         <!-- Footer with chip values end -->
@@ -209,6 +232,7 @@
     <script src="~/js/sidebarmenu.js"></script>
     <script src="~/js/jquery.ba-outside-events.min.js"></script>
     <script>
+        //Adds a number before the "first" column
         function addRowCount(tableAttr) {
             $(tableAttr).each(function () {
                 $('td:first-child', this).each(function (i) {

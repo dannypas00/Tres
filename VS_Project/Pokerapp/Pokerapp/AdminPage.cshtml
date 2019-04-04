@@ -108,6 +108,7 @@
                                         <th>Players</th>
                                         <th></th>
                                     </tr>
+                                    <!--Places every name in a table-->
                                     @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", roomCode))
                                     {
                                         string rownameform = (string)row.Name;
@@ -138,6 +139,7 @@
     </div>
 
 <script>
+    //Automatically numbered column
     function addRowCount(tableAttr) {
         $(tableAttr).each(function () {
             $('td:first-child', this).each(function (i) {
