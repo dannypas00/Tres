@@ -21,7 +21,7 @@
     if (IsPost && Validation.IsValid())
     {
 
-        if (Request["AddBlinds"] == "Add" && (!Request["small"].IsEmpty() || !Request["big"].IsEmpty()))
+        if (Request["AddBlinds"] == "Add" && (!Request["small"].IsEmpty() && !Request["big"].IsEmpty()))
         {
             int small = Convert.ToInt32(Request["small"]);
             int big = Convert.ToInt32(Request["big"]);
