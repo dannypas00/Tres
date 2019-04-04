@@ -135,7 +135,7 @@
         }
     }
     #endregion
-
+    string warning = "";
     //continues to next page
     if (IsPost && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {
@@ -143,8 +143,90 @@
         {
             if (Request["Proceed"] == "Proceed")
             {
-                Save();
-                Response.Redirect("~/Blinds.cshtml/" + code);
+                int goed = 0;
+
+                var prelink = Request["round_time"];
+                string[] times = prelink.Split(':');
+                int i = 0;
+                if(times.Count() > 2 && times.Count() < 4)
+                {
+                    if (int.TryParse(Convert.ToString(times[0]), out i) == true && int.TryParse(Convert.ToString(times[1]), out i) == true && int.TryParse(Convert.ToString(times[2]), out i) == true)
+                    {
+                        if (times[0].ToString().Length == 2 && times[1].ToString().Length == 2 && times[2].ToString().Length == 2)
+                        {
+                            goed = goed + 1;
+                        }
+                        else
+                        {
+                            warning = "Not a valid round time, use hh:mm:ss";
+                        }
+                    }
+                    else
+                    {
+                        warning = "Not a valid round time, use hh:mm:ss";
+                    }
+                }
+                else
+                {
+                    warning = "Not a valid round time, use hh:mm:ss";
+                }
+
+
+                var blind = Request["blind_time"];
+                string[] blinds = prelink.Split(':');
+                if (blinds.Count() > 2 && blinds.Count() < 4)
+                {
+                    if (int.TryParse(Convert.ToString(blinds[0]), out i) == true && int.TryParse(Convert.ToString(blinds[1]), out i) == true && int.TryParse(Convert.ToString(blinds[2]), out i) == true)
+                    {
+                        if (blinds[0].ToString().Length == 2 && blinds[1].ToString().Length == 2 && blinds[2].ToString().Length == 2)
+                        {
+                            goed = goed + 1;
+                        }
+                        else
+                        {
+                            warning = "Not a valid blind time, use hh:mm:ss";
+                        }
+                    }
+                    else
+                    {
+                        warning = "Not a valid blind time, use hh:mm:ss";
+                    }
+                }
+                else
+                {
+                    warning = "Not a valid blind time, use hh:mm:ss";
+                }
+
+                var pauze = Request["pause_time"];
+                string[] pauzes = prelink.Split(':');
+                if (pauzes.Count() > 2 && pauzes.Count() < 4)
+                {
+                    if (int.TryParse(Convert.ToString(pauzes[0]), out i) == true && int.TryParse(Convert.ToString(pauzes[1]), out i) == true && int.TryParse(Convert.ToString(pauzes[2]), out i) == true)
+                    {
+                        if (pauzes[0].ToString().Length == 2 && pauzes[1].ToString().Length == 2 && pauzes[2].ToString().Length == 2)
+                        {
+                            goed = goed + 1;
+                        }
+                        else
+                        {
+                            warning = "Not a valid pause time, use hh:mm:ss";
+                        }
+                    }
+                    else
+                    {
+                        warning = "Not a valid pause time, use hh:mm:ss";
+                    }
+                }
+                else
+                {
+                    warning = "Not a valid pause time, use hh:mm:ss";
+                }
+
+                if (goed >= 3)
+                {
+                    Save();
+                    Response.Redirect("~/Blinds.cshtml/" + code);
+                }
             }
             else
             {
@@ -152,7 +234,8 @@
             }
         }
     }
-}
+    }
+    }
 
 
 <head>
@@ -161,7 +244,10 @@
             color: red;
             font-weight: bold;
         }
-
+        .error-time {
+            color: red;
+            font-weight: bold;
+        }
         .field-validation-error {
             font-weight: bold;
             color: red;
@@ -178,41 +264,44 @@
         <div class="row">
             <div class="col-md-12">
                 <h3>Settings</h3>
+                <span class="error-time">
+                    @warning
+                </span>
                 <span class="help-block">
                     @Html.ValidationSummary()
                 </span>
-                    <form style="display: inline-block" name="Settings" method="post">
-                        <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form2">Room name</label> <input type="text" class="form-control" id="form2" placeholder="Room name" name="room_name" value="@room_name" required> </div>
-                            <div class="form-group col-md-6"> <label for="form3">Start value</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form3" placeholder="Start value" name="start_value" value="@start_value" required> </div>
+                <form style="display: inline-block" name="Settings" method="post">
+                    <div class="form-row">
+                        <div class="form-group col-md-6"> <label for="form2">Room name</label> <input type="text" class="form-control" id="form2" placeholder="Room name" name="room_name" value="@room_name" required> </div>
+                        <div class="form-group col-md-6"> <label for="form3">Start value</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form3" placeholder="Start value" name="start_value" value="@start_value" required> </div>
 
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form4">Time per round</label> <input type="text" class="form-control" id="form4" placeholder="9001" name="round_time" value="@round_time" required> </div>
-                            <div class="form-group col-md-6"> <label for="form5">Duration of pauses</label> <input type="text" class="form-control" id="form5" placeholder="9001" name="pause_time" value="@pause_time"required> </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form6">Interval for blinds</label> <input type="text" class="form-control" id="form6" placeholder="9001" name="blind_time" value="@blind_time"> </div>
-                            <div class="form-group col-md-6"> <label for="form7">Minimum players per table</label> <input type="number" step="1" min="2" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form7" placeholder="3" name="min_table" value="@min_table"required> </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form8">Maximum players per table</label> <input type="number" step="1" min="3" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form8" placeholder="9001" name="max_table" value="@max_table_amount"required> </div>
-                            <div class="form-group col-md-6"> <label for="form9">Amount of tables</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form9" placeholder="9001" name="tbl_amount" value="@table_amount"required> </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form10">Amount of rebuys</label> <input type="number" step="1" min="0" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form10" placeholder="9001" name="rebuy" value="@rebuy"required> </div>
-                            <div class="form-group col-md-6"> <label for="form11">Value chip 1</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form11" placeholder="9001" name="chip1" value="@chip_worth1"required> </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form12">Value chip 2</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form12" placeholder="9001" name="chip2" value="@chip_worth2"required> </div>
-                            <div class="form-group col-md-6"> <label for="form13">Value chip 3</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form13" placeholder="9001" name="chip3" value="@chip_worth3"required> </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form14">Value chip 4</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form14" placeholder="9001" name="chip4" value="@chip_worth4"required> </div>
-                            <div class="form-group col-md-6"> <label for="form15">Value chip 5</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form15" placeholder="9001" name="chip5" value="@chip_worth5"required> </div>
-                        </div>
-                        <input class="btn btn-primary" type="submit" name="Proceed" value="Proceed" />
-                    </form>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6"> <label for="form4">Time per round</label> <input type="text" class="form-control" id="form4" placeholder="9001" name="round_time" value="@round_time" required> </div>
+                        <div class="form-group col-md-6"> <label for="form5">Duration of pauses</label> <input type="text" class="form-control" id="form5" placeholder="9001" name="pause_time" value="@pause_time" required> </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6"> <label for="form6">Interval for blinds</label> <input type="text" class="form-control" id="form6" placeholder="9001" name="blind_time" value="@blind_time"> </div>
+                        <div class="form-group col-md-6"> <label for="form7">Minimum players per table</label> <input type="number" step="1" min="2" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form7" placeholder="3" name="min_table" value="@min_table" required> </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6"> <label for="form8">Maximum players per table</label> <input type="number" step="1" min="3" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form8" placeholder="9001" name="max_table" value="@max_table_amount" required> </div>
+                        <div class="form-group col-md-6"> <label for="form9">Amount of tables</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form9" placeholder="9001" name="tbl_amount" value="@table_amount" required> </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6"> <label for="form10">Amount of rebuys</label> <input type="number" step="1" min="0" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form10" placeholder="9001" name="rebuy" value="@rebuy" required> </div>
+                        <div class="form-group col-md-6"> <label for="form11">Value chip 1</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form11" placeholder="9001" name="chip1" value="@chip_worth1" required> </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6"> <label for="form12">Value chip 2</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form12" placeholder="9001" name="chip2" value="@chip_worth2" required> </div>
+                        <div class="form-group col-md-6"> <label for="form13">Value chip 3</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form13" placeholder="9001" name="chip3" value="@chip_worth3" required> </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6"> <label for="form14">Value chip 4</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form14" placeholder="9001" name="chip4" value="@chip_worth4" required> </div>
+                        <div class="form-group col-md-6"> <label for="form15">Value chip 5</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form15" placeholder="9001" name="chip5" value="@chip_worth5" required> </div>
+                    </div>
+                    <input class="btn btn-primary" type="submit" name="Proceed" value="Proceed" />
+                </form>
             </div>
         </div>
     </div>
