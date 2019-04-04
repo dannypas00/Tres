@@ -127,6 +127,7 @@
                                                         <th>Round</th>
                                                         <th>Small</th>
                                                         <th>Big</th>
+                                                        <th></th>
                                                     </tr>
                                                     @foreach (var row in db.Query("SELECT ValueSB, ValueBB, ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID ASC", urlcode))
                                                     {
@@ -141,7 +142,7 @@
                                                             </td>
                                                             <td>
                                                                 <form method="post">
-                                                                    <button class="btn btn-outline-primary" type="submit" name="delete" value="delete">X</button>
+                                                                    <button class="btn btn-outline-primary" style="width:75px; float:right" type="submit" name="delete" value="delete">X</button>
                                                                     @Html.Hidden("rowblindform", rowblindform)
                                                                 </form>
                                                             </td>
