@@ -1,0 +1,38 @@
+﻿@{
+    //load layout
+    Layout = "_Layout.cshtml";
+    Page.Title = "Login";
+
+    //if the page is posted and validation is valid
+    if (IsPost && Validation.IsValid())
+    {
+        //check if name and password are correct
+        if (Request.Form["name"] == "TimoSchraa" && Request.Form["password"] == "password")
+        {
+            //turn on a cookie for 3 hours
+            Response.Cookies["LoginCookie"].Value = "true";
+            Response.Cookies["LoginCookie"].Expires = DateTime.Now.AddHours(3);
+            Response.Redirect("~/Gameselect.cshtml");
+        }
+        else
+        {
+            //error message by wrong login
+            <p style="color: red">Invalid credentials!</p>
+        }
+    }
+}
+
+<div class="py-5 text-center">
+    <div class="container">
+        <div class="row">
+            <div id="login" class="mx-auto col-md-6 col-10 bg-white p-5">
+                <h1 class="mb-4">Log in</h1>
+                <form method="post" name="login" action="" accept-charset="utf-8">
+                    <div class="form-group"> <input type="text" class="form-control" name="name" placeholder="Enter username" id="form1"> </div>
+                    <div class="form-group mb-3"> <input type="password" class="form-control" name="password" placeholder="Password" id="form2"> <small class="form-text text-muted text-right"></small></div> 
+                    <button name="Login" value="Login" type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
