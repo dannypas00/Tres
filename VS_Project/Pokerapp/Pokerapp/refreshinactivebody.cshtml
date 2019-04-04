@@ -1,20 +1,20 @@
 ﻿@using WebMatrix.Data
 
 @{
-
+    Layout = "~/_Layout.cshtml";
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
     string url = Request.Url.AbsolutePath;
-    //string urlcode = url.Substring(url.Length - 7);
-    int urlcode = 1234567;
+    //string roomCode = url.Substring(url.Length - 7);
+    int roomCode = 1234567;
 
-    //int table = Convert.ToInt32(Session["tablenumber"]);
-    int table = 2;
+    string olaftry2 = Request["Name"];
+    int table = db.QueryValue("SELECT Tbl_nr FROM Players WHERE Name = @0 AND Room_Code = @1", olaftry2, roomCode);
 
-    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", urlcode, table);
-    int aantal = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", urlcode, table);
+    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
+    int aantal = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
     double gedeeld = aantal / 2;
     int helft = Convert.ToInt32(gedeeld);
     int eerste = Convert.ToInt32(aantal - helft);
@@ -25,73 +25,56 @@
     }
     if (aantal > 10)    //Haal max spelers uit database
     {
-        string Url = "Players.cshtml/" + urlcode;   //Needs fixing
+        string Url = "Players.cshtml/" + roomCode;   //Needs fixing
         Response.Redirect("~/" + Url);
     }
 
-    int maxrebuy = (int)db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", urlcode);
-    db.Query("SELECT Name FROM Players WHERE Active = 0 AND Room_Code = @0", urlcode);
+    int maxrebuy = (int)db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", roomCode);
+    db.Query("SELECT Name FROM Players WHERE Active = 0 AND Room_Code = @0", roomCode);
 
 }
 
-<html>
-<head>
-    <title>Tableview</title>
+<div id="inactivebody">
+    @foreach (var pirnp in db.Query("SELECT Name FROM Players WHERE Active = 0 AND Room_Code = @0 AND Rebuy = @1 ORDER BY Name ASC", roomCode, maxrebuy))
+    {
+        <h3>@pirnp.Name</h3>
+    }
 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-    <!-- jQuery library -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <!-- Latest compiled JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="~/StyleSheet.css">
-</head>
-<body>
-    <div id="inactivebody">
-        @foreach (var pirnp in db.Query("SELECT Name FROM Players WHERE Active = 0 AND Room_Code = @0 AND Rebuy = @1 ORDER BY Name ASC", urlcode, maxrebuy))
-        {
-            <h3>@pirnp.Name</h3>
-        }
+    @foreach (var pirp in db.Query("SELECT Name, Rebuy FROM Players WHERE Room_Code = @0 AND Active = 0 AND Rebuy < @1 ORDER BY Name DESC", roomCode, maxrebuy))
+    {
+        int rebuyyy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", pirp.Name, roomCode, table);
+        string player = pirp.Name;
+        string test2 = player + roomCode;
+        <h2>@player</h2>
 
-        @foreach (var pirp in db.Query("SELECT Name, Rebuy FROM Players WHERE Room_Code = @0 AND Active = 0 AND Rebuy < @1 ORDER BY Name DESC", urlcode, maxrebuy))
-        {
-            int rebuyyy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", pirp.Name, urlcode, table);
-            string player = pirp.Name;
-            string test2 = player + urlcode;
-            <h2>@player</h2>
-            <form method="post">
-                <button value="@player" name="player" type="button" class="btn btn-primary" data-toggle="modal" data-target="#@test2">Options</button>
-            </form>
+        <!-- Button trigger modal -->
+        <button value="@player" name="player" type="button" data-toggle="modal" data-target="#@test2">@player</button>
 
-            <!-- Modal -->
-            <div class="modal fade" id="@test2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Options for: @player</h5>
-                        </div>
-
-                        <div class="modal-body">
-                            @*<form method="post" name="optionsform" class="optionsform">*@
-                            <div class="options-form-popup" id="player-options">
-                                <button value="rebuy" name="rebuy" onclick="updaterebuys('@player')" type="submit" data-dismiss="modal">Rebuy</button>
-                                @Html.Hidden("sender", player)
-                            </div>
-                            <div class="modal-footer">
-                                <div id="@player"><h5>@player you are now at @rebuyyy / @maxrebuy rebuys.</h5></div>
-                            </div>
-                            @*</form>*@
-                        </div>
-
+        <!-- Modal -->
+        <div class="modal fade" id="@test2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Options for: @player</h5>
                     </div>
+
+                    <div class="modal-body">
+                        @*<form method="post" name="optionsform" class="optionsform">*@
+                        <div class="options-form-popup" id="player-options">
+                            <button value="rebuy" name="rebuy" onclick="updaterebuys('@player')" type="submit" data-dismiss="modal">Rebuy</button>
+                            @Html.Hidden("sender", player)
+                        </div>
+                        <div class="modal-footer">
+                            <div id="@player"><h5>@player you are now at @rebuyyy / @maxrebuy rebuys.</h5></div>
+                        </div>
+                        @*</form>*@
+                    </div>
+
                 </div>
             </div>
+        </div>
 
 
-        }
-    </div>
-
-</body>
-</html>
+    }
+</div>
+ 

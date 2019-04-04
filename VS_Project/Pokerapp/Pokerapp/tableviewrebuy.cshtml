@@ -7,14 +7,14 @@
     Database db = Database.OpenConnectionString(connectionString, provider);
 
     string url = Request.Url.AbsolutePath;
-    //string urlcode = url.Substring(url.Length - 7);
-    int urlcode = 1234567;
+    //string roomCode = url.Substring(url.Length - 7);
+    int roomCode = 1234567;
 
-    //int table = Convert.ToInt32(Session["tablenumber"]);
-    int table = 2;
+    string olaftry2 = Request["Name"];
+    int table = db.QueryValue("SELECT Tbl_nr FROM Players WHERE Name = @0 AND Room_Code = @1", olaftry2, roomCode);
 
-    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", urlcode, table);
-    int aantal = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", urlcode, table);
+    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
+    int aantal = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
     double gedeeld = aantal / 2;
     int helft = Convert.ToInt32(gedeeld);
     int eerste = Convert.ToInt32(aantal - helft);
@@ -25,22 +25,22 @@
     }
     if (aantal > 10)    //Haal max spelers uit database
     {
-        string Url = "Players.cshtml/" + urlcode;   //Needs fixing
+        string Url = "Players.cshtml/" + roomCode;   //Needs fixing
         Response.Redirect("~/" + Url);
     }
 
-    int maxrebuy = (int)db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", urlcode);
+    int maxrebuy = (int)db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", roomCode);
     int updaterebuy = 0;
-    string olaftry2 = Request["Name"];
+
     //string olaftry2 = "Baap";
-    int rebuyyy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", olaftry2, urlcode, table);
+    int rebuyyy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", olaftry2, roomCode, table);
 
 
     if (olaftry2 != null && rebuyyy < maxrebuy)
     {
 
-        updaterebuy = db.Execute("UPDATE Players SET Rebuy = @0, Active = 1 WHERE Name = @1 AND Room_Code = @2 AND Tbl_nr = @3", rebuyyy + 1, olaftry2, urlcode, table);
-        int rebuyyyafterupdate = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", olaftry2, urlcode, table);
+        updaterebuy = db.Execute("UPDATE Players SET Rebuy = @0, Active = 1 WHERE Name = @1 AND Room_Code = @2 AND Tbl_nr = @3", rebuyyy + 1, olaftry2, roomCode, table);
+        int rebuyyyafterupdate = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", olaftry2, roomCode, table);
         <h5>@olaftry2 You are now at @rebuyyyafterupdate / @maxrebuy rebuys.</h5>
     }
 

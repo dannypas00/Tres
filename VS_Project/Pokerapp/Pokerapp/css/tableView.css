@@ -41,3 +41,28 @@
     grid-column: 5;
     grid-row-end: 5;
 }
+
+#activebody {
+    position: absolute;
+    top: 25%;
+    left: 25%;
+
+}
+#pokerstool {
+    background-color: transparent;
+    background-image: url(../assets/Tableview/Pokerstool.png);
+    background-size: 100%;
+    border: none;
+    width: 150px;
+    height: 150px;
+    color: white;
+}
+
+#pokertable {
+    background-color: transparent;
+    background-image: url(../assets/Tableview/Pokertable.png);
+    background-size: 100%;
+    border: none;
+    width: 1000px;
+    height: 500px;
+}

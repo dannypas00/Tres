@@ -14,9 +14,7 @@
     string Url = "RulesPageNL/" + roomCode;
     string urlBack = "Players/" + roomCode;
 
-    int table = Convert.ToInt32(Session["tablenumber"]);
-
-    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, table);
+    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     int aantal = namen.Count();
     double gedeeld = aantal / 2;
     int helft = Convert.ToInt32(gedeeld);
@@ -39,9 +37,9 @@
         int new_Round = current_Round + 1;
         db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", new_Round, roomCode);
         <script>
-            //$(document).ready(function() {
-            alert("The blind has been raised!");
-            //})
+            $(document).ready(function () {
+                alert("The blind has been raised!");
+            })
         </script>
     }
     int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
@@ -71,27 +69,48 @@
     if (min_size >= players)
     {
         <script>
-            alert("The minimum size has been reached!");
+            $(document).ready(function () {
+                alert("The minimum size has been reached!");
+            })
         </script>
         Shuffle shuffle = new Shuffle();
         shuffle.ShuffleTable(db, roomCode);
         Url = "Players.cshtml/" + roomCode;
         Response.Redirect("~/" + Url);
     }
+    dynamic room = db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode);
+    TimeSpan startTime;
+    if (room.Started_Time != null)
+    {
+        startTime = DateTime.Now - room.Started_Time;
+    }
+    else
+    {
+        startTime = TimeSpan.Zero;
+    }
+    DateTime pauzeTime = DateTime.Now + room.Pause_Time;
+    DateTime blindTime = DateTime.Now + room.Blind_Time;
+    //startTime.AddHours(Convert.ToInt32(DateTime.Now.Date - startTime.Date) * 24);
+    //startTime.AddDays(-Convert.ToInt32(DateTime.Now.Date - startTime.Date));
+    int hrs = startTime.Hours;
+    int mns = startTime.Minutes;
+    int scs = startTime.Seconds;
 
-
+    int maxrebuy = (int)db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", roomCode);
 }
 
-        <div class="header">
-            <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
-                Rules
-            </div>
-            <div style="cursor:pointer; float:right; margin-top:40px;margin-right:10px" class="btn btn-primary clickableBtn" data-href="@urlBack">
-                Back
-            </div>
-        </div>
-<div class="py-5">
 
+
+<div class="header">
+    <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
+        Rules
+    </div>
+    <div style="cursor:pointer; float:right; margin-top:40px;margin-right:10px" class="btn btn-primary clickableBtn" data-href="@urlBack">
+        Back
+    </div>
+</div>
+<div class="py-5">
+    <div class="hidden"><p id="Hours">@hrs</p><p id="Minutes">@mns</p><p id="Seconds">@scs</p></div>
     <div class="container">
         <div class="col-md-12 text-center">
             <h1>Table @table</h1>
@@ -100,7 +119,7 @@
             <div id="roomCode" style="display:none;">@roomCode</div>
             <div id="table" style="display:none;">@table</div>
 
-            <div name="timer" class="timer"></div>
+            <div name="timer" class="timer">loading timer...</div>
             <div class="round">This is round: <span id="rnumber"></span></div>
         </div>
         <div class="row">
@@ -111,146 +130,298 @@
                     <input class="btn btn-outline-secondary" type="submit" name="blindnext" value="Raise blinds" />
                 </form>
             </div>
-            <div class="gridd">
-                <div class="white"></div>
-                <div class="white2"></div>
-                <div class="white3"></div>
-                <div class="white4"></div>
-                @if (aantal <= 7)
-                {
-                    foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", roomCode, table, tweede))
-                    {
-                        <div class="chair2">
-                            <img src="~/stoel.png" alt="chair" style="width:75px;height:75px" />
-                            <b>@a.Name</b>
-                        </div>
-                    }
 
-                    foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, roomCode, table))
-                    {
+        </div>
+    </div>
+</div>
+<div id="activebody">
+    <div>
+        @foreach (var a in db.Query("SELECT TOP (@0) Name, Rebuy FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 AND Active = 1 ORDER BY Name ASC", eerste, roomCode, table, eerste))
+        {
 
-                        <div class="chair">
-                            <img src="~/stoel.png" alt="chair" style="width:75px;height:75px" />
-                            <b>@a.Name</b>
-                        </div>
-                    }
-                }
-                @if (aantal > 7)
-                {
-                    foreach (var a in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name ASC", roomCode, table))
-                    {
-                        <div class="chair">
-                            <img src="stoel.png" alt="chair" style="width:75px;height:75px" />
-                            <b>@a.Name</b>
-                        </div>
-                    }
-                }
 
-                <div class="table">
-                    <img src="~/tafel.png" name="pokertable" style="height:250px; width:100%" />
+            string player = (string)db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", a.Name, roomCode, table);
+            string gaanmetdiebanaan = player + roomCode;
+
+            <!-- Button trigger modal -->
+            <button id="pokerstool" value="@player" name="player" type="button" data-toggle="modal" data-target="#@gaanmetdiebanaan">@player</button>
+
+
+
+            int rebuyyy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", player, roomCode, table);
+
+
+
+            <!-- Modal -->
+            <div class="modal fade" id="@gaanmetdiebanaan" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Options for: @player</h5>
+                        </div>
+
+                        <div class="modal-body">
+                            @*<form method ="post" name="optionsform" class="optionsform">*@
+                            <div class="options-form-popup" id="player-options">
+                                <button type="submit" id="rebuy" onclick="updaterebuys('@player')" value="@player" name="rebuy" data-dismiss="modal">Rebuy</button>
+
+                            </div>
+                            <div>
+                                <button value="@player" name="delete" onclick="deleteplayer('@player')" data-dismiss="modal">Delete</button>
+                                @Html.Hidden("sender", player)
+                            </div>
+                            @*</form>*@
+                        </div>
+                        <div class="modal-footer">
+                            <div id="@player"><h5>@player you are now at @rebuyyy / @maxrebuy rebuys.</h5></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        }
+
+
+    </div>
+
+
+    <br />
+    <div>
+        <img id="pokertable" class="table" src="~/assets/Tableview/Pokertable.png" />
+    </div>
+    <br />
+    @foreach (var a in db.Query("SELECT TOP (@2) Name, Rebuy FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1 ORDER BY Name DESC", roomCode, table, tweede, tweede))
+    {
+
+        string player = (string)db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", a.Name, roomCode, table);
+        string gaanmetdiebanaan = player + roomCode;
+
+        <!-- Button trigger modal -->
+        <button id="pokerstool" value="@player" name="player" type="button" data-toggle="modal" data-target="#@gaanmetdiebanaan">@player</button>
+
+
+        int rebuyyy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", player, roomCode, table);
+
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="@gaanmetdiebanaan" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Options for: @player</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        @*<form method ="post" name="optionsform" class="optionsform">*@
+                        <div class="options-form-popup" id="player-options">
+                            <button type="submit" id="rebuy" onclick="updaterebuys('@player')" value="@player" name="rebuy" data-dismiss="modal">Rebuy</button>
+
+                        </div>
+                        <div>
+                            <button value="@player" name="delete" onclick="deleteplayer('@player')" data-dismiss="modal">Delete</button>
+                            @Html.Hidden("sender", player)
+                        </div>
+                        @*</form>*@
+                    </div>
+                    <div class="modal-footer">
+                        <div id="@player"><h5>@player you are now at @rebuyyy / @maxrebuy rebuys.</h5></div>
+                    </div>
+
                 </div>
             </div>
         </div>
-    </div>
+    }
+</div>
+
+<div id="inactivebody">
+    @foreach (var pirnp in db.Query("SELECT Name FROM Players WHERE Active = 0 AND Room_Code = @0 AND Rebuy = @1 ORDER BY Name ASC", roomCode, maxrebuy))
+    {
+        <h3>@pirnp.Name</h3>
+    }
+
+    @foreach (var pirp in db.Query("SELECT Name, Rebuy FROM Players WHERE Room_Code = @0 AND Active = 0 AND Rebuy < @1 ORDER BY Name DESC", roomCode, maxrebuy))
+    {
+        int rebuyyy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", pirp.Name, roomCode, table);
+        string player = pirp.Name;
+        string test2 = player + roomCode;
+        <h2>@player</h2>
+
+        <!-- Button trigger modal -->
+        <button value="@player" name="player" type="button" data-toggle="modal" data-target="#@test2">@player</button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="@test2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Options for: @player</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        @*<form method="post" name="optionsform" class="optionsform">*@
+                        <div class="options-form-popup" id="player-options">
+                            <button value="rebuy" name="rebuy" onclick="updaterebuys('@player')" type="submit" data-dismiss="modal">Rebuy</button>
+                            @Html.Hidden("sender", player)
+                        </div>
+                        <div class="modal-footer">
+                            <div id="@player"><h5>@player you are now at @rebuyyy / @maxrebuy rebuys.</h5></div>
+                        </div>
+                        @*</form>*@
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    }
 </div>
 
 
 
+
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.js"
+        integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+        crossorigin="anonymous"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
-    jQuery(document).ready(function ($) {
-        $(".clickableBtn").click(function () {
-            window.location = $(this).data("href");
+    //function test() {console.log("test"); }
+    //function loadrebuys(player) {
+    //    $.get("delete-ajax.cshtml?Name=" + player, function (data, status) {
+    //        console.log(data)
+    //        document.getElementById("demo").innerHTML = data;
+    //    });
+    //}
+
+    function updaterebuys(player) {
+        $.get("tableviewrebuy.cshtml?Name=" + player, function (data, status) {
+            console.log(data)
+            document.getElementById(player).innerHTML = data;
+            $.get("refreshinactivebody.cshtml?Name=" + player, function (data, status) {
+                document.getElementById("inactivebody").innerHTML = data;
+                $.get("rebuynotactive.cshtml?Name=" + player, function (data, status) {
+                    document.getElementById("activebody").innerHTML = data;
+                });
+            });
         });
+
+
+    }
+
+    function deleteplayer(player) {
+
+        $.get("delete-ajax.cshtml?Name=" + player, function (data, status) {
+            console.log(data)
+            document.getElementById(player).innerHTML = data;
+            $.get("refreshinactivebody.cshtml?Name=" + player, function (data, status) {
+                document.getElementById("inactivebody").innerHTML = data;
+                $.get("rebuynotactive.cshtml?Name=" + player, function (data, status) {
+                    document.getElementById("activebody").innerHTML = data;
+                });
+            });
+        });
+
+
+
+
+    }
+</script>
+
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.js"
+        integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+        crossorigin="anonymous"></script>
+<script>
+    var roomcode = $("#roomCode").html();
+    $("#roomCode").remove();
+
+    var table = $("#table").html();
+    $("#table").remove();
+
+    var hrs = $('#Hours').html();
+    var mns = $('#Minutes').html();
+    var scs = $('#Seconds').html();
+
+    console.log("roomcode" + roomcode);
+    console.log("table" + table);
+    //Ajax connect with url Timer get the data roomcode
+    $.ajax({
+        url: "Timer.cshtml",
+        type: "get",
+        data: {
+            roomCode: roomcode,
+            table: table
+        },
+        success: function (response) {
+            startTimer(response); // Returns timer from db
+        }
     });
 
-$(document).ready(function () {
-            var roomcode = $("#roomCode").html();
-            $("#roomCode").remove();
 
-            var table = $("#table").html();
-            $("#table").remove();
+    function startTimer(timer) {
+        var timer = timer.split(":"); // Split timer
 
-            console.log("roomcode" + roomcode);
-            console.log("table" + table);
-            //Ajax connect with url Timer get the data roomcode
-            $.ajax({
-                url: "Timer.cshtml",
-                type: "get",
-                data: {
-                    roomCode: @roomCode,
-                    table: @table,
-                },
-                success: function (response) {
-                    startTimer(response); // Returns timer from db
-                }
-            });
+        var targetHours = parseInt(timer[0]); // Parse hours to int
+        var targetMinutes = parseInt(timer[1]);
+        var targetSeconds = parseInt(timer[2]);
+
+        var currentHours = hrs;
+        var currentMinutes = mns;
+        var currentSeconds = scs;
+
+        var round = 1;
+        document.querySelector('#rnumber').innerHTML = round;
+
+        //Increment timer
+        setInterval(function () {
+            var displayHours = currentHours;
+            var displayMinutes = currentMinutes;
+            var displaySeconds = currentSeconds;
+
+            sessionStorage.setItem("timer", displayHours);
 
 
-            function startTimer(timer) {
-                var timer = timer.split(":"); // Split timer
+            if (currentHours.toString().length < 2) {
+                displayHours = "0" + currentHours;
+            }
 
-                var targetHours = parseInt(timer[0]); // Parse hours to int
-                var targetMinutes = parseInt(timer[1]);
-                var targetSeconds = parseInt(timer[2]);
+            if (currentMinutes.toString().length < 2) {
+                displayMinutes = "0" + currentMinutes;
+            }
 
-                var currentHours = 0;
-                var currentMinutes = 0;
-                var currentSeconds = 0;
+            if (currentSeconds.toString().length < 2) {
+                displaySeconds = "0" + currentSeconds;
+            }
 
-                var displayHours;
-                var displayMinutes;
-                var displaySeconds;
+            document.querySelector('.timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
 
-                var round = 1;
+
+            // if condition is met round + 1
+            if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
+                round++;
                 document.querySelector('#rnumber').innerHTML = round;
 
-                //Increment timer
-                setInterval(function () {
-                    var displayHours = currentHours;
-                    var displayMinutes = currentMinutes;
-                    var displaySeconds = currentSeconds;
-
-                    sessionStorage.setItem("timer", displayHours);
-
-
-                    if (currentHours.toString().length < 2) {
-                        displayHours = "0" + currentHours;
-                    }
-
-                    if (currentMinutes.toString().length < 2) {
-                        displayMinutes = "0" + currentMinutes;
-                    }
-
-                    if (currentSeconds.toString().length < 2) {
-                        displaySeconds = "0" + currentSeconds;
-                    }
-
-                    document.querySelector('.timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
-
-
-                    // if condition is met round + 1
-                    if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
-                        round++;
-                        document.querySelector('#rnumber').innerHTML = round;
-
-                        currentHours = 0;
-                        currentMinutes = 0;
-                        currentSeconds = 0;
-                    }
-
-                    currentSeconds++;
-
-                    if (currentSeconds == 60) {
-                        currentMinutes++;
-                        currentSeconds = 0;
-                    }
-
-                    if (currentMinutes == 60) {
-                        currentHours++;
-                        currentMinutes = 0;
-                    }
-                }, 1000);
+                currentHours = 0;
+                currentMinutes = 0;
+                currentSeconds = 0;
             }
-        });</script>
 
+            currentSeconds++;
+
+            if (currentSeconds == 60) {
+                currentMinutes++;
+                currentSeconds = 0;
+            }
+
+            if (currentMinutes == 60) {
+                currentHours++;
+                currentMinutes = 0;
+            }
+        }, 1000);
+    }
+</script>
