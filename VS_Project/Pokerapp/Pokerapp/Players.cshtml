@@ -24,6 +24,7 @@
 
     int amount = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
 
+    //Link for redirecting to the rulespage
     string Url = link[0] + "//" + link[2] + "/" + "RulesPageNL/" + link[4];
 }
 <style>

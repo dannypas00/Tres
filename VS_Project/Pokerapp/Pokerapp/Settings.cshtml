@@ -123,6 +123,8 @@
         {
             if (Request["Proceed"] == "Proceed")
             {
+                //Checks for roundtime, pausetime and blindtime so it contains no letters
+                //And checks if time has a value of hh:mm:ss by splitting it with ':'
                 int check = 0;
 
                 var prelink = Request["round_time"];
@@ -202,6 +204,7 @@
                     warning = "Not a valid pause time, use hh:mm:ss";
                 }
 
+                //If all three times are valid (at the time it wil count check + 1) than all settings will be saved and user will be redirected
                 if (check >= 3)
                 {
                     Save();

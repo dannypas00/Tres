@@ -1,5 +1,4 @@
 ﻿@using WebMatrix.Data
-
 @{
     Layout = "~/_Layout.cshtml";
     Page.Title = "Select Game";
@@ -61,7 +60,6 @@
                                 <!--Shows games that have been made-->
                                 @foreach (var row in db.Query("SELECT Room_Code, Room_Name, Room_Create_Date FROM Room ORDER BY Room_Create_Date DESC"))
                                 {
-
                                     string code = Convert.ToString((int)row.Room_Code);
                                     string prelink = Request.Url.AbsoluteUri;
                                     string[] link = prelink.Split('/');
@@ -72,7 +70,6 @@
                                             <small>@row.Room_Code - @row.Room_Create_Date</small>
                                         </td>
                                     </tr>
-
                                 }
                             </tbody>
                         </table>
