@@ -8,6 +8,7 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
+    //Looks if user logged in
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
         Response.Redirect("~/Login.cshtml");
@@ -29,12 +30,35 @@
 
 <div class="py-5 text-center">
     <div class="container">
+        @if (db.QueryValue("SELECT Room_Code FROM ROOM") == null)
+        {
+            <div class="row" style="text-align: center">
+                <div class="col-md-12">
+                    <div style="display:inline-block">
+                        <form method="post">
+                            <input type="hidden" name="roomCode" value="@roomCode" />
+                            <button class="btn btn-outline-secondary" type="submit">New Game</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <form method="post">
+                <div class="footer">
+                    <input type="hidden" name="roomCode" value="@roomCode" />
+                    <button class="btn btn-outline-secondary" type="submit">New Game</button>
+                </div>
+            </form>
+        }
         <div class="col text-center">
             <div class="mx-auto col-lg-6 col-10">
                 <div style="padding: 15px 0px 0px 0px" class="col-md-12">
                     <div class="table-responsive">
                         <table class="table">
                             <tbody>
+                                <!--Shows games that have been made-->
                                 @foreach (var row in db.Query("SELECT Room_Code, Room_Name, Room_Create_Date FROM Room ORDER BY Room_Create_Date DESC"))
                                 {
 
@@ -64,6 +88,7 @@
     </div>
 </div>
 <script>
+    //Makes the whole row clickable
     jQuery(document).ready(function ($) {
         $(".clickable").click(function () {
             window.location = $(this).data("href");

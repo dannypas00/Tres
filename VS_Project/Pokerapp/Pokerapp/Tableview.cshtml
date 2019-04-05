@@ -1,6 +1,7 @@
 ﻿@using WebMatrix.Data
 @{
     Layout = "~/_Layout.cshtml";
+    //Gets roomcode and tablenumber
     int roomCode = Request.QueryString["roomcode"].AsInt();
     int table = Request.QueryString["table"].AsInt();
     Page.Title = "Table" + table;
@@ -9,9 +10,11 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
+    //Creates roomcode
     string Url = "RulesPageNL/" + roomCode;
     string urlBack = "Players/" + roomCode;
 
+    //Splits number of names in two 
     var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     int aantal = namen.Count();
     double gedeeld = aantal / 2;
@@ -23,9 +26,47 @@
         tweede = eerste;
     }
 
-    int bigBlind = 0;
-    int smallBlind = 0;
+    //Gets startvalue
+    int startvalue = db.QueryValue("SELECT Start_Value FROM Room WHERE Room_Code = @0", roomCode);
 
+    //Raises the current blinds
+    if (IsPost && !Request["blindnext"].IsEmpty())
+    {
+        int current_Round = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
+        int new_Round = current_Round + 1;
+        db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", new_Round, roomCode);
+        <script>
+            $(document).ready(function () {
+                alert("The blind has been raised!");
+            })
+        </script>
+    }
+    int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
+    var blind_id = db.Query("SELECT Top (@0) ID FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
+    int min_size = db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", roomCode);
+    var small_blind = db.Query("SELECT TOP (@0) ValueSB FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
+    int small = 0;
+    foreach (var a in small_blind)
+    {
+        if (a.ValueSB > small)
+        {
+            small = a.ValueSB;
+        }
+    }
+    var big_blind = db.Query("SELECT TOP (@0) ValueBB FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
+    int big = 0;
+    foreach (var a in big_blind)
+    {
+        if (a.ValueBB > big)
+        {
+            big = a.ValueBB;
+        }
+    }
+
+    //Updats blinds
+    db.Execute("UPDATE Room SET Small_Blind = @0, Big_Blind = @1 WHERE Room_Code = @2", small, big, roomCode);
+
+    //If minimum size is reached reshuffle names by tables
     int players = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     /*if (min_size >= players)
     {
@@ -97,8 +138,9 @@
         </div>
         <div class="row">
             <div class="col-md-2">
-                <p id="small">Small blind: <span id="SB"></span></p>
-                <p id="big">Big blind: <span id="BB"></span></p>
+                <p>Starting capital: @startvalue</p>
+                <p>Small blind: @small</p>
+                <p>Big blind: @big</p>
                 <form method="post">
                     <input class="btn btn-outline-secondary" type="submit" name="blindnext" value="Raise blinds" />
                 </form>

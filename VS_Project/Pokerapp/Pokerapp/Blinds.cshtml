@@ -9,17 +9,20 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-    Validation.Add("small", Validator.Range(1, 999999999999999999, "Small blind has to be higher than 1"));
-    Validation.Add("big", Validator.Range(1, 999999999999999999, "Big blind has to be higher than 1"));
+    //Validations
+    Validation.Add("small", Validator.Range(1, 999999999999999999, "Small blind has to be higher than or equal to 1"));
+    Validation.Add("big", Validator.Range(1, 999999999999999999, "Big blind has to be higher than or equeal to 1"));
 
     //request the last 7 digits of the urgl (roomcode)
     string url = Request.Url.AbsolutePath;
     string urlcode = url.Substring(url.Length - 7);
 
     string error = "";
+    //Count blinds
     int Blind_Round = (db.QueryValue("SELECT COUNT(ValueSB) FROM Blinds WHERE Room_Code = @0", urlcode));
     if (IsPost && Validation.IsValid())
     {
+        //Add blindvalues to blinds
         if (Request["AddBlinds"] == "Add" && (!Request["small"].IsEmpty() && !Request["big"].IsEmpty()))
         {
             int small = Convert.ToInt32(Request["small"]);
@@ -37,7 +40,7 @@
 
                 //    }
 
-
+                //Compares values, if values are lower than last value it will not be added to the database
                 if ((small_blind <= small) && (big_blind <= big))
                 {
                     int id_old = Convert.ToInt32(db.QueryValue("SELECT ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID DESC", urlcode));
@@ -59,15 +62,29 @@
         {
             error = "Please enter a value";
         }
+        //Delete selected blinds
         if (Request["delete"] == "delete")
         {
             string rowblind = Request.Form["rowblindform"];
             db.Execute("DELETE FROM Blinds WHERE ID = @0 AND Room_Code = @1", rowblind, urlcode);
         }
+        //Goes to other page
         if (Request["Proceed"] == "Proceed")
         {
-            string Url = "AdminPage.cshtml/" + urlcode;
-            Response.Redirect("~/" + Url);
+            int blinds = Convert.ToInt32(db.QueryValue("SELECT COUNT(ValueBB) FROM Blinds WHERE Room_Code = @0", urlcode));
+            if (blinds > 0)
+            {
+                string Url = "AdminPage.cshtml/" + urlcode;
+                Response.Redirect("~/" + Url);
+            }
+            else
+            {
+                <script>
+                    $(document).ready(function () {
+                        alert("Add a minimum of one blind at least!");
+                    })
+                </script>
+            }
         }
 
     }
@@ -102,8 +119,8 @@
                 </span>
                     <form style="display: inline-block" method="post">
                         <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form5">Small blind</label> <input class="form-control" type="number" step="1" min="0" max="999999" pattern="[0-9]" inputmode="numeric" name="small" placeholder="Small Blind @Blind_Round" autofocus/> </div>
-                            <div class="form-group col-md-6"> <label for="form6">Big blind</label> <input class="form-control" type="number" step="1" min="0" max="999999" pattern="[0-9]" inputmode="numeric" name="big" placeholder="Big Blind @Blind_Round" /> </div>
+                            <div class="form-group col-md-6"> <label for="form5">Small blind</label> <input class="form-control" type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" name="small" placeholder="Small Blind @Blind_Round" autofocus/> </div>
+                            <div class="form-group col-md-6"> <label for="form6">Big blind</label> <input class="form-control" type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" name="big" placeholder="Big Blind @Blind_Round" /> </div>
                         </div>
                         <button class="btn btn-primary" type="submit" name="AddBlinds" value="Add">Add</button>
                     </form>
@@ -126,6 +143,7 @@
                                                         <th>Round</th>
                                                         <th>Small</th>
                                                         <th>Big</th>
+                                                        <th></th>
                                                     </tr>
                                                     @foreach (var row in db.Query("SELECT ValueSB, ValueBB, ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID ASC", urlcode))
                                                     {
@@ -140,7 +158,7 @@
                                                             </td>
                                                             <td>
                                                                 <form method="post">
-                                                                    <button class="btn btn-outline-primary" type="submit" name="delete" value="delete">X</button>
+                                                                    <button class="btn btn-outline-secondary" style="width:75px; float:right" type="submit" name="delete" value="delete">X</button>
                                                                     @Html.Hidden("rowblindform", rowblindform)
                                                                 </form>
                                                             </td>
@@ -161,6 +179,7 @@
 </div>
 
 <script>
+    //Automatically numbered column
     function addRowCount(tableAttr) {
         $(tableAttr).each(function () {
             $('td:first-child', this).each(function (i) {

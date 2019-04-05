@@ -1,19 +1,12 @@
 ﻿DROP TABLE Players;
-CREATE TABLE Players
-(
-    [Name] NVARCHAR(50) NOT NULL , 
-    [Room_Code] INT NOT NULL, 
-    [Tbl_nr] INT NULL, 
-    [Rebuy] INT NULL,
-    PRIMARY KEY ([Name],[Room_Code]), 
-)
-
+DROP TABLE Blinds;
 DROP TABLE Room;
+
 CREATE TABLE [dbo].[Room] (
     [Room_Code]        INT           NOT NULL,
     [Room_Name]        NVARCHAR (50) NOT NULL,
     [Room_Create_Date] DATETIME      NOT NULL,
-	[Round_Nr] INT NOT NULL DEFAULT 1,
+	[Round_Nr]		   INT NOT NULL DEFAULT 1,
     [Tbl_Min_Size]     INT           NOT NULL,
     [Started]          CHAR (1) NOT NULL DEFAULT 0,
     [Chip_1_Worth]     INT           NOT NULL,
@@ -35,11 +28,28 @@ CREATE TABLE [dbo].[Room] (
     PRIMARY KEY CLUSTERED ([Room_Code] ASC)
 );
 
-DROP TABLE Blinds;
+CREATE TABLE Players
+(
+    [Name] NVARCHAR(50) NOT NULL , 
+    [Room_Code] INT NOT NULL, 
+    [Tbl_nr] INT NULL, 
+    [Rebuy] INT NULL,
+    PRIMARY KEY CLUSTERED ([Name] ASC, [Room_Code] ASC),
+    CONSTRAINT [FK_Player_Room_Code] FOREIGN KEY ([Room_Code])
+		REFERENCES [dbo].[Room] ([Room_Code])
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+)
+
 CREATE TABLE [dbo].[Blinds] (
-    [Room_Code] INT NOT NULL,
-    [ID]        INT IDENTITY(0,1) NOT NULL,
-    [ValueSB]   INT NOT NULL,
-    [ValueBB]   INT NOT NULL,
-    PRIMARY KEY CLUSTERED ([Room_Code] ASC, [ID] ASC)
+
+    [Room_Code] INT      NOT NULL,
+    [ID]        INT     IDENTITY(0,1) NOT NULL,
+    [ValueSB]     INT      NOT NULL,
+    [ValueBB] INT NOT NULL, 
+    PRIMARY KEY CLUSTERED ([Room_Code] ASC, [ID] ASC),
+    CONSTRAINT [FK_Blind_Room_Code] FOREIGN KEY ([Room_Code])
+		REFERENCES [dbo].[Room] ([Room_Code])
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
 );
