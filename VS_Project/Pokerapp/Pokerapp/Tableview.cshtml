@@ -173,7 +173,7 @@
                     }
                 }
                 @if (aantal > 7)
-                {
+                {       
                     foreach (var a in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name ASC", roomCode, table))
                     {
                         <div class="chair">
@@ -260,6 +260,9 @@
                     totalSecs: totalSecs
                 },
                 success: function (response) {
+                    response = response.split("-")
+                    console.log(response);
+                    console.log("SB: " + response[1] + "BB" + response[2]);
                     document.querySelector('#SB').innerHTML = response[1];
                     document.querySelector('#BB').innerHTML = response[2];
                 }
@@ -274,7 +277,7 @@
                     totalSecs: totalSecs
                 },
                 success: function (response) {
-                    console.log("Round: " + round);
+                    console.log("Round: " + response);
                     document.querySelector('#rnumber').innerHTML = response;
                 }
             })
