@@ -7,22 +7,24 @@
 
     string url = Request.Url.AbsolutePath;
     //string roomCode = url.Substring(url.Length - 7);
-    int roomCode = (int)Session["roomcode"];
 
-    string olaftry2 = Request["Name"];
-    int table = db.QueryValue("SELECT Tbl_nr FROM Players WHERE Name = @0 AND Room_Code = @1", olaftry2, roomCode);
+    //get name and roomcode
+    string playerName = Request["name"];
+    int roomCode = Convert.ToInt32(Request["roomcode"]);
 
-    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
-    int aantal = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
-    double gedeeld = aantal / 2;
-    int helft = Convert.ToInt32(gedeeld);
-    int eerste = Convert.ToInt32(aantal - helft);
-    int tweede = Convert.ToInt32(eerste - 1);
-    if (aantal % 2 == 0)
+    int table = db.QueryValue("SELECT Tbl_nr FROM Players WHERE Name = @0 AND Room_Code = @1", playerName, roomCode);
+
+    var names = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
+    int amount = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
+    double devision = amount / 2;
+    int halfnamesCount = Convert.ToInt32(devision);
+    int firsthalfnamesCount = Convert.ToInt32(amount - halfnamesCount);
+    int secondhalfnamesCount = Convert.ToInt32(firsthalfnamesCount - 1);
+    if (amount % 2 == 0)
     {
-        tweede = eerste;
+        secondhalfnamesCount = firsthalfnamesCount;
     }
-    if (aantal > 10)    //Haal max spelers uit database
+    if (amount > 10)    //Haal max spelers uit database
     {
         string Url = "Players.cshtml/" + roomCode;   //Needs fixing
         Response.Redirect("~/" + Url);
@@ -33,11 +35,11 @@
 
 
 
-    if (olaftry2 != null)
+    if (playerName != null)
     {
-        activeupdate = db.Execute("UPDATE Players SET Active = 0 WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", olaftry2, roomCode, table);
-        int activeforplayer = db.QueryValue("SELECT Active FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", olaftry2, roomCode, table);
-        <h5>@olaftry2 your activity is now @activeforplayer.</h5>
+        activeupdate = db.Execute("UPDATE Players SET Active = 0 WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", playerName, roomCode, table);
+        int activeforplayer = db.QueryValue("SELECT Active FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", playerName, roomCode, table);
+        <h5>@playerName your activity is now @activeforplayer.</h5>
     }
 
     var spelerinactive = db.Query("SELECT Name FROM Players WHERE ACTIVE = 0 AND Room_Code = @0", roomCode);

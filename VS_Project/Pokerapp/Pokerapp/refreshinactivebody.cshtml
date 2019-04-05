@@ -8,22 +8,24 @@
 
     string url = Request.Url.AbsolutePath;
     //string roomCode = url.Substring(url.Length - 7);
-    int roomCode = (int)Session["roomcode"];
 
-    string olaftry2 = Request["Name"];
-    int table = db.QueryValue("SELECT Tbl_nr FROM Players WHERE Name = @0 AND Room_Code = @1", olaftry2, roomCode);
+    //get name and roomcode
+    string playerName = Request["name"];
+    int roomCode = Convert.ToInt32(Request["roomcode"]);
 
-    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
-    int aantal = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
-    double gedeeld = aantal / 2;
-    int helft = Convert.ToInt32(gedeeld);
-    int eerste = Convert.ToInt32(aantal - helft);
-    int tweede = Convert.ToInt32(eerste - 1);
-    if (aantal % 2 == 0)
+    int table = db.QueryValue("SELECT Tbl_nr FROM Players WHERE Name = @0 AND Room_Code = @1", playerName, roomCode);
+
+    var names = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
+    int amount = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
+    double devision = amount / 2;
+    int halfnamesCount = Convert.ToInt32(devision);
+    int firsthalfnamesCount = Convert.ToInt32(amount - halfnamesCount);
+    int secondhalfnamesCount = Convert.ToInt32(firsthalfnamesCount - 1);
+    if (amount % 2 == 0)
     {
-        tweede = eerste;
+        secondhalfnamesCount = firsthalfnamesCount;
     }
-    if (aantal > 10)    //Haal max spelers uit database
+    if (amount > 10)    //Haal max spelers uit database
     {
         string Url = "Players.cshtml/" + roomCode;   //Needs fixing
         Response.Redirect("~/" + Url);
@@ -42,16 +44,16 @@
 
     @foreach (var pirp in db.Query("SELECT Name, Rebuy FROM Players WHERE Room_Code = @0 AND Active = 0 AND Rebuy < @1 ORDER BY Name DESC", roomCode, maxrebuy))
     {
-        int rebuyyy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", pirp.Name, roomCode, table);
+        int rebuy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", pirp.Name, roomCode, table);
         string player = pirp.Name;
-        string test2 = player + roomCode;
+        string inactiveuniqueModal = player + roomCode;
         <h2>@player</h2>
 
         <!-- Button trigger modal -->
-        <button value="@player" name="player" type="button" data-toggle="modal" data-target="#@test2">@player</button>
+        <button value="@player" name="player" type="button" data-toggle="modal" data-target="#@inactiveuniqueModal">@player</button>
 
         <!-- Modal -->
-        <div class="modal fade" id="@test2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="@inactiveuniqueModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -61,11 +63,11 @@
                     <div class="modal-body">
                         @*<form method="post" name="optionsform" class="optionsform">*@
                         <div class="options-form-popup" id="player-options">
-                            <button value="rebuy" name="rebuy" onclick="updaterebuys('@player')" type="submit" data-dismiss="modal">Rebuy</button>
+                            <button value="rebuy" name="rebuy" onclick="updaterebuys('@player', '@roomCode', '@table')" type="submit" data-dismiss="modal">Rebuy</button>
                             @Html.Hidden("sender", player)
                         </div>
                         <div class="modal-footer">
-                            <div id="@player"><h5>@player you are now at @rebuyyy / @maxrebuy rebuys.</h5></div>
+                            <div id="@player"><h5>@player you are now at @rebuy / @maxrebuy rebuys.</h5></div>
                         </div>
                         @*</form>*@
                     </div>
