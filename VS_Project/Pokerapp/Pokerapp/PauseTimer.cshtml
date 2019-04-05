@@ -1,16 +1,3 @@
-﻿@using WebMatrix.Data
-@{
-    //Database connectie
-    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
-    string provider = "System.Data.SqlClient";
-    Database db = Database.OpenConnectionString(connectionString, provider);
-
-    //get the url
-    string url = Request.Url.AbsoluteUri;
-    string urlcode = url.Substring(url.Length - 7);
-
-    //Get the Pause_Time
-    var pauseTimer = db.QuerySingle("SELECT Pause_Time FROM Room WHERE Room_Code = @0", Request["roomcode"].AsInt());
-
-    Response.Write(pauseTimer.Pause_Time);
+﻿@{
+    
 }

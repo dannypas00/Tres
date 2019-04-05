@@ -1,16 +1,10 @@
-﻿@using WebMatrix.Data
-@{
-    //Database connectie
-    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
-    string provider = "System.Data.SqlClient";
-    Database db = Database.OpenConnectionString(connectionString, provider);
-
+﻿@using WebMatrix.Data;
+@{ 
     //get the url
-    string url = Request.Url.AbsoluteUri;
-    string urlcode = url.Substring(url.Length - 7);
+    string roomCode = Request.QueryString["roomCode"];
+    int timer = Request.QueryString["totalSecs"].AsInt();
+    int roundTimer = Request.QueryString["roundTimer"].AsInt();
 
-    //Get the Pause_Time
-    var roundTimer = db.QuerySingle("SELECT Round_Time FROM Room WHERE Room_Code = @0", Request["roomcode"].AsInt());
-
-    Response.Write(roundTimer.Round_Time);
+    int round = timer / roundTimer;
+    Response.Write(round+1);
 }
