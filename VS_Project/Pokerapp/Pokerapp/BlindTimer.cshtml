@@ -1,0 +1,14 @@
+﻿@using WebMatrix.Data;
+@{
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+    //get the url
+    string url = Request.Url.AbsoluteUri;
+    string room = Request.QueryString["room"];
+    string table = Request.QueryString["table"];
+    string blind = Request.QueryString["blind"];
+
+    Response.Write(blind);
+}
