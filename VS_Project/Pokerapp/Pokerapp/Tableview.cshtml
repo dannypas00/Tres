@@ -244,7 +244,7 @@
     }
     @if (amount > 6)
     {
-        foreach (var a in db.Query("SELECT TOP Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1 ORDER BY Name ASC", roomCode, table))
+        foreach (var a in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1 ORDER BY Name ASC", roomCode, table))
         {
 
             string player = (string)db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", a.Name, roomCode, table);
@@ -352,12 +352,12 @@
     //}
 
     function updaterebuys(player, roomCode, table) {
-        $.get("tableviewrebuy.cshtml?name=" + player + "roomcode=" + roomCode + "table=" + table, function (data, status) {
+        $.get("tableviewrebuy.cshtml?name=" + player + "&roomcode=" + roomCode + "&table=" + table, function (data, status) {
             console.log(data)
             document.getElementById(player).innerHTML = data;
-            $.get("refreshinactivebody.cshtml?name=" + player + "roomcode=" + roomCode + "table=" + table, function (data, status) {
+            $.get("refreshinactivebody.cshtml?name=" + player + "&roomcode=" + roomCode + "&table=" + table, function (data, status) {
                 document.getElementById("inactivebody").innerHTML = data;
-                $.get("rebuynotactive.cshtml?name=" + player + "roomcode=" + roomCode + "table=" + table, function (data, status) {
+                $.get("rebuynotactive.cshtml?name=" + player + "&roomcode=" + roomCode + "&table=" + table, function (data, status) {
                     document.getElementById("activebody").innerHTML = data;
                 });
             });
@@ -368,12 +368,12 @@
 
     function deleteplayer(player, roomCode, table) {
 
-        $.get("delete-ajax.cshtml?name=" + player + "roomcode=" + roomCode + "table=" + table, function (data, status) {
+        $.get("delete-ajax.cshtml?name=" + player + "&roomcode=" + roomCode + "&table=" + table, function (data, status) {
             console.log(data)
             document.getElementById(player).innerHTML = data;
-            $.get("refreshinactivebody.cshtml?name=" + player + "roomcode=" + roomCode + "table=" + table, function (data, status) {
+            $.get("refreshinactivebody.cshtml?name=" + player + "&roomcode=" + roomCode + "&table=" + table, function (data, status) {
                 document.getElementById("inactivebody").innerHTML = data;
-                $.get("rebuynotactive.cshtml?name=" + player + "roomcode=" + roomCode + "table=" + table, function (data, status) {
+                $.get("rebuynotactive.cshtml?name=" + player + "&roomcode=" + roomCode + "&table=" + table, function (data, status) {
                     document.getElementById("activebody").innerHTML = data;
                 });
             });
