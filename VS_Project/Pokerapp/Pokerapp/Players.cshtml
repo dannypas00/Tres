@@ -1,7 +1,6 @@
 @using WebMatrix.Data
 
 @{
-
     Layout = "~/_Layout.cshtml";
     Page.Title = "Players";
 
@@ -9,22 +8,15 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-
     //Gets roomcode from url
     string prelink = Request.Url.AbsoluteUri;
     string[] link = prelink.Split('/');
     int urlcode = Convert.ToInt32(link[4]);
 
-    //Looks if user logged in
-    if (Request.Cookies["LoginCookie"].Value != "true")
-    {
-        Response.Redirect("~/Login.cshtml");
-    }
-
     int amount = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
-
     string Url = link[0] + "//" + link[2] + "/" + "RulesPageNL/" + link[4];
 }
+<link rel="stylesheet" href="~/css/pViewGrid.css" />
 <style>
     .centered {
         position: absolute;
@@ -34,56 +26,55 @@
     }
 </style>
 
-<div class="header">
-    <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
-        Rules
+    <div class="header">
+        <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
+            Rules
+        </div>
     </div>
-</div>
-<div class="py-5">
-
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <h1>Tables</h1>
-            </div>
+    <div class="py-5">
+        <div class="col-md-12 text-center">
+            <h1>Tables</h1>
         </div>
 
-        <div class="col-md-6">
-            @for (int i = 0; i < amount; i++)
-            {
-                int tbl_nr = i + 1;
-                string table = i.ToString();
-                Url = link[0] + "//" + link[2] + "/" + "Tableview.cshtml?roomcode=" + link[4] + "&table=" + tbl_nr;
-
-                <form method="post">
-                    <div class="row">
-                        <div class="col-md-12 clickable" style="background-image: url(/tafel.png);cursor:pointer; width:400px;height:100%; margin-top:15px">
-                            <div class="row">
-                                <div class="col">
-                                    <div class="text-center" style="justify-content:center; margin-top: 40%"><h3><b>Table @tbl_nr</b></h3></div>
-                                </div>
-                                <div class="col d-flex flex-column align-items-start justify-content-center order-1 order-lg-2" style="padding-top:5px">
 
 
-                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
-                                    {
-                                    <div class="flex-column">
-                                        <p><b>@row.Name </b></p>
-                                    </div>
-                                    }
-
-
-                                    <input type="hidden" name="roomcode" value=@urlcode />
-                                    <a href=@Url></a>
-                                </div>
+        @for (int i = 0; i < amount; i++)
+        {
+            int tbl_nr = i + 1;
+            string table = i.ToString();
+            Url = link[0] + "//" + link[2] + "/" + "Tableview.cshtml?roomcode=" + link[4] + "&table=" + tbl_nr;
+            <div class="pGrid">
+                <div class="wSpace"></div>
+                <form method="post" class="pTable">
+                    <div class="clickable" style="background-image: url(/tafel.png);cursor:pointer; margin-top:15px">
+                        <div class="row">
+                            <div class="col">
+                                <div class="text-center" style="justify-content:center; margin-top: 40%"><h3><b>Table @tbl_nr</b></h3></div>
+                            </div>
+                            <div class="col d-flex flex-column align-items-start justify-content-center order-1 order-lg-2" style="padding-top:5px">
                             </div>
                         </div>
                     </div>
+                    <input type="hidden" name="roomcode" value=@urlcode />
+                    <a href=@Url></a>
+
                 </form>
-            }
-        </div>
+                @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
+                {
+                    <div class="pNames" style="padding-bottom:10px; padding-left:10px">
+                        <p><b>@row.Name </b></p>
+                    </div>
+                }
+
+
+
+
+
+
+            </div>
+        }
+
     </div>
-</div>
 
 <script>
     jQuery(document).ready(function ($) {

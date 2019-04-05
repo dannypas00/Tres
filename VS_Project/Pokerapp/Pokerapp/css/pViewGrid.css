@@ -1,0 +1,22 @@
+﻿.pGrid {
+    display: grid;
+    grid-template-columns: 40% 6% 6%;
+    grid-template-rows: 6% 6% 6% 6% 6% 6%;
+    grid-template-areas: "Table . ." "Table . ." "Table . ." "Table . ." "Table . .";
+    grid-gap: 10px;
+}
+
+.pTable {
+    grid-area: 1 / 1 / 6 / 2;
+}
+
+.wSpace {
+    grid-area: 1 / 2 / 2 / 4;
+}
+
+
+.pNames {
+    grid-column-start: auto;
+    order: inherit;
+    position:relative;
+}
