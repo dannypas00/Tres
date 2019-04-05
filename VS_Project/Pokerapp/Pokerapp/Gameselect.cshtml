@@ -1,5 +1,4 @@
 ﻿@using WebMatrix.Data
-
 @{
     Layout = "~/_Layout.cshtml";
     Page.Title = "Select Game";
@@ -14,26 +13,17 @@
         Response.Redirect("~/Login.cshtml");
     }
 
-    //Creates new roomcode
+    int? roomCode = null;
+
     Random r = new Random();
-    var roomCode = r.Next(1000000, 9999999);
-
-    var selectQuery = "SELECT * FROM Room WHERE Room_Code = @0";
-    var selectRoomcodes = db.QuerySingle(selectQuery, roomCode);
-
-    //If the room does not exist, redirecting to settings with newly created roomcode
-    if (selectRoomcodes == null)
+    do
     {
-        if (IsPost && roomCode != selectRoomcodes)
-        {
-
-            string Url = "Settings.cshtml/" + roomCode;
-            Response.Redirect("~/" + Url);
-        }
-        else if (IsPost)
-        {
-            Response.Write("Probeer het nog eens...");
-        }
+        roomCode = r.Next(1000000, 9999999);
+    } while (db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode) != null);
+    if (IsPost && Request.Form["new"] == "submit")
+    {
+        string Url = "Settings.cshtml/" + roomCode;
+        Response.Redirect("~/" + Url);
     }
 }
 
@@ -46,7 +36,7 @@
                     <div style="display:inline-block">
                         <form method="post">
                             <input type="hidden" name="roomCode" value="@roomCode" />
-                            <button class="btn btn-outline-secondary" type="submit">New Game</button>
+                            <button class="btn btn-outline-secondary" type="submit" name="new" value="submit">New Game</button>
                         </form>
                     </div>
                 </div>
@@ -57,7 +47,7 @@
             <form method="post">
                 <div class="footer">
                     <input type="hidden" name="roomCode" value="@roomCode" />
-                    <button class="btn btn-outline-secondary" type="submit">New Game</button>
+                    <button class="btn btn-outline-secondary" type="submit" name="new" value="submit">New Game</button>
                 </div>
             </form>
         }
@@ -70,7 +60,6 @@
                                 <!--Shows games that have been made-->
                                 @foreach (var row in db.Query("SELECT Room_Code, Room_Name, Room_Create_Date FROM Room ORDER BY Room_Create_Date DESC"))
                                 {
-
                                     string code = Convert.ToString((int)row.Room_Code);
                                     string prelink = Request.Url.AbsoluteUri;
                                     string[] link = prelink.Split('/');
@@ -81,7 +70,6 @@
                                             <small>@row.Room_Code - @row.Room_Create_Date</small>
                                         </td>
                                     </tr>
-
                                 }
                             </tbody>
                         </table>
@@ -99,7 +87,3 @@
         });
     });
 </script>
-
-
-
-
