@@ -14,7 +14,7 @@
     int roomCode = Convert.ToInt32(link[4]);
 
     //Return to login if players are lower than min_size
-    int players = Convert.ToInt32(db.QueryValue("SELECT COUNT(Player) FROM Players WHERE Room_Code = @0", roomCode));
+    int players = Convert.ToInt32(db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0", roomCode));
     int min_size = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", roomCode));
     if (players < (min_size + 1))
     {
