@@ -5,7 +5,7 @@
     Database db = Database.OpenConnectionString(connectionString, provider);
 
     string roomCode = Request.QueryString["roomCode"];
-    int timer = Request.QueryString["totalSec"].AsInt();
+    int timer = Request.QueryString["totalSecs"].AsInt();
     int blind = Request.QueryString["blind"].AsInt();
     var blindCount = db.Query("SELECT * FROM Blinds WHERE Room_Code = @0", roomCode).Count();
     int index = timer / blind;
