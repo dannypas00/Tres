@@ -9,12 +9,14 @@
 
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-
+    //Gets roomcode from url
     string prelink = Request.Url.AbsoluteUri;
     string[] link = prelink.Split('/');
     string linked = link[0] + "//" + link[2] + "/Players/" + link[4];
     int urlcode = int.Parse(link[4]);
 
+
+    //Gets the chipworths
     var chips = db.QuerySingle("SELECT Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth FROM Room WHERE  Room_Code=@0", urlcode);
 
     int chip1 = chips.Chip_1_Worth;
@@ -26,6 +28,15 @@
 
 
 }
+
+<style>
+    .chipcentered {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+</style>
 
 <div id="begin" class="page-wrapper chiller-theme toggled">
     <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
@@ -66,19 +77,24 @@
         <!-- Footer with chip values start -->
         <div class="sidebar-footer">
             <a>
-                <span style="color:darkblue">@chip1 </span>
+                <img src="~/Chip_White.png" alt="chip1" style="width:50px;height:50px" />
+                <strong><span class="chipcentered" style="color:black">@chip1 </span></strong>
             </a>
             <a>
-                <span style="color:darkred">@chip2</span>
+                <img src="~/Chip_Red.png" alt="chip2" style="width:50px;height:50px" />
+                <strong><span class="chipcentered" style="color:black">@chip2</span></strong>
             </a>
             <a>
-                <span style="color:darkgreen">@chip3</span>
+                <img src="~/Chip_Blue.png" alt="chip3" style="width:50px;height:50px" />
+                <strong><span class="chipcentered" style="color:black">@chip3</span></strong>
             </a>
             <a>
-                <span style="color:ghostwhite">@chip4</span>
+                <img src="~/Chip_Green.png" alt="chip4" style="width:50px;height:50px" />
+                <strong><span class="chipcentered" style="color:black">@chip4</span></strong>
             </a>
             <a>
-                <span style="color:black">@chip5</span>
+                <img src="~/Chip_Black.png" alt="chip5" style="width:50px;height:50px" />
+                <strong><span class="chipcentered" style="color:black">@chip5</span></strong>
             </a>
         </div>
         <!-- Footer with chip values end -->
@@ -248,4 +264,3 @@
     });
 </script>
 <!-- page-wrapper -->
-

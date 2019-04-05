@@ -18,6 +18,7 @@
     string urlcode = url.Substring(url.Length - 7);
 
     string error = "";
+    //Count blinds
     int Blind_Round = (db.QueryValue("SELECT COUNT(ValueSB) FROM Blinds WHERE Room_Code = @0", urlcode));
     if (IsPost && Validation.IsValid())
     {
@@ -39,7 +40,7 @@
 
                 //    }
 
-
+                //Compares values, if values are lower than last value it will not be added to the database
                 if ((small_blind <= small) && (big_blind <= big))
                 {
                     int id_old = Convert.ToInt32(db.QueryValue("SELECT ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID DESC", urlcode));
@@ -61,6 +62,7 @@
         {
             error = "Please enter a value";
         }
+        //Delete selected blinds
         if (Request["delete"] == "delete")
         {
             string rowblind = Request.Form["rowblindform"];
