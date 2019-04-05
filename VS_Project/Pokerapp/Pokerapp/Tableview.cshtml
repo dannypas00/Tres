@@ -15,7 +15,7 @@
     string Url = "RulesPageNL/" + roomCode;
     string urlBack = "Players/" + roomCode;
 
-    //Splits number of names in two 
+    //Splits number of names in two
     var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     int aantal = namen.Count();
     double gedeeld = aantal / 2;
@@ -106,6 +106,23 @@
     int mns = startTime.Minutes;
     int scs = startTime.Seconds;
 }
+
+<div class="modal fade show in">
+  <div class="modal-dialog">
+    <div class="v-cell">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Round is over</h4>
+        </div>
+        <div class="modal-body">
+            Next round starts over: @room.Pause_Time
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div class="header">
     <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
         Rules
@@ -133,8 +150,9 @@
         }*@
             <div name="timer" class="timer"></div>
             <div class="round">This is round: <span id="rnumber"></span></div>
-            <div name="pause-timer" class="pause-timer"></div>
-
+            <div class="round-timeheader">
+            
+            <div name="round-timer" class="round-timer"></div>
         </div>
         <div class="row">
             <div class="col-md-2">
@@ -180,8 +198,9 @@
                     }
                 }
 
-                <div class="table">
-                    <img src="~/tafel.png" name="pokertable" style="height:250px; width:100%" />
+                    <div class="table">
+                        <img src="~/tafel.png" name="pokertable" style="height:250px; width:100%" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -222,6 +241,18 @@
     });
 
     $.ajax({ //Second request
+        url: "RoundTimer.cshtml",
+        type: "get",
+        data: {
+            roomCode: roomcode,
+            table: table
+        },
+        success: function (response) {
+            RoundTimer(response); // Returns timer from db
+        }
+    });
+
+    $.ajax({ //Third request
         url: "PauseTimer.cshtml",
         type: "get",
         data: {
@@ -232,6 +263,73 @@
             PauseTimer(response); // Returns timer from db
         }
     });
+
+
+    function RoundTimer(timer) {
+        var timer = timer.split(":"); // Split timer
+
+        var targetHours = parseInt(timer[0]); // Parse hours to int
+        var targetMinutes = parseInt(timer[1]);
+        var targetSeconds = parseInt(timer[2]);
+
+        var currentHours = 0;
+        var currentMinutes = 0;
+        var currentSeconds = 0;
+
+        round = 1;
+        document.querySelector('#rnumber').innerHTML = round;
+
+        //Increment timer
+        setInterval(function () {
+            var displayHours = currentHours;
+            var displayMinutes = currentMinutes;
+            var displaySeconds = currentSeconds;
+
+            sessionStorage.setItem("round-timer", displayHours);
+
+
+            if (currentHours.toString().length < 2) {
+                displayHours = "0" + currentHours;
+            }
+
+            if (currentMinutes.toString().length < 2) {
+                displayMinutes = "0" + currentMinutes;
+            }
+
+            if (currentSeconds.toString().length < 2) {
+                displaySeconds = "0" + currentSeconds;
+            }
+
+            document.querySelector('.round-timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
+
+
+            // if condition is met round + 1
+            if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
+
+
+                $(".modal").modal("show");
+                $('.modal-body').append("<div name='pause-timer' class='pause-timer'></div>");
+                $("div.round-timer").remove();
+
+                round++;
+                currentHours = 0;
+                currentMinutes = 0;
+                currentSeconds = 0;
+            }
+
+            currentSeconds++;
+
+            if (currentSeconds == 60) {
+                currentMinutes++;
+                currentSeconds = 0;
+            }
+
+            if (currentMinutes == 60) {
+                currentHours++;
+                currentMinutes = 0;
+            }
+        }, 1000);
+    }
 
     function PauseTimer(timer) {
         var timer = timer.split(":"); // Split timer
@@ -252,7 +350,6 @@
 
             sessionStorage.setItem("pause-timer", displayHours);
 
-
             if (currentHours.toString().length < 2) {
                 displayHours = "0" + currentHours;
             }
@@ -267,10 +364,12 @@
 
             document.querySelector('.pause-timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
 
-
             // if condition is met round + 1
             if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
-                alert("Pauze is ingelast");
+
+                $(".modal").modal("hide");
+                $('.round-timeheader').append("<div name='round-timer' class='round-timer'></div>");
+                $("div.pause-timer").remove();
 
                 currentHours = 0;
                 currentMinutes = 0;
@@ -303,9 +402,6 @@
         var currentMinutes = mns;
         var currentSeconds = scs;
 
-        round = 1;
-        document.querySelector('#rnumber').innerHTML = round;
-
         //Increment timer
         setInterval(function () {
             var displayHours = currentHours;
@@ -329,11 +425,9 @@
 
             document.querySelector('.timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
 
-
             // if condition is met round + 1
             if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
-                round++;
-                document.querySelector('#rnumber').innerHTML = round;
+
                 currentHours = 0;
                 currentMinutes = 0;
                 currentSeconds = 0;
