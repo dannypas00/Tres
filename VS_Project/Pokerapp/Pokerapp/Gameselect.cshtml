@@ -7,6 +7,7 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
+    //Looks if user logged in
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
         Response.Redirect("~/Login.cshtml");

@@ -71,8 +71,20 @@
         //Goes to other page if the total of blinds is bigger than zero else an alert is shown
         if (Request["Proceed"] == "Proceed")
         {
-            string Url = "AdminPage.cshtml/" + urlcode;
-            Response.Redirect("~/" + Url);
+            int blinds = Convert.ToInt32(db.QueryValue("SELECT COUNT(ValueBB) FROM Blinds WHERE Room_Code = @0", urlcode));
+            if (blinds > 0)
+            {
+                string Url = "AdminPage.cshtml/" + urlcode;
+                Response.Redirect("~/" + Url);
+            }
+            else
+            {
+                <script>
+                    $(document).ready(function () {
+                        alert("Add a minimum of one blind at least!");
+                    })
+                </script>
+            }
         }
 
     }
@@ -105,65 +117,66 @@
                 <span class="help-block">
                     @Html.ValidationSummary()
                 </span>
-                    <form style="display: inline-block" method="post">
-                        <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form5">Small blind</label> <input class="form-control" type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" name="small" placeholder="Small Blind @Blind_Round" autofocus/> </div>
-                            <div class="form-group col-md-6"> <label for="form6">Big blind</label> <input class="form-control" type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" name="big" placeholder="Big Blind @Blind_Round" /> </div>
-                        </div>
-                        <button class="btn btn-primary" type="submit" name="AddBlinds" value="Add">Add</button>
-                    </form>
-            </div>
+                <form style="display: inline-block" method="post">
+                    <div class="form-row">
+                        <div class="form-group col-md-6"> <label for="form5">Small blind</label> <input class="form-control" type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" name="small" placeholder="Small Blind @Blind_Round" autofocus /> </div>
+                        <div class="form-group col-md-6"> <label for="form6">Big blind</label> <input class="form-control" type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" name="big" placeholder="Big Blind @Blind_Round" /> </div>
+                    </div>
+                    <button class="btn btn-primary" type="submit" name="AddBlinds" value="Add">Add</button>
+                </form>
             </div>
         </div>
-            <div class="py-5 text-center">
-                <div class="container">
-                    <div class="row">
-                        <div class="mx-auto col-lg-6 col-10">
-                            <p>@error</p>
-                            @if (db.QueryValue("SELECT * FROM Blinds") != null ) {
+    </div>
+    <div class="py-5 text-center">
+        <div class="container">
+            <div class="row">
+                <div class="mx-auto col-lg-6 col-10">
+                    <p>@error</p>
+                    @if (db.QueryValue("SELECT * FROM Blinds") != null)
+                    {
 
-                                    <div class="row" style="justify-content:center">
-                                        <div style="width:350px" class="table-responsive">
-                                            <p>Blinds</p>
-                                            <table class="table serial">
-                                                <tbody>
-                                                    <tr>
-                                                        <th>Round</th>
-                                                        <th>Small</th>
-                                                        <th>Big</th>
-                                                        <th></th>
-                                                    </tr>
-                                                    @foreach (var row in db.Query("SELECT ValueSB, ValueBB, ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID ASC", urlcode))
-                                                    {
-                                                        int rowblindform = (int)row.ID;
-                                                        <tr>
+                        <div class="row" style="justify-content:center">
+                            <div style="width:350px" class="table-responsive">
+                                <p>Blinds</p>
+                                <table class="table serial">
+                                    <tbody>
+                                        <tr>
+                                            <th>Round</th>
+                                            <th>Small</th>
+                                            <th>Big</th>
+                                            <th></th>
+                                        </tr>
+                                        @foreach (var row in db.Query("SELECT ValueSB, ValueBB, ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID ASC", urlcode))
+                                        {
+                                            int rowblindform = (int)row.ID;
+                                            <tr>
 
-                                                            <td>
-                                                                <p>@row.ValueSB</p>
-                                                            </td>
-                                                            <td>
-                                                                <p>@row.ValueBB</p>
-                                                            </td>
-                                                            <td>
-                                                                <form method="post">
-                                                                    <button class="btn btn-outline-secondary" style="width:75px; float:right" type="submit" name="delete" value="delete">X</button>
-                                                                    @Html.Hidden("rowblindform", rowblindform)
-                                                                </form>
-                                                            </td>
-                                                        </tr>
-                                                    }
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <form method="post">
-                                        <button class="btn btn-primary" type="submit" name="Proceed" value="Proceed">Proceed</button>
-                                    </form>
-                            }
+                                                <td>
+                                                    <p>@row.ValueSB</p>
+                                                </td>
+                                                <td>
+                                                    <p>@row.ValueBB</p>
+                                                </td>
+                                                <td>
+                                                    <form method="post">
+                                                        <button class="btn btn-outline-secondary" style="width:75px; float:right" type="submit" name="delete" value="delete">X</button>
+                                                        @Html.Hidden("rowblindform", rowblindform)
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
+                        <form method="post">
+                            <button class="btn btn-primary" type="submit" name="Proceed" value="Proceed">Proceed</button>
+                        </form>
+                    }
                 </div>
             </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -177,6 +190,3 @@
     }
     addRowCount('.serial');
 </script>
-
-
-                
