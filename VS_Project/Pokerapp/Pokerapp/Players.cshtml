@@ -9,20 +9,22 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-
     //Gets roomcode from url
     string prelink = Request.Url.AbsoluteUri;
     string[] link = prelink.Split('/');
     int urlcode = Convert.ToInt32(link[4]);
 
-    //Looks if user logged in
-    if (Request.Cookies["LoginCookie"].Value != "true")
+    //Return to login if players are lower than min_size
+    int players = Convert.ToInt32(db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0", urlcode));
+    int min_size = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", urlcode));
+    if (players < (min_size + 1))
     {
-        Response.Redirect("~/Login.cshtml");
+        Response.Redirect("~/AdminPage.cshtml/" + urlcode);
     }
 
     int amount = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
 
+    //Link for redirecting to the rulespage
     string Url = link[0] + "//" + link[2] + "/" + "RulesPageNL/" + link[4];
 }
 <style>

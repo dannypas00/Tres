@@ -13,7 +13,15 @@
     string linked = link[0] + "//" + link[2] + "/Players/" + link[4];
     int roomCode = Convert.ToInt32(link[4]);
 
-    //Gets the chipworths
+    //Return to login if players are lower than min_size
+    int players = Convert.ToInt32(db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0", roomCode));
+    int min_size = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", roomCode));
+    if (players < (min_size + 1))
+    {
+        Response.Redirect("~/AdminPage.cshtml/" + roomCode);
+    }
+
+    //Gets the chipworths 
     var chips = db.QuerySingle("SELECT Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth FROM Room WHERE  Room_Code=@0", roomCode);
 
     int chip1 = chips.Chip_1_Worth;
@@ -34,7 +42,7 @@
         Response.Redirect("~/AdminPage.cshtml/" + roomCode);
     }
 
-    //Pauzes the game, shuffles the players or manages the names on choice
+    //Pauzes the game, shuffles the players or manages the names on choice of admin
     int tables = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", roomCode);
     if (IsPost && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {
@@ -46,17 +54,23 @@
                 //Update tables with AJAX//
                 break;
             case "start":
-                db.Execute("UPDATE Room SET Started_Time = @0 WHERE Room_Code = @1", DateTime.Now, roomCode);
+                db.Execute("UPDATE Room SET Started_Time = @0, Started = 1 WHERE Room_Code = @1", DateTime.Now, roomCode);
                 break;
             case "delete":
                 <script>
                     $(document).ready(function () {
-                    if (confirm("Do you really want to delete this room? This is irreversible!")) {
+                        if (confirm("Do you really want to delete this room? This is irreversible!")) {
                         @{db.Execute("DELETE FROM Room WHERE Room_Code = @0", roomCode);
                         Response.Redirect("~/Gameselect.cshtml");}
                         }
-                    })
+                    });
                 </script>
+                break;
+            case "pauze":
+                db.Execute("UPDATE Room SET Started = 0 WHERE Room_Code = @0", roomCode);
+                break;
+            case "unpauze":
+                db.Execute("UPDATE Room SET Started = 1 WHERE Room_Code = @0", roomCode);
                 break;
             default:
                 break;
@@ -118,7 +132,9 @@
                     <li style="visibility:hidden"> -----------------------</li>
                     <li style="visibility:hidden"> -----------------------</li>
                 </ul>
-                <button style="margin-left:50px" class="btn btn-warning" type="submit" value="delete" name="submit">Delete game</button>
+                <form method="post">
+                    <button style="margin-left:50px" class="btn btn-warning" type="submit" value="delete" name="submit">Delete game</button>
+                </form>
                 <div style="bottom:0">
 
                 </div>
@@ -165,7 +181,15 @@
                                         <button class="btn btn-primary" type="submit" value="shuffle" name="submit">Shuffle all</button>
                                     </div>
                                     <div class="form-group">
-                                        <button class="btn btn-primary" type="submit" name="submit" value="start">Start</button>
+                                        <button class="btn btn-primary" type="submit" name="submit" value="start">Start / Restart</button>
+                                    </div>
+                                </div>
+                                <div class="form-row" style="justify-content:center">
+                                    <div class="form-group">
+                                        <button class="btn btn-primary" type="submit" value="pauze" name="submit">Pause</button>
+                                    </div>
+                                    <div class="form-group">
+                                        <button class="btn btn-primary" type="submit" value="unpauze" name="submit">Unpause</button>
                                     </div>
                                 </div>
                             </form>

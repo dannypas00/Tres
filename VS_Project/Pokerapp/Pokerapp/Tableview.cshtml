@@ -1,5 +1,4 @@
 ﻿@using WebMatrix.Data
-
 @{
     Layout = "~/_Layout.cshtml";
     //Gets roomcode and tablenumber
@@ -15,7 +14,7 @@
     string Url = "RulesPageNL/" + roomCode;
     string urlBack = "Players/" + roomCode;
 
-    //Splits number of names in two
+    //Splits number of names in two 
     var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     int aantal = namen.Count();
     double gedeeld = aantal / 2;
@@ -26,11 +25,6 @@
     {
         tweede = eerste;
     }
-    //if (aantal > 10)    //Haal max spelers uit database
-    //{
-    //    string Url = "Players.cshtml/" + roomCode;
-    //    Response.Redirect("~/" + Url);
-    //}
 
     //Gets startvalue
     int startvalue = db.QueryValue("SELECT Start_Value FROM Room WHERE Room_Code = @0", roomCode);
@@ -47,6 +41,8 @@
             })
         </script>
     }
+
+    //Raise blinds with the blindsrounds
     int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
     var blind_id = db.Query("SELECT Top (@0) ID FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
     int min_size = db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", roomCode);
@@ -69,12 +65,9 @@
         }
     }
 
-    //Updats blinds
-    db.Execute("UPDATE Room SET Small_Blind = @0, Big_Blind = @1 WHERE Room_Code = @2", small, big, roomCode);
-
     //If minimum size is reached reshuffle names by tables
     int players = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
-    if (min_size >= players)
+    /*if (min_size >= players)
     {
         <script>
             $(document).ready(function () {
@@ -85,9 +78,8 @@
         shuffle.ShuffleTable(db, roomCode);
         Url = "Players.cshtml/" + roomCode;
         Response.Redirect("~/" + Url);
-    }
+    }*/
 
-    //Synchronizes the timer with the database timer
     dynamic room = db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode);
     TimeSpan startTime;
     if (room.Started_Time != null)
@@ -99,30 +91,12 @@
         startTime = TimeSpan.Zero;
     }
     DateTime pauzeTime = DateTime.Now + room.Pause_Time;
-    DateTime blindTime = DateTime.Now + room.Blind_Time;
-    //startTime.AddHours(Convert.ToInt32(DateTime.Now.Date - startTime.Date) * 24);
-    //startTime.AddDays(-Convert.ToInt32(DateTime.Now.Date - startTime.Date));
+    TimeSpan blindTime = room.Blind_Time;
     int hrs = startTime.Hours;
     int mns = startTime.Minutes;
     int scs = startTime.Seconds;
+    int started = Convert.ToInt32(room.Started);
 }
-
-<div class="modal fade show in">
-  <div class="modal-dialog">
-    <div class="v-cell">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Round is over</h4>
-        </div>
-        <div class="modal-body">
-            Next round starts over: @room.Pause_Time
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
 <div class="header">
     <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
         Rules
@@ -132,7 +106,17 @@
     </div>
 </div>
 <div class="py-5">
-    <div style="display: none;"><p id="Hours">@hrs</p><p id="Minutes">@mns</p><p id="Seconds">@scs</p></div>
+    <!--Filling JS variables-->
+    <div style="display: none;">
+        <p id="Hours">@hrs</p>
+        <p id="Minutes">@mns</p>
+        <p id="Seconds">@scs</p>
+        <p id="Blinds">@blindTime.TotalSeconds</p>
+        <p id="Pauze">@pauzeTime.TimeOfDay</p>
+        <p id="Started">@started</p>
+        <p id="BlindIndex"></p>
+    </div>
+    <!--Start the page-->
     <div class="container">
         <div class="col-md-12 text-center">
             <h1>Table @table</h1>
@@ -140,25 +124,22 @@
         <div class="col-md-12 text-center">
             <div id="roomCode" style="display:none;">@roomCode</div>
             <div id="table" style="display:none;">@table</div>
-            @*@if (startTime == TimeSpan.Zero || startTime == null)
-        {
-            <div name=timer class="timer">Game not started yet</div>
-        }
-        else
-        {
-            <div name=timer class="timer">loading timer...</div>
-        }*@
+            @if (started == 0)
+            {
+                <div name=timer class="timer">Game not running</div>
+            }
+            else
+            {
+                <div name=timer class="timer">loading timer...</div>
+            }
             <div name="timer" class="timer"></div>
             <div class="round">This is round: <span id="rnumber"></span></div>
-            <div class="round-timeheader">
-            
-            <div name="round-timer" class="round-timer"></div>
         </div>
         <div class="row">
             <div class="col-md-2">
                 <p>Starting capital: @startvalue</p>
-                <p>Small blind: @small</p>
-                <p>Big blind: @big</p>
+                <p>Small blind: <span id="SB"></span></p>
+                <p>Big blind: <span id="BB"></span></p>
                 <form method="post">
                     <input class="btn btn-outline-secondary" type="submit" name="blindnext" value="Raise blinds" />
                 </form>
@@ -198,9 +179,8 @@
                     }
                 }
 
-                    <div class="table">
-                        <img src="~/tafel.png" name="pokertable" style="height:250px; width:100%" />
-                    </div>
+                <div class="table">
+                    <img src="~/tafel.png" name="pokertable" style="height:250px; width:100%" />
                 </div>
             </div>
         </div>
@@ -212,20 +192,24 @@
 <script src="https://code.jquery.com/jquery-3.3.1.js"
         integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
         crossorigin="anonymous"></script>
+@if(started == 1)
+{
 <script>
     var roomcode = $("#roomCode").html();
-    $("#roomCode").remove();
-
     var table = $("#table").html();
-    $("#table").remove();
-
     var hrs = $('#Hours').html();
     var mns = $('#Minutes').html();
     var scs = $('#Seconds').html();
     var round = 1;
-
+    var blind = $('#Blinds').html();
+    var pauze = $('#Pauze').html();
+    var started = $('#Started').html();
     console.log("roomcode" + roomcode);
     console.log("table" + table);
+    console.log("blind" + blind);
+    console.log("pauze" + pauze);
+    console.log("started" + started);
+
     //Ajax connect with url Timer get the data roomcode
     $.ajax({
         url: "Timer.cshtml",
@@ -240,170 +224,28 @@
         }
     });
 
-    $.ajax({ //Second request
-        url: "RoundTimer.cshtml",
-        type: "get",
-        data: {
-            roomCode: roomcode,
-            table: table
-        },
-        success: function (response) {
-            RoundTimer(response); // Returns timer from db
-        }
-    });
+    function startTimer(timer) {
+        timer = timer.split(":"); // Split timer
 
-    $.ajax({ //Third request
-        url: "PauseTimer.cshtml",
-        type: "get",
-        data: {
-            roomCode: roomcode,
-            table: table
-        },
-        success: function (response) {
-            PauseTimer(response); // Returns timer from db
-        }
-    });
+        var roundHours = parseInt(timer[0]); // Parse hours to int
+        var roundMinutes = parseInt(timer[1]);
+        var roundSeconds = parseInt(timer[2]);
 
-
-    function RoundTimer(timer) {
-        var timer = timer.split(":"); // Split timer
-
-        var targetHours = parseInt(timer[0]); // Parse hours to int
-        var targetMinutes = parseInt(timer[1]);
-        var targetSeconds = parseInt(timer[2]);
-
-        var currentHours = 0;
-        var currentMinutes = 0;
-        var currentSeconds = 0;
+        var currentHours = hrs;
+        var currentMinutes = mns;
+        var currentSeconds = scs;
 
         round = 1;
         document.querySelector('#rnumber').innerHTML = round;
 
         //Increment timer
         setInterval(function () {
-            var displayHours = currentHours;
-            var displayMinutes = currentMinutes;
-            var displaySeconds = currentSeconds;
+            var totalSecs = currentSeconds + (currentMinutes * 60) + (currentHours * 1440);
 
-            sessionStorage.setItem("round-timer", displayHours);
-
-
-            if (currentHours.toString().length < 2) {
-                displayHours = "0" + currentHours;
-            }
-
-            if (currentMinutes.toString().length < 2) {
-                displayMinutes = "0" + currentMinutes;
-            }
-
-            if (currentSeconds.toString().length < 2) {
-                displaySeconds = "0" + currentSeconds;
-            }
-
-            document.querySelector('.round-timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
-
-
-            // if condition is met round + 1
-            if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
-
-
-                $(".modal").modal("show");
-                $('.modal-body').append("<div name='pause-timer' class='pause-timer'></div>");
-                $("div.round-timer").remove();
-
-                round++;
-                currentHours = 0;
-                currentMinutes = 0;
-                currentSeconds = 0;
-            }
-
-            currentSeconds++;
-
-            if (currentSeconds == 60) {
-                currentMinutes++;
-                currentSeconds = 0;
-            }
-
-            if (currentMinutes == 60) {
-                currentHours++;
-                currentMinutes = 0;
-            }
-        }, 1000);
-    }
-
-    function PauseTimer(timer) {
-        var timer = timer.split(":"); // Split timer
-
-        var targetHours = parseInt(timer[0]); // Parse hours to int
-        var targetMinutes = parseInt(timer[1]);
-        var targetSeconds = parseInt(timer[2]);
-
-        var currentHours = 0;
-        var currentMinutes = 0;
-        var currentSeconds = 0;
-
-        //Increment timer
-        setInterval(function () {
-            var displayHours = currentHours;
-            var displayMinutes = currentMinutes;
-            var displaySeconds = currentSeconds;
-
-            sessionStorage.setItem("pause-timer", displayHours);
-
-            if (currentHours.toString().length < 2) {
-                displayHours = "0" + currentHours;
-            }
-
-            if (currentMinutes.toString().length < 2) {
-                displayMinutes = "0" + currentMinutes;
-            }
-
-            if (currentSeconds.toString().length < 2) {
-                displaySeconds = "0" + currentSeconds;
-            }
-
-            document.querySelector('.pause-timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
-
-            // if condition is met round + 1
-            if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
-
-                $(".modal").modal("hide");
-                $('.round-timeheader').append("<div name='round-timer' class='round-timer'></div>");
-                $("div.pause-timer").remove();
-
-                currentHours = 0;
-                currentMinutes = 0;
-                currentSeconds = 0;
-            }
-
-            currentSeconds++;
-
-            if (currentSeconds == 60) {
-                currentMinutes++;
-                currentSeconds = 0;
-            }
-
-            if (currentMinutes == 60) {
-                currentHours++;
-                currentMinutes = 0;
-            }
-        }, 1000);
-    }
-
-
-    function startTimer(timer) {
-        var timer = timer.split(":"); // Split timer
-
-        var targetHours = parseInt(timer[0]); // Parse hours to int
-        var targetMinutes = parseInt(timer[1]);
-        var targetSeconds = parseInt(timer[2]);
-
-        var currentHours = hrs;
-        var currentMinutes = mns;
-        var currentSeconds = scs;
-
-        //Increment timer
-        setInterval(function () {
+            console.log("Timer: " + timer[0] + ":" + timer[1] + ":" + timer[2]);
+            console.log("Blind: " + blind);
+            console.log("Blind Modulus " + parseInt(totalSecs % blind));
+            console.log(totalSecs);
             var displayHours = currentHours;
             var displayMinutes = currentMinutes;
             var displaySeconds = currentSeconds;
@@ -425,9 +267,32 @@
 
             document.querySelector('.timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
 
-            // if condition is met round + 1
-            if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
+            if (totalSecs % blind == 0) {
+                $.ajax({
+                    url: "BlindTimer.cshtml",
+                    type: "get",
+                    data: {
+                        table: table,
+                        roomCode: roomcode,
+                    },
+                    success: function (response) {
+                        console.log("Response: " + response)
+                        response = response.split("-");
+                        console.log("Blinds Index: " + response[0]);
+                        console.log("Small Blind: " + response[1]);
+                        console.log("Big Blind: " + response[2]);
+                        document.querySelector('#BlindIndex').innerHTML = response[0];
+                        document.querySelector('#SB').innerHTML = response[1];
+                        document.querySelector('#BB').innerHTML = response[2];
 
+                    }
+                })
+            }
+
+            // if condition is met round + 1
+            if (currentHours == roundHours && currentMinutes == roundMinutes && currentSeconds == roundSeconds) {
+                round++;
+                document.querySelector('#rnumber').innerHTML = round;
                 currentHours = 0;
                 currentMinutes = 0;
                 currentSeconds = 0;
@@ -448,6 +313,7 @@
     }
 
 </script>
+}
 <script>
     jQuery(document).ready(function ($) {
         $(".clickable").click(function () {

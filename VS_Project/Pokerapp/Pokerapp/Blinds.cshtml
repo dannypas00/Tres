@@ -10,8 +10,8 @@
     Database db = Database.OpenConnectionString(connectionString, provider);
 
     //Validations
-    Validation.Add("small", Validator.Range(1, 999999999999999999, "Small blind has to be higher than 1"));
-    Validation.Add("big", Validator.Range(1, 999999999999999999, "Big blind has to be higher than 1"));
+    Validation.Add("small", Validator.Range(1, 999999999999999999, "Small blind has to be higher than or equal to 1"));
+    Validation.Add("big", Validator.Range(1, 999999999999999999, "Big blind has to be higher than or equeal to 1"));
 
     //request the last 7 digits of the urgl (roomcode)
     string url = Request.Url.AbsolutePath;
@@ -22,7 +22,6 @@
     int Blind_Round = (db.QueryValue("SELECT COUNT(ValueSB) FROM Blinds WHERE Room_Code = @0", urlcode));
     if (IsPost && Validation.IsValid())
     {
-
         //Add blindvalues to blinds
         if (Request["AddBlinds"] == "Add" && (!Request["small"].IsEmpty() && !Request["big"].IsEmpty()))
         {
@@ -69,7 +68,7 @@
             string rowblind = Request.Form["rowblindform"];
             db.Execute("DELETE FROM Blinds WHERE ID = @0 AND Room_Code = @1", rowblind, urlcode);
         }
-        //Goes to other page
+        //Goes to other page if the total of blinds is bigger than zero else an alert is shown
         if (Request["Proceed"] == "Proceed")
         {
             int blinds = Convert.ToInt32(db.QueryValue("SELECT COUNT(ValueBB) FROM Blinds WHERE Room_Code = @0", urlcode));
@@ -120,8 +119,8 @@
                 </span>
                     <form style="display: inline-block" method="post">
                         <div class="form-row">
-                            <div class="form-group col-md-6"> <label for="form5">Small blind</label> <input class="form-control" type="number" step="1" min="0" max="999999" pattern="[0-9]" inputmode="numeric" name="small" placeholder="Small Blind @Blind_Round" autofocus/> </div>
-                            <div class="form-group col-md-6"> <label for="form6">Big blind</label> <input class="form-control" type="number" step="1" min="0" max="999999" pattern="[0-9]" inputmode="numeric" name="big" placeholder="Big Blind @Blind_Round" /> </div>
+                            <div class="form-group col-md-6"> <label for="form5">Small blind</label> <input class="form-control" type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" name="small" placeholder="Small Blind @Blind_Round" autofocus/> </div>
+                            <div class="form-group col-md-6"> <label for="form6">Big blind</label> <input class="form-control" type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" name="big" placeholder="Big Blind @Blind_Round" /> </div>
                         </div>
                         <button class="btn btn-primary" type="submit" name="AddBlinds" value="Add">Add</button>
                     </form>
