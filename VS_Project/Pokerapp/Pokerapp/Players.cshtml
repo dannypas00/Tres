@@ -9,13 +9,10 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-
-    //Gets roomcode from url
     string prelink = Request.Url.AbsoluteUri;
     string[] link = prelink.Split('/');
     int urlcode = Convert.ToInt32(link[4]);
 
-    //Looks if user logged in
     if (Request.Cookies["LoginCookie"].Value != "true")
     {
         Response.Redirect("~/Login.cshtml");

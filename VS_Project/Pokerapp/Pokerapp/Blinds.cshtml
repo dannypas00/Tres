@@ -9,7 +9,6 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-    //Validations
     Validation.Add("small", Validator.Range(1, 999999999999999999, "Small blind has to be higher than 1"));
     Validation.Add("big", Validator.Range(1, 999999999999999999, "Big blind has to be higher than 1"));
 
@@ -18,12 +17,10 @@
     string urlcode = url.Substring(url.Length - 7);
 
     string error = "";
-    //Count blinds
     int Blind_Round = (db.QueryValue("SELECT COUNT(ValueSB) FROM Blinds WHERE Room_Code = @0", urlcode));
     if (IsPost && Validation.IsValid())
     {
 
-        //Add blindvalues to blinds
         if (Request["AddBlinds"] == "Add" && (!Request["small"].IsEmpty() && !Request["big"].IsEmpty()))
         {
             int small = Convert.ToInt32(Request["small"]);
@@ -41,7 +38,7 @@
 
                 //    }
 
-                //Compares values, if values are lower than last value it will not be added to the database
+
                 if ((small_blind <= small) && (big_blind <= big))
                 {
                     int id_old = Convert.ToInt32(db.QueryValue("SELECT ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID DESC", urlcode));
@@ -63,29 +60,15 @@
         {
             error = "Please enter a value";
         }
-        //Delete selected blinds
         if (Request["delete"] == "delete")
         {
             string rowblind = Request.Form["rowblindform"];
             db.Execute("DELETE FROM Blinds WHERE ID = @0 AND Room_Code = @1", rowblind, urlcode);
         }
-        //Goes to other page
         if (Request["Proceed"] == "Proceed")
         {
-            int blinds = Convert.ToInt32(db.QueryValue("SELECT COUNT(ValueBB) FROM Blinds WHERE Room_Code = @0", urlcode));
-            if (blinds > 0)
-            {
-                string Url = "AdminPage.cshtml/" + urlcode;
-                Response.Redirect("~/" + Url);
-            }
-            else
-            {
-                <script>
-                    $(document).ready(function () {
-                        alert("Add a minimum of one blind at least!");
-                    })
-                </script>
-            }
+            string Url = "AdminPage.cshtml/" + urlcode;
+            Response.Redirect("~/" + Url);
         }
 
     }
