@@ -54,17 +54,23 @@
                 //Update tables with AJAX//
                 break;
             case "start":
-                db.Execute("UPDATE Room SET Started_Time = @0 WHERE Room_Code = @1", DateTime.Now, roomCode);
+                db.Execute("UPDATE Room SET Started_Time = @0, Started = 1 WHERE Room_Code = @1", DateTime.Now, roomCode);
                 break;
             case "delete":
                 <script>
                     $(document).ready(function () {
-                    if (confirm("Do you really want to delete this room? This is irreversible!")) {
+                        if (confirm("Do you really want to delete this room? This is irreversible!")) {
                         @{db.Execute("DELETE FROM Room WHERE Room_Code = @0", roomCode);
                         Response.Redirect("~/Gameselect.cshtml");}
                         }
-                    })
+                    });
                 </script>
+                break;
+            case "pauze":
+                db.Execute("UPDATE Room SET Started = 0 WHERE Room_Code = @0", roomCode);
+                break;
+            case "unpauze":
+                db.Execute("UPDATE Room SET Started = 1 WHERE Room_Code = @0", roomCode);
                 break;
             default:
                 break;
@@ -175,7 +181,15 @@
                                         <button class="btn btn-primary" type="submit" value="shuffle" name="submit">Shuffle all</button>
                                     </div>
                                     <div class="form-group">
-                                        <button class="btn btn-primary" type="submit" name="submit" value="start">Start</button>
+                                        <button class="btn btn-primary" type="submit" name="submit" value="start">Start / Restart</button>
+                                    </div>
+                                </div>
+                                <div class="form-row" style="justify-content:center">
+                                    <div class="form-group">
+                                        <button class="btn btn-primary" type="submit" value="pauze" name="submit">Pause</button>
+                                    </div>
+                                    <div class="form-group">
+                                        <button class="btn btn-primary" type="submit" value="unpauze" name="submit">Unpause</button>
                                     </div>
                                 </div>
                             </form>

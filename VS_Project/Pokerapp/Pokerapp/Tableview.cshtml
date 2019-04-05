@@ -122,9 +122,9 @@
         <div class="col-md-12 text-center">
             <div id="roomCode" style="display:none;">@roomCode</div>
             <div id="table" style="display:none;">@table</div>
-            @if (startTime == TimeSpan.Zero || startTime == null)
+            @if (started == 0)
             {
-                <div name=timer class="timer">Game not started yet</div>
+                <div name=timer class="timer">Game not running</div>
             }
             else
             {
@@ -190,6 +190,8 @@
 <script src="https://code.jquery.com/jquery-3.3.1.js"
         integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
         crossorigin="anonymous"></script>
+@if(started == 1)
+{
 <script>
     var roomcode = $("#roomCode").html();
     var table = $("#table").html();
@@ -263,7 +265,7 @@
 
             document.querySelector('.timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
 
-            if (totalSecs % blind == 0) {   
+            if (totalSecs % blind == 0) {
                 $.ajax({
                     url: "BlindTimer.cshtml",
                     type: "get",
@@ -280,7 +282,7 @@
                         document.querySelector('#BlindIndex').innerHTML = response[0];
                         document.querySelector('#SB').innerHTML = response[1];
                         document.querySelector('#BB').innerHTML = response[2];
-                        
+
                     }
                 })
             }
@@ -309,6 +311,7 @@
     }
 
 </script>
+}
 <script>
     jQuery(document).ready(function ($) {
         $(".clickable").click(function () {
