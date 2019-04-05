@@ -17,11 +17,12 @@
     //Gather roomcode
     int roomCode = Convert.ToInt32(Request.Url.AbsolutePath.Split('/')[2]);
 
-    int number = 1;         //later toevoegen table number
-    int rebuy = 0;          //aantal rebuys standaard op 0
+    int number = 1;         //table number will be added later
+    int rebuy = 0;          //number of rebuys standard on 0
     string error = "";
     Validation.Add("name", Validator.StringLength(15, 1, "Name has to be between 1 - 15 digits"));
 
+    //When buttons has been clicked
     if (IsPost)
     {
         dynamic room = db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode);
@@ -31,7 +32,7 @@
         int maxplayerstotal = maxplayerstable * maxtables;
         int playercount = db.QueryValue("SELECT Count(Name) FROM Players WHERE Room_Code = @0", roomCode);
 
-
+        //If the clicked button is AddName and the number of players is smaller than the max players per table
         string name = Request["name"];
         if (Validation.IsValid() && Request["AddName"] == "Add" && db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1", name, roomCode) is null)
         {
@@ -46,23 +47,29 @@
             }
         }
 
+        //If clicked button is delete, delete player form database
         if (Request["delete"] == "delete")
         {
             db.Execute("DELETE FROM Players WHERE Name = @0 AND Room_Code = @1", Request.Form["rownameform"], roomCode);
         }
 
+        //If clicked button is Proceed
         if (Request["Proceed"] == "Proceed")
         {
+            //Shuffles players when number of players is bigger than min players per table 
+            //And number of players is smaller than or equal to max players per table
             if (playercount > minplayerstable && playercount <= maxplayerstotal)
             {
                 Shuffle shuffle = new Shuffle();
                 shuffle.ShuffleTable(db, roomCode);
                 Response.Redirect("~/PlayingAdmin.cshtml/" + roomCode);
             }
+            //If min players per table is bigger than or equal to number of players show error
             else if (playercount <= minplayerstable)
             {
                 error = "Add atleast " + (minplayerstable + 1) + " players!";
             }
+            //If number of players is bigger than max players per table show error
             else if (playercount > maxplayerstotal)
             {
                 error = "You can't have more than " + maxplayerstotal + " players, because you only have " + maxtables + " tables and a maximum of " + maxplayerstable + " players per table";
