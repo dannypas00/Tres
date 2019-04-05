@@ -63,9 +63,6 @@
         }
     }
 
-    //Updats blinds
-    db.Execute("UPDATE Room SET Small_Blind = @0, Big_Blind = @1 WHERE Room_Code = @2", small, big, roomCode);
-
     //If minimum size is reached reshuffle names by tables
     int players = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     /*if (min_size >= players)
@@ -115,7 +112,7 @@
         <p id="Blinds">@blindTime.TotalSeconds</p>
         <p id="Pauze">@pauzeTime.TimeOfDay</p>
         <p id="Started">@started</p>
-        <p id="BlindIndex">0</p>
+        <p id="BlindIndex"></p>
     </div>
     <!--Start the page-->
     <div class="container">
@@ -139,8 +136,8 @@
         <div class="row">
             <div class="col-md-2">
                 <p>Starting capital: @startvalue</p>
-                <p>Small blind: @small</p>
-                <p>Big blind: @big</p>
+                <p>Small blind: <span id="SB"></span></p>
+                <p>Big blind: <span id="BB"></span></p>
                 <form method="post">
                     <input class="btn btn-outline-secondary" type="submit" name="blindnext" value="Raise blinds" />
                 </form>
@@ -202,7 +199,6 @@
     var round = 1;
     var blind = $('#Blinds').html();
     var pauze = $('#Pauze').html();
-    var blindIndex = $('#BlindIndex').html()
     var started = $('#Started').html();
     console.log("roomcode" + roomcode);
     console.log("table" + table);
@@ -274,13 +270,17 @@
                     data: {
                         table: table,
                         roomCode: roomcode,
-                        blindIndex: blindIndex
                     },
                     success: function (response) {
+                        console.log("Response: " + response)
                         response = response.split("-");
-                        $('#BlindIndex').innerHTML = response[0];
-                        $('#SB').innerHTML = response[1];
-                        $('#BB').innerHTML = response[2];
+                        console.log("Blinds Index: " + response[0]);
+                        console.log("Small Blind: " + response[1]);
+                        console.log("Big Blind: " + response[2]);
+                        document.querySelector('#BlindIndex').innerHTML = response[0];
+                        document.querySelector('#SB').innerHTML = response[1];
+                        document.querySelector('#BB').innerHTML = response[2];
+                        
                     }
                 })
             }

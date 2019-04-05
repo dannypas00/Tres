@@ -100,24 +100,21 @@
         int chip4 = Convert.ToInt32(Request["chip4"]);
         int chip5 = Convert.ToInt32(Request["chip5"]);
         var started = 0;
-        int blind_round = 1;
-        int small = 0;
-        int big = 0;
         today = DateTime.Now;
 
         var check = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
         if (check == code)
         {
-            db.Execute("UPDATE Room SET Room_Code = @0, Room_Name = @1, Tbl_Min_Size = @2, Started = @3, Chip_1_Worth = @4, Chip_2_Worth = @5, Chip_3_Worth = @6, Chip_4_Worth = @7, Chip_5_Worth = @8, Round_Time = @9, Pause_Time = @10, Blind_Time = @11, Allow_Rebuy = @12, Start_Value = @13, Tbl_Amount = @14, Tbl_Max_Size = @15, Blind_Round = 1, Small_Blind = 0, Big_Blind = 0, Room_Create_Date = @16 WHERE Room_Code = @0"
+            db.Execute("UPDATE Room SET Room_Code = @0, Room_Name = @1, Tbl_Min_Size = @2, Started = @3, Chip_1_Worth = @4, Chip_2_Worth = @5, Chip_3_Worth = @6, Chip_4_Worth = @7, Chip_5_Worth = @8, Round_Time = @9, Pause_Time = @10, Blind_Time = @11, Allow_Rebuy = @12, Start_Value = @13, Tbl_Amount = @14, Tbl_Max_Size = @15, Room_Create_Date = @16 WHERE Room_Code = @0"
             , code, roomname, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, today);
         }
         else
         {
-            db.Execute("INSERT INTO Room (Room_Code, Room_Name, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Blind_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size, Blind_Round, Small_Blind, Big_Blind, Room_Create_Date)" +
-            "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17, @18, @19)", code, roomname, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, blind_round, small, big, today);
+            db.Execute("INSERT INTO Room (Room_Code, Room_Name, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Blind_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size, Room_Create_Date)" +
+            "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16)", code, roomname, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, today);
         }
     }
-    #endregion
+#endregion
     string warning = "";
     //continues to next page
     if (IsPost && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)

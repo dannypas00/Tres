@@ -6,13 +6,20 @@
 
     //get the url
     string url = Request.Url.AbsoluteUri;
-    string roomCode = Request.QueryString["room"];
+    string roomCode = Request.QueryString["roomCode"];
     string table = Request.QueryString["table"];
     string blind = Request.QueryString["blind"];
-    int index = Request.QueryString["blindIndex"].AsInt();
-
-    dynamic blinds = db.Query("SELECT ValueSB, ValueBB FROM Blinds WHERE Room_Code = @0 AND ID = @1", roomCode, index);
-    db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", index + 2, roomCode);
-
+    int index = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
+    var blindCount = db.Query("SELECT * FROM Blinds WHERE Room_Code = @0", roomCode).Count();
+    if (index >= blindCount)
+    {
+        index = blindCount;
+    }
+    else if (index <= 0)
+    {
+        index = 1;
+    }
+    var blinds = db.QuerySingle("SELECT * FROM Blinds WHERE Room_Code = @0 AND ID = @1", roomCode, index);
+    db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", index + 1, roomCode);
     Response.Write(index + "-" + blinds.ValueSB + "-" + blinds.ValueBB);
 }

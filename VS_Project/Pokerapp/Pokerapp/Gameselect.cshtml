@@ -37,7 +37,7 @@
                     <div style="display:inline-block">
                         <form method="post">
                             <input type="hidden" name="roomCode" value="@roomCode" />
-                            <button class="btn btn-outline-secondary" type="submit">New Game</button>
+                            <button class="btn btn-outline-secondary" type="submit" name="new" value="submit">New Game</button>
                         </form>
                     </div>
                 </div>
@@ -48,7 +48,7 @@
             <form method="post">
                 <div class="footer">
                     <input type="hidden" name="roomCode" value="@roomCode" />
-                    <button class="btn btn-outline-secondary" type="submit">New Game</button>
+                    <button class="btn btn-outline-secondary" type="submit" name="new" value="submit">New Game</button>
                 </div>
             </form>
         }
@@ -80,11 +80,6 @@
                 </div>
             </div>
         </div>
-        <form method="post">
-            <div style="padding: 0px 3px 3px 3px">
-
-            </div>
-        </form>
     </div>
 </div>
 <script>
@@ -95,9 +90,3 @@
         });
     });
 </script>
-<form method="post">
-    <div class="footer">
-        <input type="hidden" name="roomCode" value="@roomCode" />
-        <button class="btn btn-outline-primary" name="new" type="submit">New Game</button>
-    </div>
-</form>
