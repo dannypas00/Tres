@@ -1,22 +1,24 @@
 ﻿.pGrid {
     display: grid;
-    grid-template-columns: 40% 6% 6%;
-    grid-template-rows: 6% 6% 6% 6% 6% 6%;
-    grid-template-areas: "Table . ." "Table . ." "Table . ." "Table . ." "Table . .";
-    grid-gap: 10px;
+    grid-template-columns: minmax(200px, 400px) minmax(200px, 400px);
+    grid-template-rows: minmax(200px, 400px);
 }
 
 .pTable {
-    grid-area: 1 / 1 / 6 / 2;
+    grid-area: 1 / 1 / 2 / 2;
 }
 
-.wSpace {
-    grid-area: 1 / 2 / 2 / 4;
-}
 
+
+.pNGrid {
+    display: grid;
+    grid-template-columns: minmax(40px, 80px) minmax(40px, 80px);
+    grid-template-rows: 10% 10% 10% 10% 10%;
+    grid-area: 1 / 2 / 2 / 3;
+}
 
 .pNames {
     grid-column-start: auto;
     order: inherit;
-    position:relative;
+    position: relative;
 }
