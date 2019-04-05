@@ -27,8 +27,8 @@
     Validation.Add("round_time", Validator.StringLength(8, 8, "Incorrect format for round time please use hh:mm:ss"));
     Validation.Add("pause_time", Validator.StringLength(8, 8, "Incorrect format for pause time please use hh:mm:ss"));
     Validation.Add("blind_time", Validator.StringLength(8, 8, "Incorrect format for blind time please use hh:mm:ss"));
-    Validation.Add("min_table", Validator.Range(2, 99, "Minimum amount is 2 players per table"));
-    Validation.Add("max_table", Validator.Range(2, 10, "Maximum amount of players per table is 10"));
+    Validation.Add("min_table", Validator.Range(1, 99, "Minimum amount is 2 players per table"));
+    Validation.Add("max_table", Validator.Range(3, 10, "Maximum amount of players per table is 10"));
     Validation.Add("start_value", Validator.Range(1, 999999, "The range of the start value is 1 - 9.999.999"));
     Validation.Add("tbl_amount", Validator.Range(1, 99, "Please set a realistic amount of tables"));
     Validation.Add("rebuy", Validator.Range(0, 999, "Rebuy has to be 0 or higher"));
@@ -47,7 +47,7 @@
     TimeSpan blind_time = new TimeSpan(00,05,00);
     int min_table = 2;
     int max_table_amount = 8;
-    int start_value = 1000;
+    int start_value = 500;
     int table_amount = 3;
     int rebuy = 3;
     int chip_worth1 = 1;
@@ -78,23 +78,6 @@
         chip_worth3 = room.Chip_3_Worth;
         chip_worth4 = room.Chip_4_Worth;
         chip_worth5 = room.Chip_5_Worth;
-
-        //Comments plz
-        //Haal de object "room" op uit de database en haal daar alle waardes uit. Is minder resource intensive
-        //room_name = Convert.ToString(db.QueryValue("SELECT Room_Name FROM Room WHERE Room_Code = @0", code));
-        //round_time = Convert.ToString(db.QueryValue("SELECT Round_Time FROM Room WHERE Room_Code = @0", code));
-        //pause_time = Convert.ToString(db.QueryValue("SELECT Pause_Time FROM Room WHERE Room_Code = @0", code));
-        //blind_time = Convert.ToString(db.QueryValue("SELECT Blind_Time FROM Room WHERE Room_Code = @0", code));
-        //min_table = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", code));
-        //max_table_amount = Convert.ToInt32(db.QueryValue("SELECT Tbl_Max_Size FROM Room WHERE Room_Code = @0", code));
-        //start_value = Convert.ToInt32(db.QueryValue("SELECT Start_Value FROM Room WHERE Room_Code = @0", code));
-        //table_amount = Convert.ToInt32(db.QueryValue("SELECT Tbl_Amount FROM Room WHERE Room_Code = @0", code));
-        //rebuy = Convert.ToInt32(db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", code));
-        //chip_worth1 = Convert.ToInt32(db.QueryValue("SELECT Chip_1_Worth FROM Room WHERE Room_Code = @0", code));
-        //chip_worth2 = Convert.ToInt32(db.QueryValue("SELECT Chip_2_Worth FROM Room WHERE Room_Code = @0", code));
-        //chip_worth3 = Convert.ToInt32(db.QueryValue("SELECT Chip_3_Worth FROM Room WHERE Room_Code = @0", code));
-        //chip_worth4 = Convert.ToInt32(db.QueryValue("SELECT Chip_4_Worth FROM Room WHERE Room_Code = @0", code));
-        //chip_worth5 = Convert.ToInt32(db.QueryValue("SELECT Chip_5_Worth FROM Room WHERE Room_Code = @0", code));
     }
     #endregion
 
@@ -143,6 +126,8 @@
         {
             if (Request["Proceed"] == "Proceed")
             {
+                //Checks for roundtime, pausetime and blindtime so it contains no letters
+                //And checks if time has a value of hh:mm:ss by splitting it with ':'
                 int check = 0;
 
                 var prelink = Request["round_time"];
@@ -222,6 +207,7 @@
                     warning = "Not a valid pause time, use hh:mm:ss";
                 }
 
+                //If all three times are valid (at the time it wil count check + 1) than all settings will be saved and user will be redirected
                 if (check >= 3)
                 {
                     Save();

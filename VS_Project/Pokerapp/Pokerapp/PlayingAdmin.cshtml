@@ -13,7 +13,15 @@
     string linked = link[0] + "//" + link[2] + "/Players/" + link[4];
     int roomCode = Convert.ToInt32(link[4]);
 
-    //Gets the chipworths
+    //Return to login if players are lower than min_size
+    int players = Convert.ToInt32(db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0", roomCode));
+    int min_size = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", roomCode));
+    if (players < (min_size + 1))
+    {
+        Response.Redirect("~/AdminPage.cshtml/" + roomCode);
+    }
+
+    //Gets the chipworths 
     var chips = db.QuerySingle("SELECT Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth FROM Room WHERE  Room_Code=@0", roomCode);
 
     int chip1 = chips.Chip_1_Worth;
@@ -34,7 +42,7 @@
         Response.Redirect("~/AdminPage.cshtml/" + roomCode);
     }
 
-    //Pauzes the game, shuffles the players or manages the names on choice
+    //Pauzes the game, shuffles the players or manages the names on choice of admin
     int tables = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", roomCode);
     if (IsPost && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {

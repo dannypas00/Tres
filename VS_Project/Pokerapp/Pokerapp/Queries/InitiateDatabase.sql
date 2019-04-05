@@ -6,7 +6,7 @@ CREATE TABLE [dbo].[Room] (
     [Room_Code]        INT           NOT NULL,
     [Room_Name]        NVARCHAR (50) NOT NULL,
     [Room_Create_Date] DATETIME      NOT NULL,
-	[Round_Nr] INT NOT NULL DEFAULT 1,
+	[Round_Nr]		   INT NOT NULL DEFAULT 1,
     [Tbl_Min_Size]     INT           NOT NULL,
     [Started]          CHAR (1) NOT NULL DEFAULT 0,
     [Chip_1_Worth]     INT           NOT NULL,
