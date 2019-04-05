@@ -41,7 +41,7 @@
             Rules
         </div>
     </div>
-    <div class="py-5">
+    <div class="py-5" >
         <div class="col-md-12 text-center">
             <h1>Tables</h1>
         </div>
@@ -53,10 +53,10 @@
             int tbl_nr = i + 1;
             string table = i.ToString();
             Url = link[0] + "//" + link[2] + "/" + "Tableview.cshtml?roomcode=" + link[4] + "&table=" + tbl_nr;
-            <div class="pGrid clickable">
+            <div class="pGrid" style="margin-left:30px">
                 <div class="wSpace"></div>
-                <form method="post" class="pTable">
-                    <div style="background-image: url(/tafel.png);cursor:pointer; margin-top:15px">
+                <form method="post" class="pTable clickable">
+                    <div style="background-image: url(/tafel.png);cursor:pointer;">
                         <div class="row">
                             <div class="col">
                                 <div class="text-center" style="justify-content:center; margin-top: 40%"><h3><b>Table @tbl_nr</b></h3></div>

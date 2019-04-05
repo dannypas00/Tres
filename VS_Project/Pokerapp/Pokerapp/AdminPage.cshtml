@@ -105,42 +105,44 @@
                         <div class="form-group"> <button type="submit" name="AddName" value="Add" class="btn btn-primary">Add</button> </div>
 
                     </form>
-
-                    <div style="padding: 15px 0px 0px 0px; text-align: center" class="col-md-12">
-                        <div class="table-responsive" style="display: inline-block; top:0; width:350px;">
-                            <table class="table serial">
-                                <tbody>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Players</th>
-                                        <th></th>
-                                    </tr>
-                                    <!--Places every name in a table-->
-                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", roomCode))
-                                    {
-                                        string rownameform = (string)row.Name;
+                    @if (db.QueryValue("SELECT * FROM Players WHERE Room_Code=@0", roomCode) != null)
+                    {
+                        <div style="padding: 15px 0px 0px 0px; text-align: center" class="col-md-12">
+                            <div class="table-responsive" style="display: inline-block; top:0; width:350px;">
+                                <table class="table serial">
+                                    <tbody>
                                         <tr>
-                                            <td>
-                                                @row.Name
-                                            </td>
-                                            <td>
-                                                <form method="post">
-                                                    <button type="submit" name="delete" value="delete" style="width:75px; float:right" class="btn btn-outline-secondary">X</button>
-                                                    @Html.Hidden("rownameform", rownameform)
-                                                </form>
-                                            </td>
+                                            <th>#</th>
+                                            <th>Players</th>
+                                            <th></th>
                                         </tr>
-                                    }
-                                </tbody>
-                            </table>
-                            <form method="post">
-                                <div>
-                                    <button type="submit" name="Proceed" value="Proceed" class="btn btn-primary">Proceed</button>
-                                </div>
-                            </form>
+                                        <!--Places every name in a table-->
+                                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0", roomCode))
+                                        {
+                                            string rownameform = (string)row.Name;
+                                            <tr>
+                                                <td>
+                                                    @row.Name
+                                                </td>
+                                                <td>
+                                                    <form method="post">
+                                                        <button type="submit" name="delete" value="delete" style="width:75px; float:right" class="btn btn-outline-secondary">X</button>
+                                                        @Html.Hidden("rownameform", rownameform)
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                                <form method="post">
+                                    <div>
+                                        <button type="submit" name="Proceed" value="Proceed" class="btn btn-primary">Proceed</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
+                    }
                     </div>
-                </div>
             </div>
         </div>
     </div>
