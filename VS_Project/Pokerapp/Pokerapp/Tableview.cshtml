@@ -3,7 +3,6 @@
     Layout = "~/_Layout.cshtml";
     int roomCode = Request.QueryString["roomcode"].AsInt();
     int table = Request.QueryString["table"].AsInt();
-    int? blindsIndex = Request.QueryString["blindsIndex"].AsInt();
     Page.Title = "Table" + table;
 
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
@@ -26,29 +25,6 @@
 
     int bigBlind = 0;
     int smallBlind = 0;
-
-    if (blindsIndex != null)
-    {
-        int index = (int)blindsIndex;
-        db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", index, roomCode);
-        dynamic blind = db.Query("SELECT * FROM Blinds WHERE Room_Code = @0", roomCode);
-        if (blindsIndex + 2 < blind.Count)
-        {
-            blindsIndex++;
-        }
-
-        smallBlind = blind[index].ValueSB;
-        bigBlind = blind[index].ValueBB;
-        <script>
-            $(document).ready(function () {
-                alert("The blinds have been raised!\nThe values are now Small Blind: {%s} and Big Blind: {%s}" + @smallBlind + @bigBlind);
-            });
-        </script>
-    }
-    else
-    {
-        blindsIndex = (int) db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
-    }
 
     int players = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     /*if (min_size >= players)
@@ -98,7 +74,7 @@
         <p id="Blinds">@blindTime.TotalSeconds</p>
         <p id="Pauze">@pauzeTime.TimeOfDay</p>
         <p id="Started">@started</p>
-        <p id="BlindsIndex">@blindsIndex</p>
+        <p id="BlindIndex">0</p>
     </div>
     <!--Start the page-->
     <div class="container">
@@ -121,8 +97,8 @@
         </div>
         <div class="row">
             <div class="col-md-2">
-                <p id="small">Small blind: @smallBlind.ToString()</p>
-                <p id="big">Big blind: @bigBlind.ToString()</p>
+                <p id="small">Small blind: <span id="SB"></span></p>
+                <p id="big">Big blind: <span id="BB"></span></p>
                 <form method="post">
                     <input class="btn btn-outline-secondary" type="submit" name="blindnext" value="Raise blinds" />
                 </form>
@@ -177,17 +153,15 @@
         crossorigin="anonymous"></script>
 <script>
     var roomcode = $("#roomCode").html();
-
     var table = $("#table").html();
-
     var hrs = $('#Hours').html();
     var mns = $('#Minutes').html();
     var scs = $('#Seconds').html();
     var round = 1;
     var blind = $('#Blinds').html();
     var pauze = $('#Pauze').html();
+    var blindIndex = $('#BlindIndex').html()
     var started = $('#Started').html();
-    var blindsIndex = $('#BlindsIndex').html();
     console.log("roomcode" + roomcode);
     console.log("table" + table);
     console.log("blind" + blind);
@@ -253,12 +227,18 @@
 
             if (totalSecs % blind == 0) {   
                 $.ajax({
-                    url: "Tableview.cshtml",
+                    url: "BlindTimer.cshtml",
                     type: "get",
                     data: {
                         table: table,
                         roomCode: roomcode,
-                        blindsIndex: blindsIndex
+                        blindIndex: blindIndex
+                    },
+                    success: function (response) {
+                        response = response.split("-");
+                        $('#BlindIndex').innerHTML = response[0];
+                        $('#SB').innerHTML = response[1];
+                        $('#BB').innerHTML = response[2];
                     }
                 })
             }

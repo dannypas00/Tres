@@ -37,9 +37,9 @@ CREATE TABLE [dbo].[Room] (
 
 DROP TABLE Blinds;
 CREATE TABLE [dbo].[Blinds] (
-    [Room_Code] INT      NOT NULL,
-    [ID]        INT      NOT NULL,
-    [ValueSB]     INT      NOT NULL,
-    [ValueBB] INT NOT NULL, 
+    [Room_Code] INT NOT NULL,
+    [ID]        INT IDENTITY(0,1) NOT NULL,
+    [ValueSB]   INT NOT NULL,
+    [ValueBB]   INT NOT NULL,
     PRIMARY KEY CLUSTERED ([Room_Code] ASC, [ID] ASC)
 );

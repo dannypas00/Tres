@@ -47,7 +47,7 @@
                         id_new = id_old + 1;
                         Blind_Round = id_new;
                     }
-                    db.Execute("INSERT INTO Blinds (Room_Code, ID, ValueSB, ValueBB) VALUES (@0, @1, @2, @3)", urlcode, id_new, small, big);
+                    db.Execute("INSERT INTO Blinds (Room_Code, ValueSB, ValueBB) VALUES (@0, @1, @2, @3)", urlcode, small, big);
                 }
                 else
                 {

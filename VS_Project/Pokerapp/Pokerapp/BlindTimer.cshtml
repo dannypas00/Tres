@@ -6,9 +6,13 @@
 
     //get the url
     string url = Request.Url.AbsoluteUri;
-    string room = Request.QueryString["room"];
+    string roomCode = Request.QueryString["room"];
     string table = Request.QueryString["table"];
     string blind = Request.QueryString["blind"];
+    int index = Request.QueryString["blindIndex"].AsInt();
 
-    Response.Write(blind);
+    dynamic blinds = db.Query("SELECT ValueSB, ValueBB FROM Blinds WHERE Room_Code = @0 AND ID = @1", roomCode, index);
+    db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", index + 2, roomCode);
+
+    Response.Write(index + "-" + blinds.ValueSB + "-" + blinds.ValueBB);
 }
