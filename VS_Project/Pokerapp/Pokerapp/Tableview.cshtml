@@ -25,6 +25,8 @@
         secondhalfnamesCount = firsthalfnamesCount;
     }
 
+    //Gets startvalue
+    int startvalue = db.QueryValue("SELECT Start_Value FROM Room WHERE Room_Code = @0", roomCode);
 
     if (IsPost && !Request["blindnext"].IsEmpty())
     {
