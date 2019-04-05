@@ -1,43 +1,68 @@
 ﻿.gridd {
     display: grid;
-    grid-template-columns: 20% 20% 20% 20% 20%;
-    grid-template-rows: 20% 30% 30% 20%;
+    grid-template-columns: 10% 1min-content 10%;
+    grid-template-rows: 10% 1min-content 10%;
+    grid-template-areas: "white gridRow1 white2" ". tabloo ." "white3 gridRow2 white4";
+}
+.white3 {
+    grid-area: white3;
+}
+
+.white4 {
+    grid-area: white4;
+}
+
+.tabloo {
+    grid-area: tabloo;
+}
+
+.white {
+    grid-area: white;
+}
+
+.white2 {
+    grid-area: white2;
+}
+.gridRow1 {
+    display: grid;
+    grid-template-columns: 1auto 1auto 1auto 1auto;
+    grid-template-rows: minmax(75px, 75px);
+    grid-template-areas: ". . . .";
+    grid-area: gridRow1;
 }
 
 .chair {
     grid-column-start: auto;
     order: inherit;
-    position:relative;
+    position: relative;
+}
+
+.gridRow2 {
+    display: grid;
+    grid-template-columns: 1auto 1auto 1auto 1auto;
+    grid-template-rows: 1auto;
+    grid-template-areas: ". . . .";
+    grid-area: gridRow2;
 }
 
 .chair2 {
-    grid-row-start: 4;
     grid-column-start: auto;
     order: inherit;
-    position:relative;
 }
 
-.table {
-    flex: auto;
-    grid-area: 2 / 2 / 4 / 5;
+#pokerstool {
+    background-color: transparent;
+    background-image: url(../assets/Tableview/Pokerstool.png);
+    background-size: 100%;
+    border: none;
+    width: 90px;
+    height: 90px;
+    color: white;
+    object-fit: contain;
 }
 
-.white {
-    grid-column: 1;
-    grid-row: 1;
-}
+#pokertable {
+    background-color: transparent;
+    border: none;
 
-.white2 {
-    grid-column: 5;
-    grid-row: 1;
-}
-
-.white3 {
-    grid-column: 1;
-    grid-row: 4;
-}
-
-.white4 {
-    grid-column: 5;
-    grid-row-end: 5;
 }

@@ -34,11 +34,13 @@
 
         //If the clicked button is AddName and the number of players is smaller than the max players per table
         string name = Request["name"];
+        //Default active value
+        int active = 1;
         if (Validation.IsValid() && Request["AddName"] == "Add" && db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1", name, roomCode) is null)
         {
             if (playercount < maxplayerstotal)
             {
-                db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr, Rebuy) VALUES (@0, @1, @2, @3)", name, roomCode, number, rebuy);
+                db.Execute("INSERT INTO Players (Name, Room_Code, Tbl_nr, Rebuy, Active) VALUES (@0, @1, @2, @3, @4)", name, roomCode, number, rebuy, active);
                 name = null;
             }
             else

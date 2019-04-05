@@ -32,6 +32,7 @@ CREATE TABLE Players
     [Room_Code] INT           NOT NULL,
     [Tbl_nr]    INT           NULL,
     [Rebuy]     INT           NULL,
+	[Active]	INT			  NULL,
     PRIMARY KEY CLUSTERED ([Name] ASC, [Room_Code] ASC),
     CONSTRAINT [FK_Player_Room_Code] FOREIGN KEY ([Room_Code])
 		REFERENCES [dbo].[Room] ([Room_Code])
