@@ -42,12 +42,6 @@
     grid-row-end: 5;
 }
 
-#activebody {
-    position: absolute;
-    top: 25%;
-    left: 25%;
-
-}
 #pokerstool {
     background-color: transparent;
     background-image: url(../assets/Tableview/Pokerstool.png);
