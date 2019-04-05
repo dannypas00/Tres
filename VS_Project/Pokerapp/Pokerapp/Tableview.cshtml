@@ -14,7 +14,7 @@
     string Url = "RulesPageNL/" + roomCode;
     string urlBack = "Players/" + roomCode;
 
-    //Splits number of names in two 
+    //Splits number of names in two
     var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     int aantal = namen.Count();
     double gedeeld = aantal / 2;
@@ -105,6 +105,22 @@
         Back
     </div>
 </div>
+
+<div class="modal fade show in" data-target="#myModal" data-toggle="modal" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="v-cell">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Round is over</h4>
+                </div>
+                <div class="modal-body">
+                    Next round starts in: @room.Pause_Time
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="py-5">
     <!--Filling JS variables-->
     <div style="display: none;">
@@ -134,53 +150,57 @@
             }
             <div name="timer" class="timer"></div>
             <div class="round">This is round: <span id="rnumber"></span></div>
-        </div>
-        <div class="row">
-            <div class="col-md-2">
-                <p>Starting capital: @startvalue</p>
-                <p>Small blind: <span id="SB"></span></p>
-                <p>Big blind: <span id="BB"></span></p>
-                <form method="post">
-                    <input class="btn btn-outline-secondary" type="submit" name="blindnext" value="Raise blinds" />
-                </form>
+            <div class="round-timeheader">
+                <div style="display:none" name="round-timer" class="round-timer">
+                </div>
             </div>
-            <div class="gridd">
-                <div class="white"></div>
-                <div class="white2"></div>
-                <div class="white3"></div>
-                <div class="white4"></div>
-                @if (aantal <= 7)
-                {
-                    foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", roomCode, table, tweede))
+            <div class="row">
+                <div class="col-md-2">
+                    <p>Starting capital: @startvalue</p>
+                    <p>Small blind: <span id="SB"></span></p>
+                    <p>Big blind: <span id="BB"></span></p>
+                    <form method="post">
+                        <input class="btn btn-outline-secondary" type="submit" name="blindnext" value="Raise blinds" />
+                    </form>
+                </div>
+                <div class="gridd">
+                    <div class="white"></div>
+                    <div class="white2"></div>
+                    <div class="white3"></div>
+                    <div class="white4"></div>
+                    @if (aantal <= 7)
                     {
-                        <div class="chair2">
-                            <img src="~/stoel.png" alt="chair" style="width:75px;height:75px" />
-                            <b>@a.Name</b>
-                        </div>
+                        foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", roomCode, table, tweede))
+                        {
+                            <div class="chair2">
+                                <img src="~/stoel.png" alt="chair" style="width:75px;height:75px" />
+                                <b>@a.Name</b>
+                            </div>
+                        }
+
+                        foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, roomCode, table))
+                        {
+
+                            <div class="chair">
+                                <img src="~/stoel.png" alt="chair" style="width:75px;height:75px" />
+                                <b>@a.Name</b>
+                            </div>
+                        }
+                    }
+                    @if (aantal > 7)
+                    {
+                        foreach (var a in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name ASC", roomCode, table))
+                        {
+                            <div class="chair">
+                                <img src="stoel.png" alt="chair" style="width:75px;height:75px" />
+                                <b>@a.Name</b>
+                            </div>
+                        }
                     }
 
-                    foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, roomCode, table))
-                    {
-
-                        <div class="chair">
-                            <img src="~/stoel.png" alt="chair" style="width:75px;height:75px" />
-                            <b>@a.Name</b>
-                        </div>
-                    }
-                }
-                @if (aantal > 7)
-                {
-                    foreach (var a in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name ASC", roomCode, table))
-                    {
-                        <div class="chair">
-                            <img src="stoel.png" alt="chair" style="width:75px;height:75px" />
-                            <b>@a.Name</b>
-                        </div>
-                    }
-                }
-
-                <div class="table">
-                    <img src="~/tafel.png" name="pokertable" style="height:250px; width:100%" />
+                    <div class="table">
+                        <img src="~/tafel.png" name="pokertable" style="height:250px; width:100%" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -192,127 +212,272 @@
 <script src="https://code.jquery.com/jquery-3.3.1.js"
         integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
         crossorigin="anonymous"></script>
-@if(started == 1)
+@if (started == 1)
 {
-<script>
-    var roomcode = $("#roomCode").html();
-    var table = $("#table").html();
-    var hrs = $('#Hours').html();
-    var mns = $('#Minutes').html();
-    var scs = $('#Seconds').html();
-    var round = 1;
-    var blind = $('#Blinds').html();
-    var pauze = $('#Pauze').html();
-    var started = $('#Started').html();
-    console.log("roomcode" + roomcode);
-    console.log("table" + table);
-    console.log("blind" + blind);
-    console.log("pauze" + pauze);
-    console.log("started" + started);
+    <script>
+        var roomcode = $("#roomCode").html();
+        var table = $("#table").html();
+        var hrs = $('#Hours').html();
+        var mns = $('#Minutes').html();
+        var scs = $('#Seconds').html();
+        var round = 1;
+        var blind = $('#Blinds').html();
+        var pauze = $('#Pauze').html();
+        var started = $('#Started').html();
+        console.log("roomcode" + roomcode);
+        console.log("table" + table);
+        console.log("blind" + blind);
+        console.log("pauze" + pauze);
+        console.log("started" + started);
 
-    //Ajax connect with url Timer get the data roomcode
-    $.ajax({
-        url: "Timer.cshtml",
-        type: "get",
-        data: {
-            roomCode: roomcode,
-            table: table,
-            round: round
-        },
-        success: function (response) {
-            startTimer(response); // Returns timer from db
+        //Ajax connect with url Timer get the data roomcode
+        $.ajax({
+            url: "Timer.cshtml",
+            type: "get",
+            data: {
+                roomCode: roomcode,
+                table: table,
+                round: round
+            },
+            success: function (response) {
+                startTimer(response); // Returns timer from db
+            }
+        });
+        $.ajax({ //Second request
+            url: "RoundTimer.cshtml",
+            type: "get",
+            data: {
+                roomCode: roomcode,
+                table: table
+            },
+            success: function (response) {
+                roundTimer(response); // Returns timer from db
+            }
+        });
+        $.ajax({ //Third request
+            url: "PauseTimer.cshtml",
+            type: "get",
+            data: {
+                roomCode: roomcode,
+                table: table
+            },
+            success: function (response) {
+                pauseTimer(response); // Returns timer from db
+            }
+        });
+
+        function pauseTimer(timer) {
+            var timer = timer.split(":"); // Split timer
+
+            var targetHours = parseInt(timer[0]); // Parse hours to int
+            var targetMinutes = parseInt(timer[1]);
+            var targetSeconds = parseInt(timer[2]);
+
+            var currentHours = 0;
+            var currentMinutes = 0;
+            var currentSeconds = 0;
+
+            //Increment timer
+            setInterval(function () {
+                var displayHours = currentHours;
+                var displayMinutes = currentMinutes;
+                var displaySeconds = currentSeconds;
+
+                sessionStorage.setItem("pause-timer", displayHours);
+
+                if (currentHours.toString().length < 2) {
+                    displayHours = "0" + currentHours;
+                }
+
+                if (currentMinutes.toString().length < 2) {
+                    displayMinutes = "0" + currentMinutes;
+                }
+
+                if (currentSeconds.toString().length < 2) {
+                    displaySeconds = "0" + currentSeconds;
+                }
+
+                document.querySelector('.pause-timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
+
+                // if condition is met round + 1
+                if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
+
+                    $(".modal").modal("hide");
+                    $('.round-timeheader').append("<div style='display: none;' name='round-timer' class='round-timer'></div>");
+                    $("div.pause-timer").remove();
+                    $(".timer").show();
+
+
+                    currentHours = 0;
+                    currentMinutes = 0;
+                    currentSeconds = 0;
+                }
+
+                currentSeconds++;
+
+                if (currentSeconds == 60) {
+                    currentMinutes++;
+                    currentSeconds = 0;
+                }
+
+                if (currentMinutes == 60) {
+                    currentHours++;
+                    currentMinutes = 0;
+                }
+            }, 1000);
         }
-    });
 
-    function startTimer(timer) {
-        timer = timer.split(":"); // Split timer
+        function roundTimer(timer) {
+            var timer = timer.split(":"); // Split timer
 
-        var roundHours = parseInt(timer[0]); // Parse hours to int
-        var roundMinutes = parseInt(timer[1]);
-        var roundSeconds = parseInt(timer[2]);
+            var targetHours = parseInt(timer[0]); // Parse hours to int
+            var targetMinutes = parseInt(timer[1]);
+            var targetSeconds = parseInt(timer[2]);
 
-        var currentHours = hrs;
-        var currentMinutes = mns;
-        var currentSeconds = scs;
+            var currentHours = 0;
+            var currentMinutes = 0;
+            var currentSeconds = 0;
 
-        round = 1;
-        document.querySelector('#rnumber').innerHTML = round;
+            round = 1;
+            document.querySelector('#rnumber').innerHTML = round;
 
-        //Increment timer
-        setInterval(function () {
-            var totalSecs = currentSeconds + (currentMinutes * 60) + (currentHours * 1440);
+            //Increment timer
+            setInterval(function () {
+                var displayHours = currentHours;
+                var displayMinutes = currentMinutes;
+                var displaySeconds = currentSeconds;
 
-            console.log("Timer: " + timer[0] + ":" + timer[1] + ":" + timer[2]);
-            console.log("Blind: " + blind);
-            console.log("Blind Modulus " + parseInt(totalSecs % blind));
-            console.log(totalSecs);
-            var displayHours = currentHours;
-            var displayMinutes = currentMinutes;
-            var displaySeconds = currentSeconds;
+                var totalSecs = currentSeconds + (currentMinutes * 60) + (currentHours * 1440);
 
-            sessionStorage.setItem("timer", displayHours);
+                console.log("Timer: " + timer[0] + ":" + timer[1] + ":" + timer[2]);
+                console.log("Blind: " + blind);
+                console.log("Blind Modulus " + parseInt(totalSecs % blind));
+                console.log(totalSecs);
+
+                sessionStorage.setItem("round-timer", displayHours);
+
+                if (currentHours.toString().length < 2) {
+                    displayHours = "0" + currentHours;
+                }
+
+                if (currentMinutes.toString().length < 2) {
+                    displayMinutes = "0" + currentMinutes;
+                }
+
+                if (currentSeconds.toString().length < 2) {
+                    displaySeconds = "0" + currentSeconds;
+                }
+
+                document.querySelector('.round-timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
+
+                if (totalSecs % blind == 0) {
+                    $.ajax({
+                        url: "BlindTimer.cshtml",
+                        type: "get",
+                        data: {
+                            table: table,
+                            roomCode: roomcode,
+                        },
+                        success: function (response) {
+                            console.log("Response: " + response)
+                            response = response.split("-");
+                            console.log("Blinds Index: " + response[0]);
+                            console.log("Small Blind: " + response[1]);
+                            console.log("Big Blind: " + response[2]);
+                            document.querySelector('#BlindIndex').innerHTML = response[0];
+                            document.querySelector('#SB').innerHTML = response[1];
+                            document.querySelector('#BB').innerHTML = response[2];
+
+                        }
+                    })
+                }
+
+                // if condition is met round + 1
+                if (currentHours == targetHours && currentMinutes == targetMinutes && currentSeconds == targetSeconds) {
+
+                    $(".modal").modal("show");
+                    $('.modal-body').append("<div name='pause-timer' class='pause-timer'></div>");
+                    $("div.round-timer").remove();
+                    $(".timer").hide();
+
+                    currentHours = 0;
+                    currentMinutes = 0;
+                    currentSeconds = 0;
+                    round++;
+
+                }
+
+                currentSeconds++;
+
+                if (currentSeconds == 60) {
+                    currentMinutes++;
+                    currentSeconds = 0;
+                }
+
+                if (currentMinutes == 60) {
+                    currentHours++;
+                    currentMinutes = 0;
+                }
+            }, 1000);
+        }
+
+        function startTimer(timer) {
+            timer = timer.split(":"); // Split timer
+
+            var roundHours = parseInt(timer[0]); // Parse hours to int
+            var roundMinutes = parseInt(timer[1]);
+            var roundSeconds = parseInt(timer[2]);
+
+            var currentHours = hrs;
+            var currentMinutes = mns;
+            var currentSeconds = scs;
+
+            //Increment timer
+            setInterval(function () {
+
+                var displayHours = currentHours;
+                var displayMinutes = currentMinutes;
+                var displaySeconds = currentSeconds;
+
+                sessionStorage.setItem("timer", displayHours);
 
 
-            if (currentHours.toString().length < 2) {
-                displayHours = "0" + currentHours;
-            }
+                if (currentHours.toString().length < 2) {
+                    displayHours = "0" + currentHours;
+                }
 
-            if (currentMinutes.toString().length < 2) {
-                displayMinutes = "0" + currentMinutes;
-            }
+                if (currentMinutes.toString().length < 2) {
+                    displayMinutes = "0" + currentMinutes;
+                }
 
-            if (currentSeconds.toString().length < 2) {
-                displaySeconds = "0" + currentSeconds;
-            }
+                if (currentSeconds.toString().length < 2) {
+                    displaySeconds = "0" + currentSeconds;
+                }
 
-            document.querySelector('.timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
+                document.querySelector('.timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
 
-            if (totalSecs % blind == 0) {
-                $.ajax({
-                    url: "BlindTimer.cshtml",
-                    type: "get",
-                    data: {
-                        table: table,
-                        roomCode: roomcode,
-                    },
-                    success: function (response) {
-                        console.log("Response: " + response)
-                        response = response.split("-");
-                        console.log("Blinds Index: " + response[0]);
-                        console.log("Small Blind: " + response[1]);
-                        console.log("Big Blind: " + response[2]);
-                        document.querySelector('#BlindIndex').innerHTML = response[0];
-                        document.querySelector('#SB').innerHTML = response[1];
-                        document.querySelector('#BB').innerHTML = response[2];
+                // if condition is met round + 1
+                if (currentHours == roundHours && currentMinutes == roundMinutes && currentSeconds == roundSeconds) {
+                    currentHours = 0;
+                    currentMinutes = 0;
+                    currentSeconds = 0;
+                }
 
-                    }
-                })
-            }
+                currentSeconds++;
 
-            // if condition is met round + 1
-            if (currentHours == roundHours && currentMinutes == roundMinutes && currentSeconds == roundSeconds) {
-                round++;
-                document.querySelector('#rnumber').innerHTML = round;
-                currentHours = 0;
-                currentMinutes = 0;
-                currentSeconds = 0;
-            }
+                if (currentSeconds == 60) {
+                    currentMinutes++;
+                    currentSeconds = 0;
+                }
 
-            currentSeconds++;
+                if (currentMinutes == 60) {
+                    currentHours++;
+                    currentMinutes = 0;
+                }
+            }, 1000);
+        }
 
-            if (currentSeconds == 60) {
-                currentMinutes++;
-                currentSeconds = 0;
-            }
-
-            if (currentMinutes == 60) {
-                currentHours++;
-                currentMinutes = 0;
-            }
-        }, 1000);
-    }
-
-</script>
+    </script>
 }
 <script>
     jQuery(document).ready(function ($) {
