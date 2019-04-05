@@ -42,6 +42,8 @@
             })
         </script>
     }
+
+    //Raise blinds with the blindsrounds
     int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
     var blind_id = db.Query("SELECT Top (@0) ID FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
     int min_size = db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", roomCode);

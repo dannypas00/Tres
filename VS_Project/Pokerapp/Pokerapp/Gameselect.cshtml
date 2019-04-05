@@ -21,7 +21,7 @@
     var selectQuery = "SELECT * FROM Room WHERE Room_Code = @0";
     var selectRoomcodes = db.QuerySingle(selectQuery, roomCode);
 
-
+    //If the room does not exist, redirecting to settings with newly created roomcode
     if (selectRoomcodes == null)
     {
         if (IsPost && roomCode != selectRoomcodes)

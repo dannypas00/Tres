@@ -69,7 +69,7 @@
             string rowblind = Request.Form["rowblindform"];
             db.Execute("DELETE FROM Blinds WHERE ID = @0 AND Room_Code = @1", rowblind, urlcode);
         }
-        //Goes to other page
+        //Goes to other page if the total of blinds is bigger than zero else an alert is shown
         if (Request["Proceed"] == "Proceed")
         {
             int blinds = Convert.ToInt32(db.QueryValue("SELECT COUNT(ValueBB) FROM Blinds WHERE Room_Code = @0", urlcode));
