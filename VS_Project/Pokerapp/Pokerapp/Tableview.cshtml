@@ -106,6 +106,7 @@
     </div>
 </div>
 
+<!--Create modal box for pause-->
 <div class="modal fade show in" data-target="#myModal" data-toggle="modal" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="v-cell">
@@ -114,7 +115,7 @@
                     <h4 class="modal-title">Round is over</h4>
                 </div>
                 <div class="modal-body">
-                    Next round starts in: @room.Pause_Time
+                    Next round starts in: <b>@room.Pause_Time</b>
                 </div>
             </div>
         </div>
@@ -146,9 +147,11 @@
             }
             else
             {
-                <div name=timer class="timer">loading timer...</div>
+            <div class="timeheader">
+                <div name="timer" class="timer"></div>
+            </div>
             }
-            <div name="timer" class="timer"></div>
+
             <div class="round">This is round: <span id="rnumber"></span></div>
             <div class="round-timeheader">
                 <div style="display:none" name="round-timer" class="round-timer">
@@ -204,10 +207,8 @@
                 </div>
             </div>
         </div>
-    </div>
+        </div>
 </div>
-
-
 
 <script src="https://code.jquery.com/jquery-3.3.1.js"
         integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
@@ -305,8 +306,7 @@
                     $(".modal").modal("hide");
                     $('.round-timeheader').append("<div style='display: none;' name='round-timer' class='round-timer'></div>");
                     $("div.pause-timer").remove();
-                    $(".timer").show();
-
+                    $('.timeheader').append("<div name='timer' class='timer'></div>");
 
                     currentHours = 0;
                     currentMinutes = 0;
@@ -338,7 +338,6 @@
             var currentMinutes = 0;
             var currentSeconds = 0;
 
-            round = 1;
             document.querySelector('#rnumber').innerHTML = round;
 
             //Increment timer
@@ -398,7 +397,7 @@
                     $(".modal").modal("show");
                     $('.modal-body').append("<div name='pause-timer' class='pause-timer'></div>");
                     $("div.round-timer").remove();
-                    $(".timer").hide();
+                    $("div.timer").remove();
 
                     currentHours = 0;
                     currentMinutes = 0;
@@ -423,10 +422,6 @@
 
         function startTimer(timer) {
             timer = timer.split(":"); // Split timer
-
-            var roundHours = parseInt(timer[0]); // Parse hours to int
-            var roundMinutes = parseInt(timer[1]);
-            var roundSeconds = parseInt(timer[2]);
 
             var currentHours = hrs;
             var currentMinutes = mns;
@@ -455,13 +450,6 @@
                 }
 
                 document.querySelector('.timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
-
-                // if condition is met round + 1
-                if (currentHours == roundHours && currentMinutes == roundMinutes && currentSeconds == roundSeconds) {
-                    currentHours = 0;
-                    currentMinutes = 0;
-                    currentSeconds = 0;
-                }
 
                 currentSeconds++;
 
