@@ -8,7 +8,7 @@
     int timer = Request.QueryString["totalSecs"].AsInt();
     int blind = Request.QueryString["blind"].AsInt();
     var blindCount = db.Query("SELECT * FROM Blinds WHERE Room_Code = @0", roomCode).Count();
-    int index = timer / blind;
+    int index = timer / blind + 1;
     var blinds = db.QuerySingle("SELECT * FROM Blinds WHERE Room_Code = @0 AND ID = @1", roomCode, index);
     if (blinds != null)
     {
