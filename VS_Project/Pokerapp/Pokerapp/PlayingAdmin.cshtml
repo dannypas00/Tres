@@ -18,7 +18,7 @@
     int min_size = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", roomCode));
     if (players < (min_size + 1))
     {
-        Response.Redirect("~/AdminPage.cshtml");
+        Response.Redirect("~/AdminPage.cshtml/" + roomCode);
     }
 
     //Gets the chipworths 
@@ -72,15 +72,19 @@
 
     }
 }
-                <!--Styling for the chips-->
-                <style>
-                    .chipcentered {
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                    }
-                </style>
+<!--Styling for the chips-->
+<style>
+    .chipcentered {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .table tr:hover {
+        background: transparent;
+    }
+</style>
 <div id="begin" class="page-wrapper chiller-theme toggled">
     <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
         <i class="fas fa-bars"></i>
@@ -181,7 +185,7 @@
                     <!--Grid for the Playing admin page-->
 
                     <div class="row">
-                        <div class="col-md-9">
+                        <div class="col-md-8">
                             <div class="pAdminGrid" style="justify-content:center">
                                 <!--Position for the tables-->
                                 <div class="pTable" style="text-align: center">
@@ -210,7 +214,7 @@
                             </div>
                         </div>
                         <!--Position for the blinds-->
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <table class="table serial">
                                 <tbody>
                                     <tr>
@@ -236,23 +240,23 @@
                         </div>
                     </div>
                     <div class="footer">
-                        
+
                     </div>
                 </div>
             </div>
         </div>
     </main>
-    </div>
-    <script src="~/js/sidebarmenu.js"></script>
-    <script src="~/js/jquery.ba-outside-events.min.js"></script>
-    <script>
-        //Adds a number before the "first" column
-        function addRowCount(tableAttr) {
-            $(tableAttr).each(function () {
-                $('td:first-child', this).each(function (i) {
-                    $(this).before('<td>' + (i + 1) + '</td>');
-                });
+</div>
+<script src="~/js/sidebarmenu.js"></script>
+<script src="~/js/jquery.ba-outside-events.min.js"></script>
+<script>
+    //Adds a number before the "first" column
+    function addRowCount(tableAttr) {
+        $(tableAttr).each(function () {
+            $('td:first-child', this).each(function (i) {
+                $(this).before('<td>' + (i + 1) + '</td>');
             });
-        }
-        addRowCount('.serial');
-    </script>
+        });
+    }
+    addRowCount('.serial');
+</script>

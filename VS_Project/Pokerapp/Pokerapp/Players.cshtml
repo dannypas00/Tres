@@ -19,7 +19,7 @@
     int min_size = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", urlcode));
     if (players < (min_size + 1))
     {
-        Response.Redirect("~/AdminPage.cshtml");
+        Response.Redirect("~/AdminPage.cshtml/" + urlcode);
     }
 
     //Looks if user logged in
