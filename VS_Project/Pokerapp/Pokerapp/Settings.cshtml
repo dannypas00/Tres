@@ -27,8 +27,8 @@
     Validation.Add("round_time", Validator.StringLength(8, 8, "Incorrect format for round time please use hh:mm:ss"));
     Validation.Add("pause_time", Validator.StringLength(8, 8, "Incorrect format for pause time please use hh:mm:ss"));
     Validation.Add("blind_time", Validator.StringLength(8, 8, "Incorrect format for blind time please use hh:mm:ss"));
-    Validation.Add("min_table", Validator.Range(2, 99, "Minimum amount is 2 players per table"));
-    Validation.Add("max_table", Validator.Range(2, 10, "Maximum amount of players per table is 10"));
+    Validation.Add("min_table", Validator.Range(1, 99, "Minimum amount is 2 players per table"));
+    Validation.Add("max_table", Validator.Range(3, 10, "Maximum amount of players per table is 10"));
     Validation.Add("start_value", Validator.Range(1, 999999, "The range of the start value is 1 - 9.999.999"));
     Validation.Add("tbl_amount", Validator.Range(1, 99, "Please set a realistic amount of tables"));
     Validation.Add("rebuy", Validator.Range(0, 999, "Rebuy has to be 0 or higher"));
