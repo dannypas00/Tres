@@ -53,10 +53,10 @@
             int tbl_nr = i + 1;
             string table = i.ToString();
             Url = link[0] + "//" + link[2] + "/" + "Tableview.cshtml?roomcode=" + link[4] + "&table=" + tbl_nr;
-            <div class="pGrid">
+            <div class="pGrid clickable">
                 <div class="wSpace"></div>
                 <form method="post" class="pTable">
-                    <div class="clickable" style="background-image: url(/tafel.png);cursor:pointer; margin-top:15px">
+                    <div style="background-image: url(/tafel.png);cursor:pointer; margin-top:15px">
                         <div class="row">
                             <div class="col">
                                 <div class="text-center" style="justify-content:center; margin-top: 40%"><h3><b>Table @tbl_nr</b></h3></div>
