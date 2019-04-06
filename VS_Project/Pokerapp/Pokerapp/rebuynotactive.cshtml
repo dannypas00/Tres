@@ -17,8 +17,8 @@
 
     var names = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
     int amount = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
-    double devision = amount / 2;
-    int halfnamesCount = Convert.ToInt32(devision);
+    double division = amount / 2;
+    int halfnamesCount = Convert.ToInt32(division);
     int firsthalfnamesCount = Convert.ToInt32(amount - halfnamesCount);
     int secondhalfnamesCount = Convert.ToInt32(firsthalfnamesCount - 1);
     if (amount % 2 == 0)
@@ -37,28 +37,26 @@
 
 }
 
-
-<div class="gridd" id="activebody">
+<div class="gridd" id="activebody" style="text-align: center; max-height:500px; max-width:800px;">
 
     <div class="white"></div>
     <div class="white2"></div>
     <div class="white3"></div>
     <div class="white4"></div>
-    @if (amount <= 6)
-    {
-        foreach (var a in db.Query("SELECT TOP (@0) Name, Rebuy FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 AND Active = 1 ORDER BY Name ASC", firsthalfnamesCount, roomCode, table, firsthalfnamesCount))
+    <div class="tabloo" style=" height:auto; width:auto">
+        <img src="~/assets/Tableview/Pokertable.png" style="height: 100%; width: 100%; object-fit: contain" />
+    </div>
+    <div class="gridRow1">
+        @foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 AND Active = 1 ORDER BY Name ASC", firsthalfnamesCount, roomCode, table))
         {
-
 
             string player = (string)db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", a.Name, roomCode, table);
             string activeuniqueModal = player + roomCode;
 
-            // toggle modal
+            <!-- Button trigger modal -->
             <button id="pokerstool" value="@player" name="player" type="button" data-toggle="modal" data-target="#@activeuniqueModal">@player</button>
 
             int rebuy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", player, roomCode, table);
-
-
 
             <!-- Modal -->
             <div class="modal fade" id="@activeuniqueModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -67,126 +65,90 @@
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Options for: @player</h5>
                         </div>
-
-                        <div class="modal-body">
-                            @*<form method ="post" name="optionsform" class="optionsform">*@
-                            <div class="options-form-popup" id="player-options">
-                                <button type="submit" id="rebuy" onclick="updaterebuys('@player', '@roomCode', '@table')" value="@player" name="rebuy" data-dismiss="modal">Rebuy</button>
-
-                            </div>
-                            <div>
-                                <button value="@player" name="delete" onclick="deleteplayer('@player', '@roomCode', '@table')" data-dismiss="modal">Delete</button>
-                                @Html.Hidden("sender", player)
-                            </div>
-                            @*</form>*@
-                        </div>
-                        <div class="modal-footer">
-                            <div id="@player"><h5>@player you are now at @rebuy / @maxrebuy rebuys.</h5></div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-        }
-
-
-
-
-        <br />
-        <div>
-            <img id="pokertable" class="table" src="~/assets/Tableview/Pokertable.png" />
-        </div>
-        <br />
-        foreach (var a in db.Query("SELECT TOP (@2) Name, Rebuy FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1 ORDER BY Name DESC", roomCode, table, secondhalfnamesCount, secondhalfnamesCount))
-        {
-
-            string player = (string)db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", a.Name, roomCode, table);
-            string activeuniqueModal = player + roomCode;
-
-            // toggle modal
-            <button id="pokerstool" value="@player" name="player" type="button" data-toggle="modal" data-target="#@activeuniqueModal">@player</button>
-
-
-            int rebuy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", player, roomCode, table);
-
-
-
-            <!-- Modal -->
-            <div class="modal fade" id="@activeuniqueModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Options for: @player</h5>
-                        </div>
-
-                        <div class="modal-body">
-                            @*<form method ="post" name="optionsform" class="optionsform">*@
-                            <div class="options-form-popup" id="player-options">
-                                <button type="submit" id="rebuy" onclick="updaterebuys('@player', '@roomCode', '@table')" value="@player" name="rebuy" data-dismiss="modal">Rebuy</button>
-
-                            </div>
-                            <div>
-                                <button value="@player" name="delete" onclick="deleteplayer('@player', '@roomCode', '@table')" data-dismiss="modal">Delete</button>
-                                @Html.Hidden("sender", player)
-                            </div>
-                            @*</form>*@
-                        </div>
-                        <div class="modal-footer">
-                            <div id="@player"><h5>@player you are now at @rebuy / @maxrebuy rebuys.</h5></div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        }
-    }
-
-    @if (amount > 6)
-    {
-        {
-            foreach (var a in db.Query("SELECT TOP Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1 ORDER BY Name ASC", roomCode, table))
-            {
-
-                string player = (string)db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", a.Name, roomCode, table);
-                string activeuniqueModal2 = player + roomCode;
-
-                <!-- Button trigger modal -->
-                <button id="pokerstool" value="@player" name="player" type="button" data-toggle="modal" data-target="#@activeuniqueModal2">@player</button>
-
-
-                int rebuy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", player, roomCode, table);
-
-
-
-                <!-- Modal -->
-                <div class="modal fade" id="@activeuniqueModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Options for: @player</h5>
-                            </div>
-
+                        @if (rebuy < maxrebuy)
+                        {
                             <div class="modal-body">
-                                @*<form method ="post" name="optionsform" class="optionsform">*@
                                 <div class="options-form-popup" id="player-options">
-                                    <button type="submit" id="rebuy" onclick="updaterebuys('@player', '@roomCode', '@table')" value="@player" name="rebuy" data-dismiss="modal">Rebuy</button>
-
+                                    <button value="@player" type="submit" id="rebuy" onclick="updaterebuys('@player', '@roomCode', '@table')" name="rebuy" data-dismiss="modal">Rebuy</button>
                                 </div>
                                 <div>
                                     <button value="@player" name="delete" onclick="deleteplayer('@player', '@roomCode', '@table')" data-dismiss="modal">Delete</button>
                                     @Html.Hidden("sender", player)
                                 </div>
-                                @*</form>*@
                             </div>
                             <div class="modal-footer">
                                 <div id="@player"><h5>@player you are now at @rebuy / @maxrebuy rebuys.</h5></div>
                             </div>
+                        }
+                        @if (rebuy == maxrebuy)
+                        {
+                            <div class="modal-body">
+                                <div>
+                                    <button value="@player" name="delete" onclick="deleteplayer('@player', '@roomCode', '@table')" data-dismiss="modal">Delete</button>
+                                    @Html.Hidden("sender", player)
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div id="@player"><h5>@player you have reached the maximium of @maxrebuy rebuys.</h5></div>
+                            </div>
+                        }
 
-                        </div>
                     </div>
                 </div>
-            }
+            </div>
         }
-    }
+    </div>
+    <div class="gridRow2">
+        @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1 ORDER BY Name DESC", roomCode, table, secondhalfnamesCount))
+        {
+
+            string player = (string)db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", a.Name, roomCode, table);
+            string activeuniqueModal = player + roomCode;
+
+            <!-- Button trigger modal -->
+            <button id="pokerstool" value="@player" name="player" type="button" data-toggle="modal" data-target="#@activeuniqueModal">@player</button>
+
+            int rebuy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", player, roomCode, table);
+
+            <!-- Modal -->
+            <div class="modal fade" id="@activeuniqueModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Options for: @player</h5>
+                        </div>
+                        @if (rebuy < maxrebuy)
+                        {
+                            <div class="modal-body">
+                                <div class="options-form-popup" id="player-options">
+                                    <button value="@player" type="submit" id="rebuy" onclick="updaterebuys('@player', '@roomCode', '@table')" name="rebuy" data-dismiss="modal">Rebuy</button>
+                                </div>
+                                <div>
+                                    <button value="@player" name="delete" onclick="deleteplayer('@player', '@roomCode', '@table')" data-dismiss="modal">Delete</button>
+                                    @Html.Hidden("sender", player)
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div id="@player"><h5>@player you are now at @rebuy / @maxrebuy rebuys.</h5></div>
+                            </div>
+                        }
+                        @if (rebuy == maxrebuy)
+                        {
+                            <div class="modal-body">
+                                <div>
+                                    <button value="@player" name="delete" onclick="deleteplayer('@player', '@roomCode', '@table')" data-dismiss="modal">Delete</button>
+                                    @Html.Hidden("sender", player)
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div id="@player"><h5>@player you have reached the maximium of @maxrebuy rebuys.</h5></div>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+
+        }
+    </div>
 </div>

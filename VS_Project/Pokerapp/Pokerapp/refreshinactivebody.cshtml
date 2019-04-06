@@ -17,8 +17,8 @@
 
     var names = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
     int amount = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
-    double devision = amount / 2;
-    int halfnamesCount = Convert.ToInt32(devision);
+    double division = amount / 2;
+    int halfnamesCount = Convert.ToInt32(division);
     int firsthalfnamesCount = Convert.ToInt32(amount - halfnamesCount);
     int secondhalfnamesCount = Convert.ToInt32(firsthalfnamesCount - 1);
     if (amount % 2 == 0)
@@ -61,7 +61,6 @@
                     </div>
 
                     <div class="modal-body">
-                        @*<form method="post" name="optionsform" class="optionsform">*@
                         <div class="options-form-popup" id="player-options">
                             <button value="rebuy" name="rebuy" onclick="updaterebuys('@player', '@roomCode', '@table')" type="submit" data-dismiss="modal">Rebuy</button>
                             @Html.Hidden("sender", player)
@@ -69,7 +68,6 @@
                         <div class="modal-footer">
                             <div id="@player"><h5>@player you are now at @rebuy / @maxrebuy rebuys.</h5></div>
                         </div>
-                        @*</form>*@
                     </div>
 
                 </div>

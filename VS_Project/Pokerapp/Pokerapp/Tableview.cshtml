@@ -161,14 +161,14 @@
                 @foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 AND Active = 1 ORDER BY Name ASC", firsthalfnamesCount, roomCode, table))
                 {
 
-
                     string player = (string)db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", a.Name, roomCode, table);
                     string activeuniqueModal = player + roomCode;
-                    int rebuy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", player, roomCode, table);
+
                     <!-- Button trigger modal -->
-                    <div class="chair" style="display: inline-block">
-                        <button id="pokerstool" value="@player" name="player" type="button" data-toggle="modal" data-target="#@activeuniqueModal">@player</button>
-                    </div>
+                    <button id="pokerstool" value="@player" name="player" type="button" data-toggle="modal" data-target="#@activeuniqueModal">@player</button>
+
+                    int rebuy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", player, roomCode, table);
+
                     <!-- Modal -->
                     <div class="modal fade" id="@activeuniqueModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog" role="document">
@@ -176,27 +176,37 @@
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="exampleModalLabel">Options for: @player</h5>
                                 </div>
-
-                                <div class="modal-body">
-                                    @*<form method ="post" name="optionsform" class="optionsform">*@
-                                    <div class="options-form-popup" id="player-options">
-                                        <button type="submit" id="rebuy" onclick="updaterebuys('@player', '@roomCode', '@table')" value="@player" name="rebuy" data-dismiss="modal">Rebuy</button>
-
+                                @if (rebuy < maxrebuy)
+                                {
+                                    <div class="modal-body">
+                                        <div class="options-form-popup" id="player-options">
+                                            <button value="@player" type="submit" id="rebuy" onclick="updaterebuys('@player', '@roomCode', '@table')" name="rebuy" data-dismiss="modal">Rebuy</button>
+                                        </div>
+                                        <div>
+                                            <button value="@player" name="delete" onclick="deleteplayer('@player', '@roomCode', '@table')" data-dismiss="modal">Delete</button>
+                                            @Html.Hidden("sender", player)
+                                        </div>
                                     </div>
-                                    <div>
-                                        <button value="@player" name="delete" onclick="deleteplayer('@player', '@roomCode', '@table')" data-dismiss="modal">Delete</button>
-                                        @Html.Hidden("sender", player)
+                                    <div class="modal-footer">
+                                        <div id="@player"><h5>@player you are now at @rebuy / @maxrebuy rebuys.</h5></div>
                                     </div>
-                                    @*</form>*@
-                                </div>
-                                <div class="modal-footer">
-                                    <div id="@player"><h5>@player you are now at @rebuy / @maxrebuy rebuys.</h5></div>
-                                </div>
+                                }
+                                @if (rebuy == maxrebuy)
+                                {
+                                    <div class="modal-body">
+                                        <div>
+                                            <button value="@player" name="delete" onclick="deleteplayer('@player', '@roomCode', '@table')" data-dismiss="modal">Delete</button>
+                                            @Html.Hidden("sender", player)
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <div id="@player"><h5>@player you have reached the maximium of @maxrebuy rebuys.</h5></div>
+                                    </div>
+                                }
 
                             </div>
                         </div>
                     </div>
-
                 }
             </div>
             <div class="gridRow2">
@@ -205,11 +215,12 @@
 
                     string player = (string)db.QueryValue("SELECT Name FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", a.Name, roomCode, table);
                     string activeuniqueModal = player + roomCode;
-                    int rebuy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", player, roomCode, table);
+
                     <!-- Button trigger modal -->
-                    <div class="chair" style="display: inline-block">
-                        <button id="pokerstool" value="@player" name="player" type="button" data-toggle="modal" data-target="#@activeuniqueModal">@player</button>
-                    </div>
+                    <button id="pokerstool" value="@player" name="player" type="button" data-toggle="modal" data-target="#@activeuniqueModal">@player</button>
+
+                    int rebuy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", player, roomCode, table);
+
                     <!-- Modal -->
                     <div class="modal fade" id="@activeuniqueModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog" role="document">
@@ -217,22 +228,33 @@
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="exampleModalLabel">Options for: @player</h5>
                                 </div>
-
-                                <div class="modal-body">
-                                    @*<form method ="post" name="optionsform" class="optionsform">*@
-                                    <div class="options-form-popup" id="player-options">
-                                        <button type="submit" id="rebuy" onclick="updaterebuys('@player')" value="@player" name="rebuy" data-dismiss="modal">Rebuy</button>
-
+                                @if (rebuy < maxrebuy)
+                                {
+                                    <div class="modal-body">
+                                        <div class="options-form-popup" id="player-options">
+                                            <button value="@player" type="submit" id="rebuy" onclick="updaterebuys('@player', '@roomCode', '@table')" name="rebuy" data-dismiss="modal">Rebuy</button>
+                                        </div>
+                                        <div>
+                                            <button value="@player" name="delete" onclick="deleteplayer('@player', '@roomCode', '@table')" data-dismiss="modal">Delete</button>
+                                            @Html.Hidden("sender", player)
+                                        </div>
                                     </div>
-                                    <div>
-                                        <button value="@player" name="delete" onclick="deleteplayer('@player', '@roomCode', '@table')" data-dismiss="modal">Delete</button>
-                                        @Html.Hidden("sender", player)
+                                    <div class="modal-footer">
+                                        <div id="@player"><h5>@player you are now at @rebuy / @maxrebuy rebuys.</h5></div>
                                     </div>
-                                    @*</form>*@
-                                </div>
-                                <div class="modal-footer">
-                                    <div id="@player"><h5>@player you are now at @rebuy / @maxrebuy rebuys.</h5></div>
-                                </div>
+                                }
+                                @if (rebuy == maxrebuy)
+                                {
+                                    <div class="modal-body">
+                                        <div>
+                                            <button value="@player" name="delete" onclick="deleteplayer('@player', '@roomCode', '@table')" data-dismiss="modal">Delete</button>
+                                            @Html.Hidden("sender", player)
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <div id="@player"><h5>@player you have reached the maximium of @maxrebuy rebuys.</h5></div>
+                                    </div>
+                                }
 
                             </div>
                         </div>
@@ -265,9 +287,7 @@
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Options for: @player</h5>
                         </div>
-
                         <div class="modal-body">
-                            @*<form method="post" name="optionsform" class="optionsform">*@
                             <div class="options-form-popup" id="player-options">
                                 <button value="rebuy" name="rebuy" onclick="updaterebuys('@player', '@roomCode', '@table')" type="submit" data-dismiss="modal">Rebuy</button>
                                 @Html.Hidden("sender", player)
@@ -275,14 +295,10 @@
                             <div class="modal-footer">
                                 <div id="@player"><h5>@player you are now at @rebuy / @maxrebuy rebuys.</h5></div>
                             </div>
-                            @*</form>*@
                         </div>
-
                     </div>
                 </div>
             </div>
-
-
         }
     </div>
 
