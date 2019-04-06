@@ -106,23 +106,18 @@
         <div class="col-md-12 text-center">
             <h1>Table @table</h1>
         </div>
-        <div class="col-md-12 text-center">
-            @if (started == 0)
-            {
-                <div name=timer class="timer">Game not running</div>
-            }
-            else
-            {
-                <div name=timer class="timer">loading timer...</div>
-            }
-            <div name="timer" class="timer"></div>
-            <div class="round">This is round: <span id="rnumber">@round</span></div>
-        </div>
         <div class="row">
-            <div class="col-md-2">
-                <p>Starting capital: @startvalue</p>
-                <p>Small blind: <span id="SB">@small</span></p>
-                <p>Big blind: <span id="BB">@big</span></p>
+            <div class="col-md-2 text-center">
+                @if (started == 0)
+                {
+                    <div name=timer class="timer">Game not running</div>
+                }
+                else
+                {
+                    <div name=timer class="timer">loading timer...</div>
+                }
+                <div name="timer" class="timer"></div>
+                <div class="round">This is round: <span id="rnumber">@round</span></div>
             </div>
             <div class="col-md-8">
                 <div class="gridd" id="activebody" style="text-align: center; max-height:500px; max-width:800px;">
@@ -137,10 +132,9 @@
                     <div class="gridRow1">
                         @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", roomCode, table, secondhalfnamesCount))
                         {
-                        <div class="chair" style="display: inline-block">
-                            <img id="pokerstool" alt="chair" style="width:75px;height:75px" />
-                            <b>@a.Name</b>
-                        </div>
+                            <div class="chair" style="display: inline-block">
+                                <button id="pokerstool" value="@a.Name" name="player" type="button">@a.Name</button>
+                            </div>
                         }
                     </div>
                     <div class="gridRow2">
@@ -148,15 +142,19 @@
                         {
 
                             <div class="chair">
-                                <img id="pokerstool" alt="chair" style="width:75px;height:75px" />
-                                <b>@a.Name</b>
+                                <button id="pokerstool" value="@a.Name" name="player" type="button">@a.Name</button>
                             </div>
                         }
                     </div>
-                    </div>
                 </div>
             </div>
+            <div class="col-md-2">
+                <p>Starting capital: @startvalue</p>
+                <p>Small blind: <span id="SB">@small</span></p>
+                <p>Big blind: <span id="BB">@big</span></p>
+            </div>
         </div>
+    </div>
     </div>
 <div class="pauseModal modal fade show in" data-target="#myModal" data-toggle="modal" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">

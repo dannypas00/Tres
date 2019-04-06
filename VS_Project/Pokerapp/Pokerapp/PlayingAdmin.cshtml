@@ -21,7 +21,7 @@
         Response.Redirect("~/AdminPage.cshtml/" + roomCode);
     }
 
-    //Gets the chipworths 
+    //Gets the chipworths
     var chips = db.QuerySingle("SELECT Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth FROM Room WHERE  Room_Code=@0", roomCode);
 
     int chip1 = chips.Chip_1_Worth;
@@ -33,7 +33,7 @@
     //Looks if user logged in
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
-        Response.Redirect("~/Login.cshtml");
+        Response.Redirect("~/default.cshtml");
     }
     int playerCheck = db.Query("SELECT * FROM Players WHERE Room_Code=@0", roomCode).Count();
     dynamic tableCheck = db.QuerySingle("SELECT Tbl_Amount FROM Room WHERE Room_Code=@0", roomCode);
@@ -113,30 +113,14 @@
                     <li style="visibility:hidden"> -----------------------</li>
                     <li style="visibility:hidden"> -----------------------</li>
                     <li> <a href="~/Gameselect.cshtml/">Select a different game</a> </li>
-                    <li> <a href="~/Settings/@roomCode">Settings</a> </li>
-                    <li> <a href="~/Blinds/@roomCode">Blinds</a> </li>
+                    <li> <a href="~/Settings?t=t/@roomCode">Settings</a> </li>
+                    <li> <a href="~/Blinds?t=t/@roomCode">Blinds</a> </li>
                     <li> <a href="~/AdminPage/@roomCode">Change players</a> </li>
-                    <li style="visibility:hidden"> -----------------------</li>
-                    <li style="visibility:hidden"> -----------------------</li>
-                    <li style="visibility:hidden"> -----------------------</li>
-                    <li style="visibility:hidden"> -----------------------</li>
-                    <li style="visibility:hidden"> -----------------------</li>
-                    <li style="visibility:hidden"> -----------------------</li>
-                    <li style="visibility:hidden"> -----------------------</li>
-                    <li style="visibility:hidden"> -----------------------</li>
-                    <li style="visibility:hidden"> -----------------------</li>
-                    <li style="visibility:hidden"> -----------------------</li>
-                    <li style="visibility:hidden"> -----------------------</li>
-                    <li style="visibility:hidden"> -----------------------</li>
-                    <li style="visibility:hidden"> -----------------------</li>
-                    <li style="visibility:hidden"> -----------------------</li>
-                    <li style="visibility:hidden"> -----------------------</li>
                 </ul>
-                <form method="post">
-                    <button style="margin-left:50px" class="btn btn-warning" type="submit" value="delete" name="submit">Delete game</button>
-                </form>
-                <div style="bottom:0">
-
+                <div style="position:absolute; bottom:50px;">
+                    <form method="post">
+                        <button style="margin-left:50px" class="btn btn-warning" type="submit" value="delete" name="submit">Delete game</button>
+                    </form>
                 </div>
             </div>
             <!-- TOC end -->
@@ -193,23 +177,22 @@
                                     </div>
                                 </div>
                             </form>
-
                         </div>
                         <div class="row"></div>
                         <div style="justify-content:center; padding-top:20px" class="row"><p>Share this link: <a href=@linked>@linked</a></p></div>
                     </div>
                     <!--Grid for the Playing admin page-->
-
                     <div class="row">
-                        <div class="col-md-8">
-                            <div class="pAdminGrid" style="justify-content:center">
+                        <div class="col-md-1"></div>
+                        <div class="col-md-7 text-center">
+                            <div class="pAdminGrid">
                                 <!--Position for the tables-->
-                                <div class="pTable" style="text-align: center">
+                                <div class="pTable" style="margin: 0 auto">
                                     @for (int i = 0; i < tables; i++)
                                     {
                                         int tbl_Nr = i + 1;
                                         <div style="width:200px; display:inline-block; margin-right:10px" class="table-responsive">
-                                            <table class="table" style="width:200px; padding-left:20px">
+                                            <table class="table" style="width:200px; padding-left:20px; margin: 0 auto;">
                                                 <tbody>
                                                     <tr>
                                                         <th>Table @tbl_Nr</th>
@@ -242,7 +225,6 @@
                                     {
                                         int rowblindform = (int)row.ID;
                                         <tr>
-
                                             <td>
                                                 <p>@row.ValueSB</p>
                                             </td>
@@ -255,16 +237,12 @@
                             </table>
                         </div>
                     </div>
-                    <div class="footer">
-
-                    </div>
                 </div>
             </div>
         </div>
     </main>
 </div>
 <script src="~/js/sidebarmenu.js"></script>
-<script src="~/js/jquery.ba-outside-events.min.js"></script>
 <script>
     //Adds a number before the "first" column
     function addRowCount(tableAttr) {
