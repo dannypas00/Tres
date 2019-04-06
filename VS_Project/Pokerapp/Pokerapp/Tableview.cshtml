@@ -61,9 +61,9 @@
     int scs = startTime.Seconds;
     int started = Convert.ToInt32(room.Started);
     TimeSpan totalRoundTimer = room.Round_Time;
-    int round = (int) Math.Ceiling(startTime.TotalSeconds / totalRoundTimer.TotalSeconds);
+    int round = (int)Math.Ceiling(startTime.TotalSeconds / totalRoundTimer.TotalSeconds);
     var blinds = db.Query("SELECT ValueSB, ValueBB FROM Blinds WHERE Room_Code = @0", roomCode);
-    int blindsIndex = (int) Math.Floor(startTime.TotalSeconds / blindTime.TotalSeconds);
+    int blindsIndex = (int)Math.Floor(startTime.TotalSeconds / blindTime.TotalSeconds);
     int small;
     int big;
     try
@@ -322,13 +322,6 @@
 @if (started == 1)
 {
     <script>
-        //function test() {console.log("test"); }
-        //function loadrebuys(player) {
-        //    $.get("delete-ajax.cshtml?Name=" + player, function (data, status) {
-        //        console.log(data)
-        //        document.getElementById("demo").innerHTML = data;
-        //    });
-        //}
         function updaterebuys(player, roomCode, table) {
             $.get("tableviewrebuy.cshtml?name=" + player + "&roomcode=" + roomCode + "&table=" + table, function (data, status) {
                 console.log(data)
@@ -341,154 +334,169 @@
                 });
             });
         }
-    });
 
+        function deleteplayer(player, roomCode, table) {
 
-    <div class="pauseModal modal fade show in" data-target="#myModal" data-toggle="modal" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog">
-            <div class="v-cell">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">The game is paused</h4>
-                    </div>
-                    <div class="modal-body">
-                        Pause time left: <b id="pausedDuration">@pauseDuration</b>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="roundModal modal fade show in" data-target="#myModal" data-toggle="modal" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog">
-            <div class="v-cell">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">The round is over</h4>
-                    </div>
-                    <div class="modal-body">
-                        A new round will now start
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://code.jquery.com/jquery-3.3.1.js"
-            integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
-            crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
-    @if (started == 1)
-    {
-        <script>
-            var roomcode = $("#roomCode").html();
-            var table = $("#table").html();
-            var currentHours = $('#Hours').html();
-            var currentMinutes = $('#Minutes').html();
-            var currentSeconds = $('#Seconds').html();
-            var blind = $('#Blinds').html();
-            var pauseTime = $('#Pause').html();
-            var pauseDuration = $('#PauseDuration')
-            var started = $('#Started').html();
-            var timeTotal = $('#Time').html();
-            var totalRoundTimer = $('#totalRoundTimer').html();
-            var round = $('#rnumber').html();
-
-
-            //Increment timer
-            setInterval(function () {
-                totalSecs = currentSeconds + (currentMinutes + (currentHours * 60) * 60);
-                console.log("Timer: " + currentHours + ":" + currentMinutes + ":" + currentSeconds);
-                console.log("Blind: " + blind);
-                console.log("Blind Modulus " + parseInt(totalSecs % blind));
-                console.log(totalSecs);
-                var displayHours = currentHours;
-                var displayMinutes = currentMinutes;
-                var displaySeconds = currentSeconds;
-
-                sessionStorage.setItem("timer", displayHours);
-
-
-                if (currentHours.toString().length < 2) {
-                    displayHours = "0" + currentHours;
-                }
-
-                if (currentMinutes.toString().length < 2) {
-                    displayMinutes = "0" + currentMinutes;
-                }
-
-                if (currentSeconds.toString().length < 2) {
-                    displaySeconds = "0" + currentSeconds;
-                }
-
-                if (totalSecs % blind === 0) {
-                    $.ajax({
-                        url: "BlindTimer.cshtml",
-                        type: "get",
-                        data: {
-                            roomCode: roomcode,
-                            blind: blind,
-                            totalSecs: totalSecs
-                        },
-                        success: function (response) {
-                            response = response.split("-")
-                            console.log(response);
-                            console.log("SB: " + response[1] + "BB" + response[2]);
-                            document.querySelector('#SB').innerHTML = response[1];
-                            document.querySelector('#BB').innerHTML = response[2];
-                        }
-                    })
-                }
-                if (totalSecs % totalRoundTimer === 0) {
-                    round++;
-                    $('.roundModal').modal('show');
-                    setTimeout(function () {
-                        $('.roundModal').modal('hide');
-                    }, 2000);
-                }
-                /*if (totalSecs % pauseTime === 0) {
-                    console.log("Pauze!");
-                    $('.pauseModal').modal('show');
-                    setTimeout(function () {
-                        document.querySelector('#pauseDuration').innerHTML = pauseDuration;
-
-                        //$('.pauseModal').modal('hide');
-                    }, 1000 * pauseDuration);
-                }*/
-                currentSeconds++;
-                console.log("Pause duration: " + pauseDuration);
-
-                if (currentSeconds === 60) {
-                    currentMinutes++;
-                    currentSeconds = 0;
-                }
-
-                if (currentMinutes === 60) {
-                    currentHours++;
-                    currentMinutes = 0;
-                }
-
-                //Update Page
-                document.querySelector('.timer').innerHTML = "Game Time: " + displayHours + ":" + displayMinutes + ":" + displaySeconds;
-                document.querySelector('#rnumber').innerHTML = round;
-                console.log("Pause time: " + pauseTime);
-                console.log("Pause modulus: " + totalSecs % pauseTime);
-                console.log("Round: " + totalSecs / totalRoundTimer);
-                console.log("Round Time: " + totalRoundTimer);
-            }, 1000);
-
-        </script>
-    }
-}
-    <script>
-        jQuery(document).ready(function ($) {
-            $(".clickable").click(function () {
-                window.location = $(this).find("a:first").attr("href");
+            $.get("delete-ajax.cshtml?name=" + player + "&roomcode=" + roomCode + "&table=" + table, function (data, status) {
+                console.log(data)
+                document.getElementById(player).innerHTML = data;
+                $.get("refreshinactivebody.cshtml?name=" + player + "&roomcode=" + roomCode + "&table=" + table, function (data, status) {
+                    document.getElementById("inactivebody").innerHTML = data;
+                    $.get("rebuynotactive.cshtml?name=" + player + "&roomcode=" + roomCode + "&table=" + table, function (data, status) {
+                        document.getElementById("activebody").innerHTML = data;
+                    });
+                });
             });
-        });
-        jQuery(document).ready(function ($) {
-            $(".clickableBtn").click(function () {
-                window.location = $(this).data("href");
-            });
-        });
+        }
     </script>
+}
+
+
+<div class="pauseModal modal fade show in" data-target="#myModal" data-toggle="modal" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="v-cell">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">The game is paused</h4>
+                </div>
+                <div class="modal-body">
+                    Pause time left: <b id="pausedDuration">@pauseDuration</b>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="roundModal modal fade show in" data-target="#myModal" data-toggle="modal" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="v-cell">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">The round is over</h4>
+                </div>
+                <div class="modal-body">
+                    A new round will now start
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.js"
+        integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+@if (started == 1)
+{
+    <script>
+        var roomcode = $("#roomCode").html();
+        var table = $("#table").html();
+        var currentHours = $('#Hours').html();
+        var currentMinutes = $('#Minutes').html();
+        var currentSeconds = $('#Seconds').html();
+        var blind = $('#Blinds').html();
+        var pauseTime = $('#Pause').html();
+        var pauseDuration = $('#PauseDuration')
+        var started = $('#Started').html();
+        var timeTotal = $('#Time').html();
+        var totalRoundTimer = $('#totalRoundTimer').html();
+        var round = $('#rnumber').html();
+
+
+        //Increment timer
+        setInterval(function () {
+            totalSecs = currentSeconds + (currentMinutes + (currentHours * 60) * 60);
+            console.log("Timer: " + currentHours + ":" + currentMinutes + ":" + currentSeconds);
+            console.log("Blind: " + blind);
+            console.log("Blind Modulus " + parseInt(totalSecs % blind));
+            console.log(totalSecs);
+            var displayHours = currentHours;
+            var displayMinutes = currentMinutes;
+            var displaySeconds = currentSeconds;
+
+            sessionStorage.setItem("timer", displayHours);
+
+
+            if (currentHours.toString().length < 2) {
+                displayHours = "0" + currentHours;
+            }
+
+            if (currentMinutes.toString().length < 2) {
+                displayMinutes = "0" + currentMinutes;
+            }
+
+            if (currentSeconds.toString().length < 2) {
+                displaySeconds = "0" + currentSeconds;
+            }
+
+            if (totalSecs % blind === 0) {
+                $.ajax({
+                    url: "BlindTimer.cshtml",
+                    type: "get",
+                    data: {
+                        roomCode: roomcode,
+                        blind: blind,
+                        totalSecs: totalSecs
+                    },
+                    success: function (response) {
+                        response = response.split("-")
+                        console.log(response);
+                        console.log("SB: " + response[1] + "BB" + response[2]);
+                        document.querySelector('#SB').innerHTML = response[1];
+                        document.querySelector('#BB').innerHTML = response[2];
+                    }
+                })
+            }
+            if (totalSecs % totalRoundTimer === 0) {
+                round++;
+                $('.roundModal').modal('show');
+                setTimeout(function () {
+                    $('.roundModal').modal('hide');
+                }, 2000);
+            }
+            /*if (totalSecs % pauseTime === 0) {
+                console.log("Pauze!");
+                $('.pauseModal').modal('show');
+                setTimeout(function () {
+                    document.querySelector('#pauseDuration').innerHTML = pauseDuration;
+
+                    //$('.pauseModal').modal('hide');
+                }, 1000 * pauseDuration);
+            }*/
+            currentSeconds++;
+            console.log("Pause duration: " + pauseDuration);
+
+            if (currentSeconds === 60) {
+                currentMinutes++;
+                currentSeconds = 0;
+            }
+
+            if (currentMinutes === 60) {
+                currentHours++;
+                currentMinutes = 0;
+            }
+
+            //Update Page
+            document.querySelector('.timer').innerHTML = "Game Time: " + displayHours + ":" + displayMinutes + ":" + displaySeconds;
+            document.querySelector('#rnumber').innerHTML = round;
+            console.log("Pause time: " + pauseTime);
+            console.log("Pause modulus: " + totalSecs % pauseTime);
+            console.log("Round: " + totalSecs / totalRoundTimer);
+            console.log("Round Time: " + totalRoundTimer);
+        }, 1000);
+
+    </script>
+}
+}
+<script>
+    jQuery(document).ready(function ($) {
+        $(".clickable").click(function () {
+            window.location = $(this).find("a:first").attr("href");
+        });
+    });
+    jQuery(document).ready(function ($) {
+        $(".clickableBtn").click(function () {
+            window.location = $(this).data("href");
+        });
+    });
+</script>

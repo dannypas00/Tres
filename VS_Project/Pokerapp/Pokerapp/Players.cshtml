@@ -13,29 +13,12 @@
     string[] link = prelink.Split('/');
     int urlcode = Convert.ToInt32(link[4]);
 
-    //Show message if players are lower than min_size to contact the admin
+    //Return to login if players are lower than min_size
     int players = Convert.ToInt32(db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0", urlcode));
     int min_size = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", urlcode));
-    bool cookies = false;
-    if (Request.Cookies["LoginCookie"] is null)
-    {
-        cookies = false;
-    }
-    else
-    {
-        cookies = true;
-    }
-    if (players <= (min_size) && cookies == true)
+    if (players < (min_size + 1))
     {
         Response.Redirect("~/AdminPage.cshtml/" + urlcode);
-    }
-    else if (players <= (min_size) && cookies == false)
-    {
-        <script>
-            $(document).ready(function () {
-                alert("There are too few players in the game, ask your admin to add more players or to stop the game.");
-            })
-        </script>
     }
 
     int amount = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
@@ -53,71 +36,53 @@
     }
 </style>
 
-    <div class="header">
-        <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
-            Rules
-        </div>
+<div class="header">
+    <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
+        Rules
     </div>
-    <div class="py-5" >
-        <div class="col-md-12 text-center">
-            <h1>Tables</h1>
-        </div>
-
+</div>
+<div class="py-5">
+    <div class="col-md-12 text-center">
+        <h1>Tables</h1>
+    </div>
+    <div class="row text-center">
         <!--The 2x6 grid-->
-        <div class="bpGrid">
-        @for (int i = 0; i < amount; i++)
-        {
-            int tbl_nr = i + 1;
-            string table = i.ToString();
-            Url = link[0] + "//" + link[2] + "/" + "Tableview.cshtml?roomcode=" + link[4] + "&table=" + tbl_nr;
-            <!--This gets put in the 2x6 grid and is a grid for the table and the names-->
-        <div class="pGrid" style="margin-left:30px; text-align:center">
-            <div class="clickable" style="background: url(../assets/Tableview/Pokertable.png) no-repeat; background-size: 100%; cursor:pointer">
-                <div class="text-center" style="display:inline-block; margin-top:30px"><h3><b>Table @tbl_nr</b></h3></div>
-                <!--Table gets put in the grid-->
-                <form method="post" class="pTable">
-                    <div class="row">
-                        <div class="col-md-12 clickable" style="background-image: url(/tafel.png);cursor:pointer; width:400px;height:100%; margin-top:15px">
+        <div class="bpGrid" style="margin: 0 auto">
+            @for (int i = 0; i < amount; i++)
+            {
+                int tbl_nr = i + 1;
+                string table = i.ToString();
+                Url = link[0] + "//" + link[2] + "/" + "Tableview.cshtml?roomcode=" + link[4] + "&table=" + tbl_nr;
+                <!--This gets put in the 2x6 grid and is a grid for the table and the names-->
+                <div class="pGrid" style="margin-left:30px; text-align:center">
+                    <div class="clickable" style="background: url(../assets/Tableview/Pokertable.png) no-repeat; background-size: 100%; cursor:pointer">
+                        <div class="text-center" style="display:inline-block; margin-top:30px"><h3><b>Table @tbl_nr</b></h3></div>
+                        <!--Table gets put in the grid-->
+                        <form method="post" class="pTable">
                             <div class="row">
-                                <div class="col">
-                                    <div class="text-center" style="justify-content:center; margin-top: 40%"><h3><b>Table @tbl_nr</b></h3></div>
-                                </div>
                                 <div class="col d-flex flex-column align-items-start justify-content-center order-1 order-lg-2" style="padding-top:5px">
-
-
-                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
-                                    {
-                                        <div class="flex-column">
-                                            <p><b>@row.Name </b></p>
-                                        </div>
-                                    }
-
-
-                                    <input type="hidden" name="roomcode" value=@urlcode />
-                                    <a href=@Url></a>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <input type="hidden" name="roomcode" value=@urlcode />
-                    <a href=@Url></a>
+                            <input type="hidden" name="roomcode" value=@urlcode />
+                            <a href=@Url></a>
 
-                </form>
-            </div>
-            <!--Grid for the names-->
-            <div class="pNGrid">
-                @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
-                {   <!--Names get put in the grid-->
-                    <div class="pNames" style="padding-bottom:10px; padding-left:10px">
-                        <p><b>@row.Name </b></p>
+                        </form>
                     </div>
-                }
-            </div>
-        </div>
-        }
+                    <!--Grid for the names-->
+                    <div class="pNGrid">
+                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
+                        {<!--Names get put in the grid-->
+                            <div class="pNames" style="padding-bottom:10px; padding-left:10px">
+                                <p><b>@row.Name </b></p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
         </div>
     </div>
+</div>
 
 <script>
     /*Makes Rules page button clickable */
