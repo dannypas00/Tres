@@ -4,6 +4,7 @@
     grid-template-rows: 10% 1min-content 10%;
     grid-template-areas: "white gridRow1 white2" ". tabloo ." "white3 gridRow2 white4";
 }
+
 .white3 {
     grid-area: white3;
 }
@@ -23,13 +24,14 @@
 .white2 {
     grid-area: white2;
 }
+
 .gridRow1 {
     display: grid;
     grid-template-columns: 1auto 1auto 1auto 1auto;
     grid-template-rows: 1auto;
     grid-template-areas: ". . . .";
     grid-area: gridRow1;
-    grid-row-gap:30px;
+    grid-row-gap: 30px;
 }
 
 .chair {
@@ -44,7 +46,7 @@
     grid-template-rows: 1auto;
     grid-template-areas: ". . . .";
     grid-area: gridRow2;
-    grid-row-gap:10px;
+    grid-row-gap: 10px;
 }
 
 .chair2 {
@@ -66,5 +68,4 @@
 #pokertable {
     background-color: transparent;
     border: none;
-
 }
