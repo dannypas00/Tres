@@ -1,0 +1,10 @@
+﻿@using WebMatrix.Data;
+@{ 
+    //get the url
+    string roomCode = Request.QueryString["roomCode"];
+    int timer = Request.QueryString["totalSecs"].AsInt();
+    int roundTimer = Request.QueryString["roundTimer"].AsInt();
+
+    int round = timer / roundTimer;
+    Response.Write(round+1);
+}
