@@ -113,12 +113,10 @@
                     <li style="visibility:hidden"> -----------------------</li>
                     <li style="visibility:hidden"> -----------------------</li>
                     <li> <a href="~/Gameselect.cshtml/">Select a different game</a> </li>
-                    <li> <a href="~/Settings/@roomCode">Settings</a> </li>
-                    <li> <a href="~/Blinds/@roomCode">Blinds</a> </li>
+                    <li> <a href="~/Settings?t=t/@roomCode">Settings</a> </li>
+                    <li> <a href="~/Blinds?t=t/@roomCode">Blinds</a> </li>
                     <li> <a href="~/AdminPage/@roomCode">Change players</a> </li>
-
                 </ul>
-                
                 <div style="position:absolute; bottom:50px;">
                     <form method="post">
                         <button style="margin-left:50px" class="btn btn-warning" type="submit" value="delete" name="submit">Delete game</button>
@@ -130,19 +128,19 @@
         <!-- Footer with chip values start -->
         <div class="sidebar-footer">
             <a>
-                <img src="~/Chip_White.png" alt="chip1" style="width:50px;height:50px" />
+                <img src="~/assets/Chips/Chip_White.png" alt="chip1" style="width:50px;height:50px" />
                 <strong><span class="chipcentered" style="color:black">@chip1 </span></strong>
             </a>
             <a>
-                <img src="~/Chip_Red.png" alt="chip2" style="width:50px;height:50px" />
+                <img src="~/assets/Chips/Chip_Red.png" alt="chip2" style="width:50px;height:50px" />
                 <strong><span class="chipcentered" style="color:black">@chip2</span></strong>
             </a>
             <a>
-                <img src="~/Chip_Blue.png" alt="chip3" style="width:50px;height:50px" />
+                <img src="~/assets/Chips/Chip_Blue.png" alt="chip3" style="width:50px;height:50px" />
                 <strong><span class="chipcentered" style="color:black">@chip3</span></strong>
             </a>
             <a>
-                <img src="~/Chip_Green.png" alt="chip4" style="width:50px;height:50px" />
+                <img src="~/assets/Chips/Chip_Green.png" alt="chip4" style="width:50px;height:50px" />
                 <strong><span class="chipcentered" style="color:black">@chip4</span></strong>
             </a>
             <a>
@@ -179,13 +177,11 @@
                                     </div>
                                 </div>
                             </form>
-
                         </div>
                         <div class="row"></div>
                         <div style="justify-content:center; padding-top:20px" class="row"><p>Share this link: <a href=@linked>@linked</a></p></div>
                     </div>
                     <!--Grid for the Playing admin page-->
-
                     <div class="row">
                         <div class="col-md-8">
                             <div class="pAdminGrid" style="justify-content:center">
@@ -228,7 +224,6 @@
                                     {
                                         int rowblindform = (int)row.ID;
                                         <tr>
-
                                             <td>
                                                 <p>@row.ValueSB</p>
                                             </td>
@@ -240,9 +235,6 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-                    <div class="footer">
-
                     </div>
                 </div>
             </div>

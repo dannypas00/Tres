@@ -11,15 +11,15 @@
     Database db = Database.OpenConnectionString(connectionString, provider);
 
     //Retrieving the url code
-    string url = Request.Url.AbsolutePath;
-    string urlcode = url.Substring(url.Length - 7);
-    int code = Convert.ToInt32(urlcode);
+    string preUrl = Request.Url.AbsoluteUri;
+    string[] link = preUrl.Split('/');
+    int code = Convert.ToInt32(link[4]);
 
     #region Validators
     //check if cookie is still valid
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
-        Response.Redirect("~/Login.cshtml");
+        Response.Redirect("~/default.cshtml");
     }
 
     //Validation for input
@@ -94,11 +94,13 @@
         var blind = Request["blind_time"];
         int value = Convert.ToInt32(Request["start_value"]);
         int tbl_amount = Convert.ToInt32(Request["tbl_amount"]);
-        int chip1 = Convert.ToInt32(Request["chip1"]);
-        int chip2 = Convert.ToInt32(Request["chip2"]);
-        int chip3 = Convert.ToInt32(Request["chip3"]);
-        int chip4 = Convert.ToInt32(Request["chip4"]);
-        int chip5 = Convert.ToInt32(Request["chip5"]);
+
+        int[] chips = new int[] { Convert.ToInt32(Request["chip1"]),
+            Convert.ToInt32(Request["chip2"]),
+            Convert.ToInt32(Request["chip3"]),
+            Convert.ToInt32(Request["chip4"]),
+            Convert.ToInt32(Request["chip5"]) };
+
         var started = 0;
         today = DateTime.Now;
 
@@ -106,22 +108,22 @@
         if (check == code)
         {
             db.Execute("UPDATE Room SET Room_Code = @0, Room_Name = @1, Tbl_Min_Size = @2, Started = @3, Chip_1_Worth = @4, Chip_2_Worth = @5, Chip_3_Worth = @6, Chip_4_Worth = @7, Chip_5_Worth = @8, Round_Time = @9, Pause_Time = @10, Blind_Time = @11, Allow_Rebuy = @12, Start_Value = @13, Tbl_Amount = @14, Tbl_Max_Size = @15, Room_Create_Date = @16 WHERE Room_Code = @0"
-            , code, roomname, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, today);
+            , code, roomname, min_table_size, started, chips[0], chips[1], chips[2], chips[3], chips[4], time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, today);
         }
         else
         {
             db.Execute("INSERT INTO Room (Room_Code, Room_Name, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Blind_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size, Room_Create_Date)" +
-            "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16)", code, roomname, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, today);
+            "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16)", code, roomname, min_table_size, started, chips[0], chips[1], chips[2], chips[3], chips[4], time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, today);
         }
     }
-#endregion
+    #endregion
     string warning = "";
     //continues to next page
     if (IsPost && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {
         if (Validation.IsValid())
         {
-            if (Request["Proceed"] == "Proceed")
+            if (Request["Proceed"] == "Proceed" || Request["Proceed"] == "Admin Page")
             {
                 //Checks for roundtime, pausetime and blindtime so it contains no letters
                 //And checks if time has a value of hh:mm:ss by splitting it with ':'
@@ -208,16 +210,22 @@
                 if (check >= 3)
                 {
                     Save();
-                    Response.Redirect("~/Blinds.cshtml/" + code);
+                    if(Request.QueryString["t"] == null) {
+                        Response.Redirect("~/Blinds.cshtml/" + code);
+                    }
+                    else
+                    {
+                        Response.Redirect("~/PlayingAdmin.cshtml/" + code);
+                    }
                 }
             }
             else
             {
-                Response.Redirect("~/Login.cshtml");
+                Response.Redirect("~/default.cshtml");
             }
         }
     }
-    }
+}
     }
 
 
@@ -283,7 +291,13 @@
                         <div class="form-group col-md-6"> <label for="form14">Value chip 4</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form14" placeholder="9001" name="chip4" value="@chip_worth4" required> </div>
                         <div class="form-group col-md-6"> <label for="form15">Value chip 5</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form15" placeholder="9001" name="chip5" value="@chip_worth5" required> </div>
                     </div>
+                    @if(Request.QueryString["t"] == null) {
                     <input class="btn btn-primary" type="submit" name="Proceed" value="Proceed" />
+                    }
+                    else
+                    {
+                        <input class="btn btn-primary" type="submit" name="Proceed" value="Admin Page"/>
+                    }
                 </form>
             </div>
         </div>

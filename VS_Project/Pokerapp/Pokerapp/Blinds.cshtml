@@ -14,8 +14,9 @@
     Validation.Add("big", Validator.Range(1, 999999999999999999, "Big blind has to be higher than or equeal to 1"));
 
     //request the last 7 digits of the urgl (roomcode)
-    string url = Request.Url.AbsolutePath;
-    string urlcode = url.Substring(url.Length - 7);
+    string preUrl = Request.Url.AbsoluteUri;
+    string[] link = preUrl.Split('/');
+    int urlcode = Convert.ToInt32(link[4]);
 
     string error = "";
     //Count blinds
@@ -41,7 +42,7 @@
                 //    }
 
                 //Compares values, if values are lower than last value it will not be added to the database
-                if ((small_blind <= small) && (big_blind <= big))
+                if ((small_blind < small) && (big_blind < big) && big > small)
                 {
                     int id_old = Convert.ToInt32(db.QueryValue("SELECT ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID DESC", urlcode));
                     int id_new = 1;
@@ -69,13 +70,19 @@
             db.Execute("DELETE FROM Blinds WHERE ID = @0 AND Room_Code = @1", rowblind, urlcode);
         }
         //Goes to other page if the total of blinds is bigger than zero else an alert is shown
-        if (Request["Proceed"] == "Proceed")
+        if (Request["Proceed"] == "Proceed" || Request["Proceed"] == "Admin Page")
         {
             int blinds = Convert.ToInt32(db.QueryValue("SELECT COUNT(ValueBB) FROM Blinds WHERE Room_Code = @0", urlcode));
             if (blinds > 0)
             {
-                string Url = "AdminPage.cshtml/" + urlcode;
-                Response.Redirect("~/" + Url);
+                if(Request.QueryString["t"] == null) {
+                    string Url = "AdminPage.cshtml/" + urlcode;
+                    Response.Redirect("~/" + Url);
+                }
+                else
+                {
+                    Response.Redirect("~/PlayingAdmin.cshtml/" + urlcode);
+                }
             }
             else
             {
@@ -88,8 +95,6 @@
         }
 
     }
-}
-
 }
 <head>
     <style>
@@ -169,7 +174,14 @@
                                         </div>
                                     </div>
                                     <form method="post">
-                                        <button class="btn btn-primary" type="submit" name="Proceed" value="Proceed">Proceed</button>
+                                        @if (Request.QueryString["t"] == null)
+                                        {
+                                            <input class="btn btn-primary" type="submit" name="Proceed" value="Proceed" />
+                                        }
+                                        else
+                                        {
+                                            <input class="btn btn-primary" type="submit" name="Proceed" value="Admin Page" />
+                                        }
                                     </form>
                             }
                         </div>
