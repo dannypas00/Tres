@@ -200,102 +200,103 @@
         integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
         crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
-@if(started == 1)
-{
 <script>
     var roomcode = $("#roomCode").html();
-    var table = $("#table").html();
     var currentHours = $('#Hours').html();
     var currentMinutes = $('#Minutes').html();
     var currentSeconds = $('#Seconds').html();
     var blind = $('#Blinds').html();
     var pauseTime = $('#Pause').html();
-    var pauseDuration = $('#PauseDuration')
-    var started = $('#Started').html();
-    var timeTotal = $('#Time').html();
+    var pauseDuration = $('#PauseDuration').html()
     var totalRoundTimer = $('#totalRoundTimer').html();
     var round = $('#rnumber').html();   
 
-    
     //Increment timer
     setInterval(function () {
-        totalSecs = currentSeconds + (currentMinutes * 60) + (currentHours * 3600); 
-        console.log("Timer: " + currentHours + ":" + currentMinutes + ":" + currentSeconds);
-        var displayHours = currentHours;
-        var displayMinutes = currentMinutes;
-        var displaySeconds = currentSeconds;
-    
-        sessionStorage.setItem("timer", displayHours);
-    
-    
-        if (currentHours.toString().length < 2) {
-            displayHours = "0" + currentHours;
-        }
-    
-        if (currentMinutes.toString().length < 2) {
-            displayMinutes = "0" + currentMinutes;
-        }
-    
-        if (currentSeconds.toString().length < 2) {
-            displaySeconds = "0" + currentSeconds;
-        }
-    
-        if (totalSecs % blind === 0) {
-            $.ajax({
-                url: "BlindTimer.cshtml",
-                type: "get",
-                data: {
-                    roomCode: roomcode,
-                    blind: blind,
-                    totalSecs: totalSecs
-                },
-                success: function (response) {
-                    response = response.split("-");
-                    document.querySelector('#SB').innerHTML = response[1];
-                    document.querySelector('#BB').innerHTML = response[2];
-                }
-            })
-        }
-        console.log("Round modulus: " + totalSecs % totalRoundTimer);
-        console.log("Total round time: " + totalRoundTimer);
-        console.log("Total Seconds: " + totalSecs);
-        if (totalSecs % totalRoundTimer === 0) {
-            round++;
-            $('.roundModal').modal('show');
-            currentSeconds++;
-            setTimeout(function () {
-                $('.roundModal').modal('hide');
-            }, 2000);
-        }
-        /*if (totalSecs % pauseTime === 0) {
-            console.log("Pauze!");
-            $('.pauseModal').modal('show');
-            setTimeout(function () {
-                document.querySelector('#pauseDuration').innerHTML = pauseDuration;
-                
-                //$('.pauseModal').modal('hide');
-            }, 1000 * pauseDuration);
-        }*/
-        currentSeconds++;
-        //console.log("Pause duration: " + pauseDuration);
-    
-        if (currentSeconds === 60) {
-            currentMinutes++;
-            currentSeconds = 0;
-        }
-    
-        if (currentMinutes === 60) {
-            currentHours++;
-            currentMinutes = 0;
-        }
+        $.ajax({
+            url: "PauseAjax.cshtml",
+            type: "get",
+            data: {
+                roomCode: roomcode
+            },
+            success: function (response) {
+                if (response === "1") {
+                    totalSecs = currentSeconds + (currentMinutes * 60) + (currentHours * 3600);
+                    var displayHours = currentHours;
+                    var displayMinutes = currentMinutes;
+                    var displaySeconds = currentSeconds;
 
-        //Update Page
-        document.querySelector('.timer').innerHTML = "Game Time: " + displayHours + ":" + displayMinutes + ":" + displaySeconds;
-        document.querySelector('#rnumber').innerHTML = round;
+                    sessionStorage.setItem("timer", displayHours);
+
+
+                    if (currentHours.toString().length < 2) {
+                        displayHours = "0" + currentHours;
+                    }
+
+                    if (currentMinutes.toString().length < 2) {
+                        displayMinutes = "0" + currentMinutes;
+                    }
+
+                    if (currentSeconds.toString().length < 2) {
+                        displaySeconds = "0" + currentSeconds;
+                    }
+
+                    if (totalSecs % blind === 0) {
+                        $.ajax({
+                            url: "BlindTimer.cshtml",
+                            type: "get",
+                            data: {
+                                roomCode: roomcode,
+                                blind: blind,
+                                totalSecs: totalSecs
+                            },
+                            success: function (response) {
+                                response = response.split("-");
+                                document.querySelector('#SB').innerHTML = response[1];
+                                document.querySelector('#BB').innerHTML = response[2];
+                            }
+                        })
+                    }
+                    if (totalSecs % totalRoundTimer === 0) {
+                        round++;
+                        $('.roundModal').modal('show');
+                        currentSeconds++;
+                        setTimeout(function () {
+                            $('.roundModal').modal('hide');
+                        }, 2000);
+                    }
+                    if (totalSecs % pauseTime === 0) {
+                        console.log("Pauze!");
+                        $('.pauseModal').modal('show');
+                        setTimeout(function () {
+                            $('.pauseModal').modal('hide');
+                            currentSeconds -= pauseDuration;
+                        }, 1000 * pauseDuration);
+                    }
+
+                    currentSeconds++;
+
+                    if (currentSeconds === 60) {
+                        currentMinutes++;
+                        currentSeconds = 0;
+                    }
+
+                    if (currentMinutes === 60) {
+                        currentHours++;
+                        currentMinutes = 0;
+                    }
+
+                    //Update Page
+                    document.querySelector('.timer').innerHTML = "Game Time: " + displayHours + ":" + displayMinutes + ":" + displaySeconds;
+                    document.querySelector('#rnumber').innerHTML = round;
+                }
+                else {
+                    document.querySelector('.timer').innerHTML = "The game is currently not running";
+                }
+            }
+        })
     }, 1000);
-    
 </script>
-}
 <script>
     jQuery(document).ready(function ($) {
         $(".clickable").click(function () {
