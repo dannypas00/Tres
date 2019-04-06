@@ -120,15 +120,25 @@
             <div class="round">This is round: <span id="rnumber">@round</span></div>
         </div>
         <div class="row">
-            <div class="col-md-2">
-                <p>Starting capital: @startvalue</p>
-                <p>Small blind: <span id="SB">@small</span></p>
-                <p>Big blind: <span id="BB">@big</span></p>
+            <div class="col-md-2 text-center">
+                <div id="roomCode" style="display:none;">@roomCode</div>
+                <div id="table" style="display:none;">@table</div>
+                @if (started == 0)
+                {
+                    <div name=timer class="timer">Game not running</div>
+                }
+                else
+                {
+                    <div name=timer class="timer">loading timer...</div>
+                }
+                <div name="timer" class="timer"></div>
+                <div class="round">This is round: <span id="rnumber"></span></div>
             </div>
-        </div>
 
-        <div class="gridd" id="activebody" style="text-align: center; max-height:500px; max-width:800px;">
 
+
+            <div class="col-md-8">
+                <div class="gridd" id="activebody" style="text-align: center; max-height:500px; max-width:800px;">
             <div class="white"></div>
             <div class="white2"></div>
             <div class="white3"></div>
@@ -185,7 +195,8 @@
                                 }
 
                             </div>
-                        </div>
+
+                        }
                     </div>
                 }
             </div>

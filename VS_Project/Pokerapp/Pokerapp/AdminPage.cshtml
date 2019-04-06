@@ -11,7 +11,7 @@
 
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
-        Response.Redirect("~/Login.cshtml");
+        Response.Redirect("~/default.cshtml");
     }
 
     //Gather roomcode

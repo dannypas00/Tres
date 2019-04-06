@@ -217,6 +217,8 @@
                     }
                     else
                     {
+                        Shuffle shuffle = new Shuffle();
+                        shuffle.ShuffleTable(db, code);
                         Response.Redirect("~/PlayingAdmin.cshtml/" + code);
                     }
                 }
