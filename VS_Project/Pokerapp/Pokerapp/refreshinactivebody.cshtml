@@ -61,6 +61,7 @@
                     </div>
 
                     <div class="modal-body">
+                        @*<form method="post" name="optionsform" class="optionsform">*@
                         <div class="options-form-popup" id="player-options">
                             <button value="rebuy" name="rebuy" onclick="updaterebuys('@player', '@roomCode', '@table')" type="submit" data-dismiss="modal">Rebuy</button>
                             @Html.Hidden("sender", player)
@@ -68,6 +69,7 @@
                         <div class="modal-footer">
                             <div id="@player"><h5>@player you are now at @rebuy / @maxrebuy rebuys.</h5></div>
                         </div>
+                        @*</form>*@
                     </div>
 
                 </div>
@@ -77,3 +79,4 @@
 
     }
 </div>
+ 
