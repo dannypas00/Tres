@@ -219,11 +219,8 @@
     
     //Increment timer
     setInterval(function () {
-        totalSecs = currentSeconds + (currentMinutes + (currentHours * 60) * 60); 
+        totalSecs = currentSeconds + (currentMinutes * 60) + (currentHours * 3600); 
         console.log("Timer: " + currentHours + ":" + currentMinutes + ":" + currentSeconds);
-        console.log("Blind: " + blind);
-        console.log("Blind Modulus " + parseInt(totalSecs % blind));
-        console.log(totalSecs);
         var displayHours = currentHours;
         var displayMinutes = currentMinutes;
         var displaySeconds = currentSeconds;
@@ -253,17 +250,19 @@
                     totalSecs: totalSecs
                 },
                 success: function (response) {
-                    response = response.split("-")
-                    console.log(response);
-                    console.log("SB: " + response[1] + "BB" + response[2]);
+                    response = response.split("-");
                     document.querySelector('#SB').innerHTML = response[1];
                     document.querySelector('#BB').innerHTML = response[2];
                 }
             })
         }
+        console.log("Round modulus: " + totalSecs % totalRoundTimer);
+        console.log("Total round time: " + totalRoundTimer);
+        console.log("Total Seconds: " + totalSecs);
         if (totalSecs % totalRoundTimer === 0) {
             round++;
             $('.roundModal').modal('show');
+            currentSeconds++;
             setTimeout(function () {
                 $('.roundModal').modal('hide');
             }, 2000);
@@ -278,7 +277,7 @@
             }, 1000 * pauseDuration);
         }*/
         currentSeconds++;
-        console.log("Pause duration: " + pauseDuration);
+        //console.log("Pause duration: " + pauseDuration);
     
         if (currentSeconds === 60) {
             currentMinutes++;
@@ -293,10 +292,6 @@
         //Update Page
         document.querySelector('.timer').innerHTML = "Game Time: " + displayHours + ":" + displayMinutes + ":" + displaySeconds;
         document.querySelector('#rnumber').innerHTML = round;
-        console.log("Pause time: " + pauseTime);
-        console.log("Pause modulus: " + totalSecs % pauseTime);
-        console.log("Round: " + totalSecs / totalRoundTimer);
-        console.log("Round Time: " + totalRoundTimer);
     }, 1000);
     
 </script>
