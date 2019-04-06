@@ -26,9 +26,10 @@
 .gridRow1 {
     display: grid;
     grid-template-columns: 1auto 1auto 1auto 1auto;
-    grid-template-rows: minmax(75px, 75px);
+    grid-template-rows: 1auto;
     grid-template-areas: ". . . .";
     grid-area: gridRow1;
+    grid-row-gap:30px;
 }
 
 .chair {
@@ -43,6 +44,7 @@
     grid-template-rows: 1auto;
     grid-template-areas: ". . . .";
     grid-area: gridRow2;
+    grid-row-gap:10px;
 }
 
 .chair2 {
@@ -55,8 +57,8 @@
     background-image: url(../assets/Tableview/Pokerstool.png);
     background-size: 100%;
     border: none;
-    width: 90px;
-    height: 90px;
+    width: 100px;
+    height: 100px;
     color: white;
     object-fit: contain;
 }
