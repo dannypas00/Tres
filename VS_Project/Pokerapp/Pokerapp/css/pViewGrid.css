@@ -1,0 +1,31 @@
+﻿/*Outer grid */
+.bpGrid {
+    display: grid;
+    grid-template-columns: 1auto;
+    grid-template-rows: 1auto 1auto 1auto 1auto;
+    grid-template-areas: ". " ". " ". " ". ";
+}
+/*Inner grid */
+.pGrid {
+    display: grid;
+    grid-template-columns: minmax(200px, 300px) minmax(200px, 300px);
+    grid-template-rows: minmax(200px, 200px);
+}
+/*Table start */
+.pTable {
+    grid-column-start: auto;
+    order: inherit;
+}
+/*Grid for player names */
+.pNGrid {
+    display: grid;
+    grid-template-columns: minmax(40px, 80px) minmax(40px, 80px);
+    grid-template-rows: 10% 10% 10% 10% 10%;
+    grid-area: 1 / 2 / 2 / 3;
+}
+/*Start player names */
+.pNames {
+    grid-column-start: auto;
+    order: inherit;
+    position: relative;
+}
