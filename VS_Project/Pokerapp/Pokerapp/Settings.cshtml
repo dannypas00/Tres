@@ -26,6 +26,7 @@
     Validation.Add("room_name", Validator.StringLength(30, 1, "Name has to between 1-30 characters"));
     Validation.Add("round_time", Validator.StringLength(8, 8, "Incorrect format for round time please use hh:mm:ss"));
     Validation.Add("pause_time", Validator.StringLength(8, 8, "Incorrect format for pause time please use hh:mm:ss"));
+    Validation.Add("pause_duration", Validator.StringLength(8, 8, "Incorrect format for pause time please use hh:mm:ss"));
     Validation.Add("blind_time", Validator.StringLength(8, 8, "Incorrect format for blind time please use hh:mm:ss"));
     Validation.Add("min_table", Validator.Range(1, 99, "Minimum amount is 2 players per table"));
     Validation.Add("max_table", Validator.Range(3, 10, "Maximum amount of players per table is 10"));
@@ -44,6 +45,7 @@
     string room_name = "";
     TimeSpan round_time = new TimeSpan(00,30,00);
     TimeSpan pause_time = new TimeSpan(00,30,00);
+    TimeSpan pause_duration = new TimeSpan(00, 05, 00);
     TimeSpan blind_time = new TimeSpan(00,05,00);
     int min_table = 2;
     int max_table_amount = 8;
@@ -67,6 +69,7 @@
         room_name = room.Room_Name;
         round_time = room.Round_Time;
         pause_time = room.Pause_Time;
+        pause_duration = room.Pause_Duration;
         blind_time = room.Blind_Time;
         min_table = room.Tbl_Min_Size;
         max_table_amount = room.Tbl_Max_Size;
@@ -91,6 +94,7 @@
         int max_table_size = Convert.ToInt32(Request["max_table"]);
         int allow_rebuy = Convert.ToInt32(Request["rebuy"]);
         var pause = Request["pause_time"];
+        var pauseDuration = Request["pause_duration"];
         var blind = Request["blind_time"];
         int value = Convert.ToInt32(Request["start_value"]);
         int tbl_amount = Convert.ToInt32(Request["tbl_amount"]);
@@ -99,22 +103,22 @@
         int chip3 = Convert.ToInt32(Request["chip3"]);
         int chip4 = Convert.ToInt32(Request["chip4"]);
         int chip5 = Convert.ToInt32(Request["chip5"]);
-        var started = 0;
+        int started = 0;
         today = DateTime.Now;
 
         var check = db.QueryValue("SELECT Room_Code FROM Room WHERE Room_Code = @0", code);
         if (check == code)
         {
-            db.Execute("UPDATE Room SET Room_Code = @0, Room_Name = @1, Tbl_Min_Size = @2, Started = @3, Chip_1_Worth = @4, Chip_2_Worth = @5, Chip_3_Worth = @6, Chip_4_Worth = @7, Chip_5_Worth = @8, Round_Time = @9, Pause_Time = @10, Blind_Time = @11, Allow_Rebuy = @12, Start_Value = @13, Tbl_Amount = @14, Tbl_Max_Size = @15, Room_Create_Date = @16 WHERE Room_Code = @0"
-            , code, roomname, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, today);
+            db.Execute("UPDATE Room SET Room_Code = @0, Room_Name = @1, Tbl_Min_Size = @2, Started = @3, Chip_1_Worth = @4, Chip_2_Worth = @5, Chip_3_Worth = @6, Chip_4_Worth = @7, Chip_5_Worth = @8, Round_Time = @9, Pause_Time = @10, Blind_Time = @11, Allow_Rebuy = @12, Start_Value = @13, Tbl_Amount = @14, Tbl_Max_Size = @15, Room_Create_Date = @16, Pause_Duration = @17 WHERE Room_Code = @0"
+            , code, roomname, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, today, pauseDuration);
         }
         else
         {
-            db.Execute("INSERT INTO Room (Room_Code, Room_Name, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Blind_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size, Room_Create_Date)" +
-            "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16)", code, roomname, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, today);
+            db.Execute("INSERT INTO Room (Room_Code, Room_Name, Tbl_Min_Size, Started, Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth, Round_Time, Pause_Time, Blind_Time, Allow_Rebuy, Start_Value, Tbl_Amount, Tbl_Max_Size, Room_Create_Date, Pause_Duration)" +
+            "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17)", code, roomname, min_table_size, started, chip1, chip2, chip3, chip4, chip5, time, pause, blind, allow_rebuy, value, tbl_amount, max_table_size, today, pauseDuration);
         }
     }
-#endregion
+    #endregion
     string warning = "";
     //continues to next page
     if (IsPost && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
@@ -261,7 +265,11 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6"> <label for="form4">Time per round</label> <input type="text" class="form-control" id="form4" placeholder="9001" name="round_time" value="@round_time" required> </div>
-                        <div class="form-group col-md-6"> <label for="form5">Duration of pauses</label> <input type="text" class="form-control" id="form5" placeholder="9001" name="pause_time" value="@pause_time" required> </div>
+                        <div class="form-group col-md-6"> <label for="form10">Amount of rebuys</label> <input type="number" step="1" min="0" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form10" placeholder="9001" name="rebuy" value="@rebuy" required> </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6"> <label for="form5">Interval between pauses</label> <input type="text" class="form-control" id="form5" placeholder="00:30:00" name="pause_time" value="@pause_time" required> </div>
+                        <div class="form-group col-md-6"> <label for="form16">Duration for pauses</label> <input type="text" class="form-control" id="form16" placeholder="00:05:00" name="pause_duration" value="@pause_duration" required> </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6"> <label for="form6">Interval for blinds</label> <input type="text" class="form-control" id="form6" placeholder="9001" name="blind_time" value="@blind_time"> </div>
@@ -272,16 +280,15 @@
                         <div class="form-group col-md-6"> <label for="form9">Amount of tables</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form9" placeholder="9001" name="tbl_amount" value="@table_amount" required> </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-6"> <label for="form10">Amount of rebuys</label> <input type="number" step="1" min="0" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form10" placeholder="9001" name="rebuy" value="@rebuy" required> </div>
-                        <div class="form-group col-md-6"> <label for="form11">Value chip 1</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form11" placeholder="9001" name="chip1" value="@chip_worth1" required> </div>
+                        <div class="form-group col-md-6"> <label for="form11">Value chip 1</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form11" placeholder="1" name="chip1" value="@chip_worth1" required> </div>
+                        <div class="form-group col-md-6"> <label for="form12">Value chip 2</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form12" placeholder="5" name="chip2" value="@chip_worth2" required> </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-6"> <label for="form12">Value chip 2</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form12" placeholder="9001" name="chip2" value="@chip_worth2" required> </div>
-                        <div class="form-group col-md-6"> <label for="form13">Value chip 3</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form13" placeholder="9001" name="chip3" value="@chip_worth3" required> </div>
+                        <div class="form-group col-md-6"> <label for="form13">Value chip 3</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form13" placeholder="10" name="chip3" value="@chip_worth3" required> </div>
+                        <div class="form-group col-md-6"> <label for="form14">Value chip 4</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form14" placeholder="25" name="chip4" value="@chip_worth4" required> </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-6"> <label for="form14">Value chip 4</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form14" placeholder="9001" name="chip4" value="@chip_worth4" required> </div>
-                        <div class="form-group col-md-6"> <label for="form15">Value chip 5</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form15" placeholder="9001" name="chip5" value="@chip_worth5" required> </div>
+                        <div class="form-group col-md-6"> <label for="form15">Value chip 5</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form15" placeholder="100" name="chip5" value="@chip_worth5" required> </div>
                     </div>
                     <input class="btn btn-primary" type="submit" name="Proceed" value="Proceed" />
                 </form>
