@@ -13,12 +13,29 @@
     string[] link = prelink.Split('/');
     int urlcode = Convert.ToInt32(link[4]);
 
-    //Return to login if players are lower than min_size
+    //Show message if players are lower than min_size to contact the admin
     int players = Convert.ToInt32(db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0", urlcode));
     int min_size = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", urlcode));
-    if (players < (min_size + 1))
+    bool cookies = false;
+    if (Request.Cookies["LoginCookie"] is null)
+    {
+        cookies = false;
+    }
+    else
+    {
+        cookies = true;
+    }
+    if (players <= (min_size) && cookies == true)
     {
         Response.Redirect("~/AdminPage.cshtml/" + urlcode);
+    }
+    else if (players <= (min_size) && cookies == false)
+    {
+        <script>
+            $(document).ready(function () {
+                alert("There are too few players in the game, ask your admin to add more players or to stop the game.");
+            })
+        </script>
     }
 
     int amount = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
@@ -60,7 +77,26 @@
                 <!--Table gets put in the grid-->
                 <form method="post" class="pTable">
                     <div class="row">
-                        <div class="col d-flex flex-column align-items-start justify-content-center order-1 order-lg-2" style="padding-top:5px">
+                        <div class="col-md-12 clickable" style="background-image: url(/tafel.png);cursor:pointer; width:400px;height:100%; margin-top:15px">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="text-center" style="justify-content:center; margin-top: 40%"><h3><b>Table @tbl_nr</b></h3></div>
+                                </div>
+                                <div class="col d-flex flex-column align-items-start justify-content-center order-1 order-lg-2" style="padding-top:5px">
+
+
+                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
+                                    {
+                                        <div class="flex-column">
+                                            <p><b>@row.Name </b></p>
+                                        </div>
+                                    }
+
+
+                                    <input type="hidden" name="roomcode" value=@urlcode />
+                                    <a href=@Url></a>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

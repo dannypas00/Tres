@@ -1,4 +1,5 @@
 ﻿@using WebMatrix.Data
+@using System.Linq;
 @{
     Layout = "~/_Layout.cshtml";
     int roomCode = Request.QueryString["roomcode"].AsInt();
@@ -60,9 +61,9 @@
     int scs = startTime.Seconds;
     int started = Convert.ToInt32(room.Started);
     TimeSpan totalRoundTimer = room.Round_Time;
-    int round = (int)Math.Ceiling(startTime.TotalSeconds / totalRoundTimer.TotalSeconds);
+    int round = (int) Math.Ceiling(startTime.TotalSeconds / totalRoundTimer.TotalSeconds);
     var blinds = db.Query("SELECT ValueSB, ValueBB FROM Blinds WHERE Room_Code = @0", roomCode);
-    int blindsIndex = (int)Math.Floor(startTime.TotalSeconds / blindTime.TotalSeconds);
+    int blindsIndex = (int) Math.Floor(startTime.TotalSeconds / blindTime.TotalSeconds);
     int small;
     int big;
     try
@@ -123,9 +124,6 @@
                 <p>Starting capital: @startvalue</p>
                 <p>Small blind: <span id="SB">@small</span></p>
                 <p>Big blind: <span id="BB">@big</span></p>
-                <form method="post">
-                    <input class="btn btn-outline-secondary" type="submit" name="blindnext" value="Raise blinds" />
-                </form>
             </div>
         </div>
 
@@ -286,7 +284,35 @@
 
 </div>
 
+<div class="pauseModal modal fade show in" data-target="#myModal" data-toggle="modal" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="v-cell">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">The game is paused</h4>
+                </div>
+                <div class="modal-body">
+                    Pause time left: <b id="pausedDuration">@pauseDuration</b>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+<div class="roundModal modal fade show in" data-target="#myModal" data-toggle="modal" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="v-cell">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">The round is over</h4>
+                </div>
+                <div class="modal-body">
+                    A new round will now start
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -315,20 +341,7 @@
                 });
             });
         }
-        function deleteplayer(player, roomCode, table) {
-            $.get("delete-ajax.cshtml?name=" + player + "&roomcode=" + roomCode + "&table=" + table, function (data, status) {
-                console.log(data)
-                document.getElementById(player).innerHTML = data;
-                $.get("refreshinactivebody.cshtml?name=" + player + "&roomcode=" + roomCode + "&table=" + table, function (data, status) {
-                    document.getElementById("inactivebody").innerHTML = data;
-                    $.get("rebuynotactive.cshtml?name=" + player + "&roomcode=" + roomCode + "&table=" + table, function (data, status) {
-                        document.getElementById("activebody").innerHTML = data;
-                    });
-                });
-            });
-        }
-    </script>
-}
+    });
 
 
     <div class="pauseModal modal fade show in" data-target="#myModal" data-toggle="modal" data-backdrop="static" data-keyboard="false">
