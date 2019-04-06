@@ -1,0 +1,81 @@
+﻿@using WebMatrix.Data
+
+@{
+    Layout = "~/_Layout.cshtml";
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+
+    string url = Request.Url.AbsolutePath;
+    //string roomCode = url.Substring(url.Length - 7);
+
+    //get name and roomcode
+    string playerName = Request["name"];
+    int roomCode = Convert.ToInt32(Request["roomcode"]);
+
+    int table = db.QueryValue("SELECT Tbl_nr FROM Players WHERE Name = @0 AND Room_Code = @1", playerName, roomCode);
+
+    var names = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
+    int amount = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 AND Active = 1", roomCode, table);
+    double devision = amount / 2;
+    int halfnamesCount = Convert.ToInt32(devision);
+    int firsthalfnamesCount = Convert.ToInt32(amount - halfnamesCount);
+    int secondhalfnamesCount = Convert.ToInt32(firsthalfnamesCount - 1);
+    if (amount % 2 == 0)
+    {
+        secondhalfnamesCount = firsthalfnamesCount;
+    }
+    if (amount > 10)    //Haal max spelers uit database
+    {
+        string Url = "Players.cshtml/" + roomCode;   //Needs fixing
+        Response.Redirect("~/" + Url);
+    }
+
+    int maxrebuy = (int)db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", roomCode);
+    db.Query("SELECT Name FROM Players WHERE Active = 0 AND Room_Code = @0", roomCode);
+
+}
+
+<div id="inactivebody">
+    @foreach (var pirnp in db.Query("SELECT Name FROM Players WHERE Active = 0 AND Room_Code = @0 AND Rebuy = @1 ORDER BY Name ASC", roomCode, maxrebuy))
+    {
+        <h3>@pirnp.Name</h3>
+    }
+
+    @foreach (var pirp in db.Query("SELECT Name, Rebuy FROM Players WHERE Room_Code = @0 AND Active = 0 AND Rebuy < @1 ORDER BY Name DESC", roomCode, maxrebuy))
+    {
+        int rebuy = (int)db.QueryValue("SELECT Rebuy FROM Players WHERE Name = @0 AND Room_Code = @1 AND Tbl_nr = @2", pirp.Name, roomCode, table);
+        string player = pirp.Name;
+        string inactiveuniqueModal = player + roomCode;
+        <h2>@player</h2>
+
+        <!-- Button trigger modal -->
+        <button value="@player" name="player" type="button" data-toggle="modal" data-target="#@inactiveuniqueModal">@player</button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="@inactiveuniqueModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Options for: @player</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        @*<form method="post" name="optionsform" class="optionsform">*@
+                        <div class="options-form-popup" id="player-options">
+                            <button value="rebuy" name="rebuy" onclick="updaterebuys('@player', '@roomCode', '@table')" type="submit" data-dismiss="modal">Rebuy</button>
+                            @Html.Hidden("sender", player)
+                        </div>
+                        <div class="modal-footer">
+                            <div id="@player"><h5>@player you are now at @rebuy / @maxrebuy rebuys.</h5></div>
+                        </div>
+                        @*</form>*@
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    }
+</div>
