@@ -4,22 +4,18 @@
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
 
-    //get the url
-    string url = Request.Url.AbsoluteUri;
     string roomCode = Request.QueryString["roomCode"];
-    string table = Request.QueryString["table"];
-    string blind = Request.QueryString["blind"];
-    int index = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
+    int timer = Request.QueryString["totalSecs"].AsInt();
+    int blind = Request.QueryString["blind"].AsInt();
     var blindCount = db.Query("SELECT * FROM Blinds WHERE Room_Code = @0", roomCode).Count();
-    if (index >= blindCount)
-    {
-        index = blindCount;
-    }
-    else if (index <= 0)
-    {
-        index = 1;
-    }
+    int index = timer / blind + 1;
     var blinds = db.QuerySingle("SELECT * FROM Blinds WHERE Room_Code = @0 AND ID = @1", roomCode, index);
-    db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", index + 1, roomCode);
-    Response.Write(index + "-" + blinds.ValueSB + "-" + blinds.ValueBB);
+    if (blinds != null)
+    {
+        Response.Write(index + "-" + blinds.ValueSB + "-" + blinds.ValueBB);
+    }
+    else
+    {
+        Response.Write(index + "-Ran Out Of Blinds!-Ran Out Of Blinds!");
+    }
 }
