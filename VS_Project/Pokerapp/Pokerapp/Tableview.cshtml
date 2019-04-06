@@ -97,6 +97,9 @@
     int maxrebuy = (int)db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", roomCode);
     int started = Convert.ToInt32(room.Started);
     TimeSpan totalRoundTimer = room.Round_Time;
+    dynamic blinds = db.Query("SELECT ValueSB, ValueBB FROM Blinds WHERE Room_Code = @0", roomCode);
+    var small = blinds[0].ValueSB;
+    var big = blinds[0].ValueBB;
 }
 <div class="header">
     <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
@@ -136,7 +139,7 @@
                 <div name=timer class="timer">loading timer...</div>
             }
             <div name="timer" class="timer"></div>
-            <div class="round">This is round: <span id="rnumber">@round</span></div>
+            <div class="round">This is round: <span id="rnumber">1</span></div>
         </div>
         <div class="row">
             <div class="col-md-8 text-center">
