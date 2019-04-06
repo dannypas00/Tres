@@ -2,20 +2,20 @@
 @{
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
-    Database db = Database.OpenConnectionString(connectionString, provider);
 
     string roomCode = Request.QueryString["roomCode"];
     int timer = Request.QueryString["totalSecs"].AsInt();
     int blind = Request.QueryString["blind"].AsInt();
-    var blindCount = db.Query("SELECT * FROM Blinds WHERE Room_Code = @0", roomCode).Count();
+    Database db = Database.OpenConnectionString(connectionString, provider);
+    var blinds = db.Query("SELECT * FROM Blinds WHERE Room_Code = @0", roomCode);
+    db.Close();
     int index = timer / blind + 1;
-    var blinds = db.QuerySingle("SELECT * FROM Blinds WHERE Room_Code = @0 AND ID = @1", roomCode, index);
-    if (blinds != null)
+    try
     {
-        Response.Write(index + "-" + blinds.ValueSB + "-" + blinds.ValueBB);
+        Response.Write(index + "-" + blinds.ElementAt(index).ValueSB + "-" + blinds.ElementAt(index).ValueBB);
     }
-    else
+    catch
     {
-        Response.Write(index + "-Ran Out Of Blinds!-Ran Out Of Blinds!");
+        Response.Write(index + "-" + blinds.Last().ValueSB + "-" + blinds.Last().ValueBB);
     }
 }
