@@ -10,10 +10,13 @@
     Database db = Database.OpenConnectionString(connectionString, provider);
 
 
-
+    //Creates roomcode
     string Url = "RulesPageNL/" + roomCode;
     string urlBack = "Players/" + roomCode;
 
+    int maxrebuy = (int)db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", roomCode);
+
+    //Splits number of names in two
     var names = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     int amount = names.Count();
     double devision = amount / 2;
@@ -28,55 +31,16 @@
     //Gets startvalue
     int startvalue = db.QueryValue("SELECT Start_Value FROM Room WHERE Room_Code = @0", roomCode);
 
-    if (IsPost && !Request["blindnext"].IsEmpty())
-    {
-        int current_Round = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
-        int new_Round = current_Round + 1;
-        db.Execute("UPDATE Room SET Blind_Round = @0 WHERE Room_Code = @1", new_Round, roomCode);
-        <script>
-            $(document).ready(function () {
-                alert("The blind has been raised!");
-            })
-        </script>
-    }
-
-    //Raise blinds with the blindsrounds
-    int id = db.QueryValue("SELECT Blind_Round FROM Room WHERE Room_Code = @0", roomCode);
-    var blind_id = db.Query("SELECT Top (@0) ID FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
-    int min_size = db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", roomCode);
-    var small_blind = db.Query("SELECT TOP (@0) ValueSB FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
-    int small = 0;
-    foreach (var a in small_blind)
-    {
-        if (a.ValueSB > small)
-        {
-            small = a.ValueSB;
-        }
-    }
-    var big_blind = db.Query("SELECT TOP (@0) ValueBB FROM Blinds WHERE Room_Code = @1 ORDER BY ID ASC", id, roomCode);
-    int big = 0;
-    foreach (var a in big_blind)
-    {
-        if (a.ValueBB > big)
-        {
-            big = a.ValueBB;
-        }
-    }
-
     //If minimum size is reached reshuffle names by tables
+    int min_size = db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", roomCode);
     int players = db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
-    /*if (min_size >= players)
+    if (min_size >= players)
     {
-        <script>
-            $(document).ready(function () {
-                alert("The minimum size has been reached!");
-            })
-        </script>
         Shuffle shuffle = new Shuffle();
         shuffle.ShuffleTable(db, roomCode);
         Url = "Players.cshtml/" + roomCode;
         Response.Redirect("~/" + Url);
-    }*/
+    }
 
     dynamic room = db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode);
     TimeSpan startTime;
@@ -88,14 +52,30 @@
     {
         startTime = TimeSpan.Zero;
     }
-    DateTime pauzeTime = DateTime.Now + room.Pause_Time;
+    TimeSpan pauseTime = room.Pause_Time;
+    TimeSpan pauseDuration = room.Pause_Duration;
     TimeSpan blindTime = room.Blind_Time;
     int hrs = startTime.Hours;
     int mns = startTime.Minutes;
     int scs = startTime.Seconds;
-
-    int maxrebuy = (int)db.QueryValue("SELECT Allow_Rebuy FROM Room WHERE Room_Code = @0", roomCode);
     int started = Convert.ToInt32(room.Started);
+    TimeSpan totalRoundTimer = room.Round_Time;
+    int round = (int)Math.Ceiling(startTime.TotalSeconds / totalRoundTimer.TotalSeconds);
+    var blinds = db.Query("SELECT ValueSB, ValueBB FROM Blinds WHERE Room_Code = @0", roomCode);
+    int blindsIndex = (int)Math.Floor(startTime.TotalSeconds / blindTime.TotalSeconds);
+    int small;
+    int big;
+    try
+    {
+        small = blinds.ElementAt(blindsIndex).ValueSB;
+        big = blinds.ElementAt(blindsIndex).ValueBB;
+    }
+    catch
+    {
+        small = blinds.Last().ValueSB;
+        big = blinds.Last().ValueBB;
+    }
+    db.Close();
 }
 <div class="header">
     <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
@@ -111,40 +91,42 @@
         <p id="Hours">@hrs</p>
         <p id="Minutes">@mns</p>
         <p id="Seconds">@scs</p>
+        <p id="Time">@startTime.TotalSeconds</p>
         <p id="Blinds">@blindTime.TotalSeconds</p>
-        <p id="Pauze">@pauzeTime.TimeOfDay</p>
+        <p id="Pause">@pauseTime.TotalSeconds</p>
         <p id="Started">@started</p>
         <p id="BlindIndex"></p>
+        <p id="roomCode">@roomCode</p>
+        <p id="table">@table</p>
+        <p id="totalRoundTimer">@totalRoundTimer.TotalSeconds</p>
+        <p id="PauseDuration">@pauseDuration.TotalSeconds</p>
     </div>
     <!--Start the page-->
     <div class="container">
         <div class="col-md-12 text-center">
             <h1>Table @table</h1>
         </div>
+        <div class="col-md-12 text-center">
+            @if (started == 0)
+            {
+                <div name=timer class="timer">Game not running</div>
+            }
+            else
+            {
+                <div name=timer class="timer">loading timer...</div>
+            }
+            <div name="timer" class="timer"></div>
+            <div class="round">This is round: <span id="rnumber">@round</span></div>
+        </div>
         <div class="row">
-            <div class="col-md-8 text-center">
-                <div id="roomCode" style="display:none;">@roomCode</div>
-                <div id="table" style="display:none;">@table</div>
-                @if (started == 0)
-                {
-                    <div name=timer class="timer">Game not running</div>
-                }
-                else
-                {
-                    <div name=timer class="timer">loading timer...</div>
-                }
-                <div name="timer" class="timer"></div>
-                <div class="round">This is round: <span id="rnumber"></span></div>
-            </div>
             <div class="col-md-2">
                 <p>Starting capital: @startvalue</p>
-                <p>Small blind: <span id="SB"></span></p>
-                <p>Big blind: <span id="BB"></span></p>
+                <p>Small blind: <span id="SB">@small</span></p>
+                <p>Big blind: <span id="BB">@big</span></p>
                 <form method="post">
                     <input class="btn btn-outline-secondary" type="submit" name="blindnext" value="Raise blinds" />
                 </form>
             </div>
-
         </div>
 
         <div class="gridd" id="activebody" style="text-align: center; max-height:500px; max-width:800px;">
@@ -346,120 +328,154 @@
             });
         }
     </script>
+}
 
 
+    <div class="pauseModal modal fade show in" data-target="#myModal" data-toggle="modal" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="v-cell">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">The game is paused</h4>
+                    </div>
+                    <div class="modal-body">
+                        Pause time left: <b id="pausedDuration">@pauseDuration</b>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="roundModal modal fade show in" data-target="#myModal" data-toggle="modal" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="v-cell">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">The round is over</h4>
+                    </div>
+                    <div class="modal-body">
+                        A new round will now start
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.js"
             integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
             crossorigin="anonymous"></script>
-    <script>
-        var roomcode = $("#roomCode").html();
-        var table = $("#table").html();
-        var hrs = $('#Hours').html();
-        var mns = $('#Minutes').html();
-        var scs = $('#Seconds').html();
-        var round = 1;
-        var blind = $('#Blinds').html();
-        var pauze = $('#Pauze').html();
-        var started = $('#Started').html();
-        console.log("roomcode" + roomcode);
-        console.log("table" + table);
-        console.log("blind" + blind);
-        console.log("pauze" + pauze);
-        console.log("started" + started);
-        //Ajax connect with url Timer get the data roomcode
-        $.ajax({
-            url: "Timer.cshtml",
-            type: "get",
-            data: {
-                roomCode: roomcode,
-                table: table
-            },
-            success: function (response) {
-                startTimer(response); // Returns timer from db
-            }
-        });
-        function startTimer(timer) {
-            timer = timer.split(":"); // Split timer
-            var roundHours = parseInt(timer[0]); // Parse hours to int
-            var roundMinutes = parseInt(timer[1]);
-            var roundSeconds = parseInt(timer[2]);
-            var currentHours = hrs;
-            var currentMinutes = mns;
-            var currentSeconds = scs;
-            var round = 1;
-            document.querySelector('#rnumber').innerHTML = round;
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    @if (started == 1)
+    {
+        <script>
+            var roomcode = $("#roomCode").html();
+            var table = $("#table").html();
+            var currentHours = $('#Hours').html();
+            var currentMinutes = $('#Minutes').html();
+            var currentSeconds = $('#Seconds').html();
+            var blind = $('#Blinds').html();
+            var pauseTime = $('#Pause').html();
+            var pauseDuration = $('#PauseDuration')
+            var started = $('#Started').html();
+            var timeTotal = $('#Time').html();
+            var totalRoundTimer = $('#totalRoundTimer').html();
+            var round = $('#rnumber').html();
+
+
             //Increment timer
             setInterval(function () {
-                var totalSecs = currentSeconds + (currentMinutes * 60) + (currentHours * 1440);
-                console.log("Timer: " + timer[0] + ":" + timer[1] + ":" + timer[2]);
+                totalSecs = currentSeconds + (currentMinutes + (currentHours * 60) * 60);
+                console.log("Timer: " + currentHours + ":" + currentMinutes + ":" + currentSeconds);
                 console.log("Blind: " + blind);
                 console.log("Blind Modulus " + parseInt(totalSecs % blind));
                 console.log(totalSecs);
                 var displayHours = currentHours;
                 var displayMinutes = currentMinutes;
                 var displaySeconds = currentSeconds;
+
                 sessionStorage.setItem("timer", displayHours);
+
+
                 if (currentHours.toString().length < 2) {
                     displayHours = "0" + currentHours;
                 }
+
                 if (currentMinutes.toString().length < 2) {
                     displayMinutes = "0" + currentMinutes;
                 }
+
                 if (currentSeconds.toString().length < 2) {
                     displaySeconds = "0" + currentSeconds;
                 }
-                document.querySelector('.timer').innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
-                if (totalSecs % blind == 0) {
+
+                if (totalSecs % blind === 0) {
                     $.ajax({
                         url: "BlindTimer.cshtml",
                         type: "get",
                         data: {
-                            table: table,
                             roomCode: roomcode,
+                            blind: blind,
+                            totalSecs: totalSecs
                         },
                         success: function (response) {
-                            console.log("Response: " + response)
-                            response = response.split("-");
-                            console.log("Blinds Index: " + response[0]);
-                            console.log("Small Blind: " + response[1]);
-                            console.log("Big Blind: " + response[2]);
-                            document.querySelector('#BlindIndex').innerHTML = response[0];
+                            response = response.split("-")
+                            console.log(response);
+                            console.log("SB: " + response[1] + "BB" + response[2]);
                             document.querySelector('#SB').innerHTML = response[1];
                             document.querySelector('#BB').innerHTML = response[2];
                         }
                     })
                 }
-                // if condition is met round + 1
-                if (currentHours == roundHours && currentMinutes == roundMinutes && currentSeconds == roundSeconds) {
+                if (totalSecs % totalRoundTimer === 0) {
                     round++;
-                    document.querySelector('#rnumber').innerHTML = round;
-                    currentHours = 0;
-                    currentMinutes = 0;
-                    currentSeconds = 0;
+                    $('.roundModal').modal('show');
+                    setTimeout(function () {
+                        $('.roundModal').modal('hide');
+                    }, 2000);
                 }
+                /*if (totalSecs % pauseTime === 0) {
+                    console.log("Pauze!");
+                    $('.pauseModal').modal('show');
+                    setTimeout(function () {
+                        document.querySelector('#pauseDuration').innerHTML = pauseDuration;
+
+                        //$('.pauseModal').modal('hide');
+                    }, 1000 * pauseDuration);
+                }*/
                 currentSeconds++;
-                if (currentSeconds == 60) {
+                console.log("Pause duration: " + pauseDuration);
+
+                if (currentSeconds === 60) {
                     currentMinutes++;
                     currentSeconds = 0;
                 }
-                if (currentMinutes == 60) {
+
+                if (currentMinutes === 60) {
                     currentHours++;
                     currentMinutes = 0;
                 }
+
+                //Update Page
+                document.querySelector('.timer').innerHTML = "Game Time: " + displayHours + ":" + displayMinutes + ":" + displaySeconds;
+                document.querySelector('#rnumber').innerHTML = round;
+                console.log("Pause time: " + pauseTime);
+                console.log("Pause modulus: " + totalSecs % pauseTime);
+                console.log("Round: " + totalSecs / totalRoundTimer);
+                console.log("Round Time: " + totalRoundTimer);
             }, 1000);
-        }
-    </script>
+
+        </script>
+    }
 }
-<script>
-    jQuery(document).ready(function ($) {
-        $(".clickable").click(function () {
-            window.location = $(this).find("a:first").attr("href");
+    <script>
+        jQuery(document).ready(function ($) {
+            $(".clickable").click(function () {
+                window.location = $(this).find("a:first").attr("href");
+            });
         });
-    });
-    jQuery(document).ready(function ($) {
-        $(".clickableBtn").click(function () {
-            window.location = $(this).data("href");
+        jQuery(document).ready(function ($) {
+            $(".clickableBtn").click(function () {
+                window.location = $(this).data("href");
+            });
         });
-    });
-</script>
+    </script>
