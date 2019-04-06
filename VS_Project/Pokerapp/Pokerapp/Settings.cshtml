@@ -215,6 +215,8 @@
                     }
                     else
                     {
+                        Shuffle shuffle = new Shuffle();
+                        shuffle.ShuffleTable(db, roomCode);
                         Response.Redirect("~/PlayingAdmin.cshtml/" + code);
                     }
                 }

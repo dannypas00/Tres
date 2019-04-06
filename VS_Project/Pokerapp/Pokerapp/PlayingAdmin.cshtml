@@ -33,7 +33,7 @@
     //Looks if user logged in
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
-        Response.Redirect("~/Login.cshtml");
+        Response.Redirect("~/default.cshtml");
     }
     int playerCheck = db.Query("SELECT * FROM Players WHERE Room_Code=@0", roomCode).Count();
     dynamic tableCheck = db.QuerySingle("SELECT Tbl_Amount FROM Room WHERE Room_Code=@0", roomCode);
@@ -183,10 +183,11 @@
                     </div>
                     <!--Grid for the Playing admin page-->
                     <div class="row">
-                        <div class="col-md-8">
-                            <div class="pAdminGrid" style="justify-content:center">
+                        <div class="col-md-1"></div>
+                        <div class="col-md-7 text-center">
+                            <div class="pAdminGrid">
                                 <!--Position for the tables-->
-                                <div class="pTable" style="text-align: center">
+                                <div class="pTable">
                                     @for (int i = 0; i < tables; i++)
                                     {
                                         int tbl_Nr = i + 1;
