@@ -15,6 +15,7 @@ CREATE TABLE [dbo].[Room] (
     [Chip_5_Worth]     INT           NOT NULL,
     [Round_Time]       TIME (7)      NOT NULL,
     [Pause_Time]       TIME (7)      NULL,
+	[Pause_Duration] TIME (7) NULL,
     [Blind_Time]       TIME (7)      NULL,
     [Started_Time]     DATETIME      NULL,
     [Allow_Rebuy]      INT           NOT NULL,

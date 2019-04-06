@@ -55,6 +55,7 @@
         startTime = TimeSpan.Zero;
     }
     TimeSpan pauseTime = room.Pause_Time;
+    TimeSpan pauseDuration = room.Pause_Duration;
     TimeSpan blindTime = room.Blind_Time;
     int hrs = startTime.Hours;
     int mns = startTime.Minutes;
@@ -62,8 +63,8 @@
     int started = Convert.ToInt32(room.Started);
     TimeSpan totalRoundTimer = room.Round_Time;
     dynamic blinds = db.Query("SELECT ValueSB, ValueBB FROM Blinds WHERE Room_Code = @0", roomCode);
-    var small = blinds[0].ValueSB;
-    var big = blinds[0].ValueBB;
+    int small = blinds[0].ValueSB;
+    int big = blinds[0].ValueBB;
 }
 <div class="header">
     <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
@@ -87,6 +88,7 @@
         <p id="roomCode">@roomCode</p>
         <p id="table">@table</p>
         <p id="totalRoundTimer">@totalRoundTimer.TotalSeconds</p>
+        <p id="pause_duration">@pause</p>
     </div>
     <!--Start the page-->
     <div class="container">
@@ -103,7 +105,7 @@
                 <div name=timer class="timer">loading timer...</div>
             }
             <div name="timer" class="timer"></div>
-            <div class="round">This is round: <span id="rnumber">1</span></div>
+            <div class="round">This is round: <span id="rnumber">loading...</span></div>
         </div>
         <div class="row">
             <div class="col-md-2">
@@ -184,7 +186,7 @@
     var mns = $('#Minutes').html();
     var scs = $('#Seconds').html();
     var blind = $('#Blinds').html();
-    var pause = $('#pause').html();
+    var pause = $('#Pause').html();
     var started = $('#Started').html();
     var timeTotal = $('#Time').html();
     var totalRoundTimer = $('#totalRoundTimer').html();
@@ -246,34 +248,13 @@
                 }
             })
         }
-        if (totalSecs % totalRoundTimer === 0) {
-            $.ajax({
-                url: "RoundTimer.cshtml",
-                type: "get",
-                data: {
-                    roundTimer: totalRoundTimer,
-                    totalSecs: totalSecs
-                },
-                success: function (response) {
-                    console.log("Round: " + response);
-                    document.querySelector('#rnumber').innerHTML = response;
-                }
-            })
+        document.querySelector('#rnumber').innerHTML = Math.floor(totalSecs / totalRoundTimer);
+        console.log("Pause time: " + pause);
+        console.log("Pause modulus: " + totalSecs % pause);
+        if (totalSecs % pause === 0) {
+            console.log("Pauze!");
+            alert("The game is pauzed");
         }
-        /*if (totalSecs % pause === 0) {
-            $.ajax({
-                url: "PauseTimer.cshtml",
-                type: "get",
-                data: {
-                    pauseTimer: totalpauseTimer,
-                    totalSecs: totalSecs
-                },
-                success: function (response) {
-                    console.log("Round: " + response);
-                    $
-                }
-            })
-        }*/
     
         currentSeconds++;
     
