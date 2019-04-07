@@ -22,7 +22,7 @@
     db.Close();
     #endregion
 
-    if (db.QueryValue("SELECT * FROM Blinds WHERE Room_Code=@0", roomCode) == null)
+    if (blinds.Count == 0)
     {
         Response.Redirect("~/Blinds.cshtml/" + roomCode);
     }
