@@ -273,6 +273,7 @@
                     }
                     //Calculate whether to pause yet
                     if (totalSecs % pauseTime === 0) {
+                        if (totalSecs != 0) {
                         @{ 
                                 db = Database.OpenConnectionString(connectionString, provider);
                                 db.Execute("UPDATE Room SET Started = 0");
@@ -287,6 +288,7 @@
                             }
                             $('.pauseModal').modal('hide');
                         }, 1000 * pauseDuration);
+                        }
                     }
 
                     currentSeconds++;
