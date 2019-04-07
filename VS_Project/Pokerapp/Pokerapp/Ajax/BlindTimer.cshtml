@@ -7,15 +7,15 @@
     int timer = Request.QueryString["totalSecs"].AsInt();
     int blind = Request.QueryString["blind"].AsInt();
     Database db = Database.OpenConnectionString(connectionString, provider);
-    var blinds = db.Query("SELECT * FROM Blinds WHERE Room_Code = @0", roomCode);
+    dynamic blinds = db.Query("SELECT * FROM Blinds WHERE Room_Code = @0", roomCode);
     db.Close();
     int index = timer / blind + 1;
     try
     {
-        Response.Write(index + "-" + blinds.ElementAt(index).ValueSB + "-" + blinds.ElementAt(index).ValueBB);
+        Response.Write(index + "-" + blinds[index].ValueSB + "-" + blinds[index].ValueBB);
     }
     catch
     {
-        Response.Write(index + "-" + blinds.Last().ValueSB + "-" + blinds.Last().ValueBB);
+        Response.Write(index + "-" + blinds[blinds.Count - 1].ValueSB + "-" + blinds[blinds.Count - 1].ValueBB);
     }
 }
