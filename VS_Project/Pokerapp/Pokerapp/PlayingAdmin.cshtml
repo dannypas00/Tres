@@ -22,11 +22,19 @@
     db.Close();
     #endregion
 
+    if (db.QueryValue("SELECT * FROM Blinds WHERE Room_Code=@0", roomCode) == null)
+    {
+        Response.Redirect("~/Blinds.cshtml/" + roomCode);
+    }
+
     //Player amount validator
     if (players.Count < (room.tbl_min_size + 1))
     {
         Response.Redirect("~/AdminPage.cshtml/" + roomCode);
     }
+
+
+
 
     //Gets the chip values
     int chip1 = room.Chip_1_Worth;
@@ -45,6 +53,8 @@
     {
         Response.Redirect("~/AdminPage.cshtml/" + roomCode);
     }
+
+
 
     #region Acts on buttons
     int tables = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", roomCode);
