@@ -73,6 +73,13 @@
                 db = Database.OpenConnectionString(connectionString, provider);
                 db.Execute("UPDATE Room SET Started_Time = @0, Started = 1 WHERE Room_Code = @1", DateTime.Now, roomCode);
                 db.Close();
+                Response.Redirect("~/PlayingAdmin/" + roomCode);
+                break;
+            case "restart":
+                db = Database.OpenConnectionString(connectionString, provider);
+                db.Execute("UPDATE Room SET Started_Time = @0, Started = 1 WHERE Room_Code = @1", DateTime.Now, roomCode);
+                db.Close();
+                Response.Redirect("~/PlayingAdmin/" + roomCode);
                 break;
             case "delete":
                 <script>
@@ -92,17 +99,19 @@
                 db = Database.OpenConnectionString(connectionString, provider);
                 db.Execute("UPDATE Room SET Started = 0 WHERE Room_Code = @0", roomCode);
                 db.Close();
+                Response.Redirect("~/PlayingAdmin/" + roomCode);
                 break;
             case "unpauze":
                 db = Database.OpenConnectionString(connectionString, provider);
                 db.Execute("UPDATE Room SET Started = 1 WHERE Room_Code = @0", roomCode);
                 db.Close();
+                Response.Redirect("~/PlayingAdmin/" + roomCode);
                 break;
             default:
                 break;
         }
-    } 
-	#endregion
+    }
+    #endregion
 }
 <!--Styling for the chips-->
 <style>
@@ -199,15 +208,26 @@
                                         <button class="btn btn-primary" type="submit" value="shuffle" name="submit">Shuffle all</button>
                                     </div>
                                     <div class="form-group">
-                                        <button class="btn btn-primary" type="submit" name="submit" value="start">Start / Restart</button>
+                                        @if (room.Started_Time != null)
+                                        {
+                                            <button class="btn btn-primary" type="submit" name="submit" value="restart">Restart</button>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-primary" type="submit" name="submit" value="start">Start</button>
+                                        }
                                     </div>
                                 </div>
                                 <div class="form-row" style="justify-content:center">
                                     <div class="form-group">
-                                        <button class="btn btn-primary" type="submit" value="pauze" name="submit">Pause</button>
-                                    </div>
-                                    <div class="form-group">
-                                        <button class="btn btn-primary" type="submit" value="unpauze" name="submit">Unpause</button>
+                                        @if (int.Parse(room.Started) == 0)
+                                        {
+                                            <button class="btn btn-primary" type="submit" value="unpauze" name="submit">Unpause</button>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-primary" type="submit" value="pauze" name="submit">Pause</button>
+                                        }
                                     </div>
                                 </div>
                             </form>
