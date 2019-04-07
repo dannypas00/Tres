@@ -7,7 +7,7 @@
 
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
-    Database db = Database.OpenConnectionString(connectionString, provider);
+    Database db;
 
     //Gets roomcode from url
     string prelink = Request.Url.AbsoluteUri;
@@ -15,8 +15,11 @@
     int urlcode = Convert.ToInt32(link[4]);
 
     //Show message if players are lower than min_size to contact the admin
+    db = Database.OpenConnectionString(connectionString, provider);
     int players = Convert.ToInt32(db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0", urlcode));
     int min_size = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", urlcode));
+    int amount = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
+    db.Close();
     bool cookies = false;
     if (Request.Cookies["LoginCookie"] is null)
     {
@@ -38,8 +41,6 @@
             })
         </script>
     }
-
-    int amount = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", urlcode);
 
     //Link for redirecting to the rulespage
     string Url = link[0] + "//" + link[2] + "/" + "RulesPageNL/" + link[4];
@@ -89,11 +90,15 @@
                     </div>
                     <!--Grid for the names-->
                     <div class="pNGrid">
-                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
-                        {<!--Names get put in the grid-->
+                        @{
+                            db = Database.OpenConnectionString(connectionString, provider);
+                            foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
+                            {<!--Names get put in the grid-->
                             <div class="pNames" style="padding-bottom:10px; padding-left:10px">
                                 <p><b>@row.Name </b></p>
                             </div>
+                            }
+                            db.Close();
                         }
                     </div>
                 </div>
@@ -105,13 +110,10 @@
 <script>
     /*Makes Rules page button clickable */
     jQuery(document).ready(function ($) {
-        $(".clickable").click(function () {
+        $(".clickable").on("click", () => {
             window.location = $(this).find("a:first").attr("href");
         });
-    });
-    /*Makes the whole table clickable */
-    jQuery(document).ready(function ($) {
-        $(".clickableBtn").click(function () {
+        $(".clickableBtn").on("click", () => {
             window.location = $(this).data("href");
         });
     });
