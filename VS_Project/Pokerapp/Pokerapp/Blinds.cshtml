@@ -97,8 +97,6 @@
 
     }
 }
-
-}
 <head>
     <style>
         .validation-summary-errors {
@@ -140,7 +138,7 @@
                     <div class="row">
                         <div class="mx-auto col-lg-6 col-10">
                             <p>@error</p>
-                            @if (db.QueryValue("SELECT * FROM Blinds") != null ) {
+                            @if (db.QueryValue("SELECT * FROM Blinds WHERE Room_Code=@0", urlcode) != null ) {
 
                                     <div class="row" style="justify-content:center">
                                         <div style="width:350px" class="table-responsive">
