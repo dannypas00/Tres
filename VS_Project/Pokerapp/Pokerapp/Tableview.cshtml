@@ -243,29 +243,33 @@
                     }
 
                     if (totalSecs % blind === 0) {
-                        $.ajax({    //Ajax call to raise the blinds
-                            url: "Ajax/BlindTimer.cshtml",
-                            type: "get",
-                            data: {
-                                roomCode: roomcode,
-                                blind: blind,
-                                totalSecs: totalSecs
-                            },
-                            success: function (response) {
-                                response = response.split("-");
-                                document.querySelector('#SB').innerHTML = response[1];
-                                document.querySelector('#BB').innerHTML = response[2];
-                            }
-                        })
+                        if (totalSecs != 0) {
+                            $.ajax({    //Ajax call to raise the blinds
+                                url: "Ajax/BlindTimer.cshtml",
+                                type: "get",
+                                data: {
+                                    roomCode: roomcode,
+                                    blind: blind,
+                                    totalSecs: totalSecs
+                                },
+                                success: function (response) {
+                                    response = response.split("-");
+                                    document.querySelector('#SB').innerHTML = response[1];
+                                    document.querySelector('#BB').innerHTML = response[2];
+                                }
+                            })
+                        }
                     }
                     //Calculate whether to up the round
                     if (totalSecs % totalRoundTimer === 0) {
-                        round++;
-                        $('.roundModal').modal('show');
-                        currentSeconds++;
-                        setTimeout(function () {
-                            $('.roundModal').modal('hide');
-                        }, 2000);
+                        if (totalSecs != 0) {
+                            round++;
+                            $('.roundModal').modal('show');
+                            currentSeconds++;
+                            setTimeout(function () {
+                                $('.roundModal').modal('hide');
+                            }, 2000);
+                        }
                     }
                     //Calculate whether to pause yet
                     if (totalSecs % pauseTime === 0) {
