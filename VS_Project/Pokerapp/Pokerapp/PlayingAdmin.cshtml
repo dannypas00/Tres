@@ -1,48 +1,52 @@
 ﻿@using WebMatrix.Data
 
 @{
-    Page.Title = "Game running";
-    Layout = "~/_Layout.cshtml";
-    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
-    string provider = "System.Data.SqlClient";
-    Database db = Database.OpenConnectionString(connectionString, provider);
-
-    //Gets roomcode from url
+    //Gets essential information
     string prelink = Request.Url.AbsoluteUri;
     string[] link = prelink.Split('/');
     string linked = link[0] + "//" + link[2] + "/Players/" + link[4];
     int roomCode = Convert.ToInt32(link[4]);
+    Page.Title = "Game running";
+    Layout = "~/_Layout.cshtml";
 
-    //Return to login if players are lower than min_size
-    int players = Convert.ToInt32(db.QueryValue("SELECT COUNT(Name) FROM Players WHERE Room_Code = @0", roomCode));
-    int min_size = Convert.ToInt32(db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", roomCode));
-    if (players < (min_size + 1))
+    #region Database Connections
+    Database db;
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    db = Database.OpenConnectionString(connectionString, provider);
+
+    //Get database tables
+    dynamic players = db.Query("SELECT Name FROM Players WHERE Room_Code = @0", roomCode);
+    dynamic room = db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode);
+    dynamic blinds = db.Query("SELECT ValueSB, ValueBB FROM Blinds WHERE Room_Code = @0", roomCode);
+    db.Close();
+    #endregion
+
+    //Player amount validator
+    if (players.Count < (room.tbl_min_size + 1))
     {
         Response.Redirect("~/AdminPage.cshtml/" + roomCode);
     }
 
-    //Gets the chipworths
-    var chips = db.QuerySingle("SELECT Chip_1_Worth, Chip_2_Worth, Chip_3_Worth, Chip_4_Worth, Chip_5_Worth FROM Room WHERE  Room_Code=@0", roomCode);
-
-    int chip1 = chips.Chip_1_Worth;
-    int chip2 = chips.Chip_2_Worth;
-    int chip3 = chips.Chip_3_Worth;
-    int chip4 = chips.Chip_4_Worth;
-    int chip5 = chips.Chip_5_Worth;
+    //Gets the chip values
+    int chip1 = room.Chip_1_Worth;
+    int chip2 = room.Chip_2_Worth;
+    int chip3 = room.Chip_3_Worth;
+    int chip4 = room.Chip_4_Worth;
+    int chip5 = room.Chip_5_Worth;
 
     //Looks if user logged in
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
         Response.Redirect("~/default.cshtml");
     }
-    int playerCheck = db.Query("SELECT * FROM Players WHERE Room_Code=@0", roomCode).Count();
-    dynamic tableCheck = db.QuerySingle("SELECT Tbl_Amount FROM Room WHERE Room_Code=@0", roomCode);
-    if (playerCheck <= tableCheck.Tbl_Amount)
+
+    if (players.Count <= room.Tbl_Amount)
     {
         Response.Redirect("~/AdminPage.cshtml/" + roomCode);
     }
 
-    //Pauzes the game, shuffles the players or manages the names on choice of admin
+    #region Acts on buttons
     int tables = db.QueryValue("SELECT TOP 1 Tbl_nr FROM Players WHERE Room_Code = @0 ORDER BY Tbl_nr DESC", roomCode);
     if (IsPost && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {
@@ -50,33 +54,45 @@
         {
             case "shuffle":
                 Shuffle shuffle = new Shuffle();
+                db = Database.OpenConnectionString(connectionString, provider);
                 shuffle.ShuffleTable(db, roomCode);
+                db.Close();
                 //Update tables with AJAX//
                 break;
             case "start":
+                db = Database.OpenConnectionString(connectionString, provider);
                 db.Execute("UPDATE Room SET Started_Time = @0, Started = 1 WHERE Room_Code = @1", DateTime.Now, roomCode);
+                db.Close();
                 break;
             case "delete":
                 <script>
                     $(document).ready(function () {
                         if (confirm("Do you really want to delete this room? This is irreversible!")) {
-                        @{db.Execute("DELETE FROM Room WHERE Room_Code = @0", roomCode);
-                        Response.Redirect("~/Gameselect.cshtml");}
+                            @{
+                                db = Database.OpenConnectionString(connectionString, provider);
+                                db.Execute("DELETE FROM Room WHERE Room_Code = @0", roomCode);
+                                db.Close();
+                                Response.Redirect("~/Gameselect.cshtml");
+                            }
                         }
                     });
                 </script>
                 break;
             case "pauze":
+                db = Database.OpenConnectionString(connectionString, provider);
                 db.Execute("UPDATE Room SET Started = 0 WHERE Room_Code = @0", roomCode);
+                db.Close();
                 break;
             case "unpauze":
+                db = Database.OpenConnectionString(connectionString, provider);
                 db.Execute("UPDATE Room SET Started = 1 WHERE Room_Code = @0", roomCode);
+                db.Close();
                 break;
             default:
                 break;
         }
-
-    }
+    } 
+	#endregion
 }
 <!--Styling for the chips-->
 <style>
@@ -112,10 +128,18 @@
                 <ul>
                     <li style="visibility:hidden"> -----------------------</li>
                     <li style="visibility:hidden"> -----------------------</li>
-                    <li> <a href="~/Gameselect.cshtml/">Select a different game</a> </li>
-                    <li> <a href="~/Settings?t=t/@roomCode">Settings</a> </li>
-                    <li> <a href="~/Blinds?t=t/@roomCode">Blinds</a> </li>
-                    <li> <a href="~/AdminPage/@roomCode">Change players</a> </li>
+                    <li>
+                        <a href="~/Gameselect.cshtml/">Select a different game</a>
+                    </li>
+                    <li>
+                        <a href="~/Settings?t=t/@roomCode">Settings</a>
+                    </li>
+                    <li>
+                        <a href="~/Blinds?t=t/@roomCode">Blinds</a>
+                    </li>
+                    <li>
+                        <a href="~/AdminPage/@roomCode">Change players</a>
+                    </li>
                 </ul>
                 <div style="position:absolute; bottom:50px;">
                     <form method="post">
@@ -179,7 +203,12 @@
                             </form>
                         </div>
                         <div class="row"></div>
-                        <div style="justify-content:center; padding-top:20px" class="row"><p>Share this link: <a href=@linked>@linked</a></p></div>
+                        <div style="justify-content:center; padding-top:20px" class="row">
+                            <p>
+                                Share this link:
+                                <a href=@linked>@linked</a>
+                            </p>
+                        </div>
                     </div>
                     <!--Grid for the Playing admin page-->
                     <div class="row">
@@ -197,13 +226,16 @@
                                                     <tr>
                                                         <th>Table @tbl_Nr</th>
                                                     </tr>
-                                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, tbl_Nr))
-                                                    {
-                                                        <tr>
-                                                            <td>
-                                                                <p>@row.Name</p>
-                                                            </td>
-                                                        </tr>
+                                                    @{db = Database.OpenConnectionString(connectionString, provider);
+                                                        foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, tbl_Nr))
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <p>@row.Name</p>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                        db.Close();
                                                     }
                                                 </tbody>
                                             </table>
@@ -221,17 +253,20 @@
                                         <th>Small Blind</th>
                                         <th>Big Blind</th>
                                     </tr>
-                                    @foreach (var row in db.Query("SELECT ValueSB, ValueBB, ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID ASC", roomCode))
-                                    {
-                                        int rowblindform = (int)row.ID;
-                                        <tr>
-                                            <td>
-                                                <p>@row.ValueSB</p>
-                                            </td>
-                                            <td>
-                                                <p>@row.ValueBB</p>
-                                            </td>
-                                        </tr>
+                                    @{db = Database.OpenConnectionString(connectionString, provider);
+                                        foreach (var row in db.Query("SELECT ValueSB, ValueBB, ID FROM Blinds WHERE Room_Code = @0 ORDER BY ID ASC", roomCode))
+                                        {
+                                            int rowblindform = (int)row.ID;
+                                            <tr>
+                                                <td>
+                                                    <p>@row.ValueSB</p>
+                                                </td>
+                                                <td>
+                                                    <p>@row.ValueBB</p>
+                                                </td>
+                                            </tr>
+                                        }
+                                        db.Close();
                                     }
                                 </tbody>
                             </table>
@@ -242,6 +277,7 @@
         </div>
     </main>
 </div>
+
 <script src="~/js/sidebarmenu.js"></script>
 <script>
     //Adds a number before the "first" column

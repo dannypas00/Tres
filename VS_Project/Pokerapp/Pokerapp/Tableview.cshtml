@@ -15,8 +15,9 @@
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     db = Database.OpenConnectionString(connectionString, provider);
+
     //Get database tables
-    dynamic names = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
+    dynamic player = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
     dynamic room = db.QuerySingle("SELECT * FROM Room WHERE Room_Code = @0", roomCode);
     dynamic blinds = db.Query("SELECT ValueSB, ValueBB FROM Blinds WHERE Room_Code = @0", roomCode);
     db.Close();
@@ -46,25 +47,25 @@
     int big;
     try     //Try catch RuntimeBinderException where blindsIndex.ValueSB or ValueBB is null.
     {
-        small = blinds.ElementAt(blindsIndex).ValueSB;
-        big = blinds.ElementAt(blindsIndex).ValueBB;
+        small = blinds[blindsIndex].ValueSB;
+        big = blinds[blindsIndex].ValueBB;
     }
     catch
     {
-        small = blinds.Last().ValueSB;
-        big = blinds.Last().ValueBB;
+        small = blinds[blinds.Count - 1].ValueSB;
+        big = blinds[blinds.Count - 1].ValueBB;
     }
     #endregion
 
     #region Get database dependent information
     int startvalue = room.Start_Value;
     int min_size = room.Tbl_Min_Size;
-    int players = names.Count();
-    int nameCount = names.Count();
+    int players = player.Count;
+    int nameCount = player.Count;
     #endregion
 
     #region Reshuffle - Doesn't function yet as deletion hasn't been implemented yet
-    if (min_size >= players)
+    if (min_size >= player.Count)
     {
         Shuffle shuffle = new Shuffle();
         shuffle.ShuffleTable(db, roomCode);
@@ -73,7 +74,7 @@
     }
     #endregion
 
-    //Splits number of names in two 
+    #region Distribute players among sides
     double nameDivision = nameCount / 2;
     int halfNamesCount = Convert.ToInt32(nameDivision);
     int firstHalfNamesCount = nameCount - halfNamesCount;
@@ -82,6 +83,7 @@
     {
         secondhalfnamesCount = firstHalfNamesCount;
     }
+    #endregion
 }
 <div class="header">
     <div style="cursor:pointer; float:right; margin-top:40px;margin-right:70px" class="btn btn-primary clickableBtn" data-href="@Url">
@@ -177,7 +179,7 @@
                     <h4 class="modal-title">Game Paused</h4>
                 </div>
                 <div class="modal-body">
-                    Game paused for <b id="pausedDuration">@pauseDuration</b> seconds.
+                    Game paused for <b id="pausedDuration">@pauseDuration</b>. q
                 </div>
             </div>
         </div>
@@ -216,7 +218,7 @@
     //Increment timer
     setInterval(function () {
         $.ajax({    //Ajax call to check for a paused game
-            url: "PauseAjax.cshtml",
+            url: "Ajax/PauseAjax.cshtml",
             type: "get",
             data: {
                 roomCode: roomcode
@@ -242,7 +244,7 @@
 
                     if (totalSecs % blind === 0) {
                         $.ajax({    //Ajax call to raise the blinds
-                            url: "BlindTimer.cshtml",
+                            url: "Ajax/BlindTimer.cshtml",
                             type: "get",
                             data: {
                                 roomCode: roomcode,
