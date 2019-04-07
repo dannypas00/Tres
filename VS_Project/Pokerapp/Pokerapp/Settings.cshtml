@@ -120,6 +120,7 @@
     }
     #endregion
     string warning = "";
+    string incorrectinputwarning = "";
     //continues to next page
     if (IsPost && Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
     {
@@ -130,10 +131,12 @@
                 //Checks for roundtime, pausetime and blindtime so it contains no letters
                 //And checks if time has a value of hh:mm:ss by splitting it with ':'
                 int check = 0;
-
+                int maxplayers = Convert.ToInt32(Request["max_table"]);
+                int minplayers = Convert.ToInt32(Request["min_table"]);
                 var prelink = Request["round_time"];
                 string[] times = prelink.Split(':');
                 int i = 0;
+
                 if(times.Count() > 2 && times.Count() < 4)
                 {
                     if (int.TryParse(Convert.ToString(times[0]), out i) == true && int.TryParse(Convert.ToString(times[1]), out i) == true && int.TryParse(Convert.ToString(times[2]), out i) == true)
@@ -208,8 +211,17 @@
                     warning = "Not a valid pause time, use hh:mm:ss";
                 }
 
+                if (maxplayers <= minplayers)
+                {
+                    incorrectinputwarning = "You cant set the maximum players lower or the same as minimum players";
+                }
+                else
+                {
+                    check++;
+                }
+
                 //If all three times are valid (at the time it wil count check + 1) than all settings will be saved and user will be redirected
-                if (check >= 3)
+                if (check >= 4)
                 {
                     if (Request.QueryString["t"] == null) {
                         Save();
@@ -261,6 +273,7 @@
                 <h3>Settings</h3>
                 <span class="error-time">
                     @warning
+                    @incorrectinputwarning
                 </span>
                 <span class="help-block">
                     @Html.ValidationSummary()
