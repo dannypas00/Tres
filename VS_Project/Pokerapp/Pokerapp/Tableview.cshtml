@@ -16,19 +16,20 @@
     string urlBack = "Players/" + roomCode;
 
     //Splits number of names in two 
-    var namen = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
-    int aantal = namen.Count();
-    double gedeeld = aantal / 2;
-    int helft = Convert.ToInt32(gedeeld);
-    int eerste = Convert.ToInt32(aantal - helft);
-    int tweede = Convert.ToInt32(eerste - 1);
-    if (aantal % 2 == 0)
+    var names = db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", roomCode, table);
+    int amount = names.Count();
+    double devision = amount / 2;
+    int halfnamesCount = Convert.ToInt32(devision);
+    int firsthalfnamesCount = Convert.ToInt32(amount - halfnamesCount);
+    int secondhalfnamesCount = Convert.ToInt32(firsthalfnamesCount - 1);
+    if (amount % 2 == 0)
     {
-        tweede = eerste;
+        secondhalfnamesCount = firsthalfnamesCount;
     }
 
     //Gets startvalue
     int startvalue = db.QueryValue("SELECT Start_Value FROM Room WHERE Room_Code = @0", roomCode);
+
 
     //If minimum size is reached reshuffle names by tables
     int min_size = db.QueryValue("SELECT Tbl_Min_Size FROM Room WHERE Room_Code = @0", roomCode);
@@ -105,67 +106,56 @@
         <div class="col-md-12 text-center">
             <h1>Table @table</h1>
         </div>
-        <div class="col-md-12 text-center">
-            @if (started == 0)
-            {
-                <div name=timer class="timer">Game not running</div>
-            }
-            else
-            {
-                <div name=timer class="timer">loading timer...</div>
-            }
-            <div name="timer" class="timer"></div>
-            <div class="round">This is round: <span id="rnumber">@round</span></div>
-        </div>
         <div class="row">
+            <div class="col-md-2 text-center">
+                @if (started == 0)
+                {
+                    <div name=timer class="timer">Game not running</div>
+                }
+                else
+                {
+                    <div name=timer class="timer">loading timer...</div>
+                }
+                <div name="timer" class="timer"></div>
+                <div class="round">This is round: <span id="rnumber">@round</span></div>
+            </div>
+            <div class="col-md-8">
+                <div class="gridd" id="activebody" style="text-align: center; max-height:500px; max-width:800px;">
+
+                    <div class="white"></div>
+                    <div class="white2"></div>
+                    <div class="white3"></div>
+                    <div class="white4"></div>
+                    <div class="tabloo" style=" height:auto; width:auto">
+                        <img src="~/assets/Tableview/Pokertable.png" style="height: 100%; width: 100%; object-fit: contain" />
+                    </div>
+                    <div class="gridRow1">
+                        @foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", roomCode, table, secondhalfnamesCount))
+                        {
+                            <div class="chair" style="display: inline-block">
+                                <button id="pokerstool" value="@a.Name" name="player" type="button">@a.Name</button>
+                            </div>
+                        }
+                    </div>
+                    <div class="gridRow2">
+                        @foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", firsthalfnamesCount, roomCode, table))
+                        {
+
+                            <div class="chair">
+                                <button id="pokerstool" value="@a.Name" name="player" type="button">@a.Name</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
             <div class="col-md-2">
                 <p>Starting capital: @startvalue</p>
                 <p>Small blind: <span id="SB">@small</span></p>
                 <p>Big blind: <span id="BB">@big</span></p>
             </div>
-            <div class="gridd">
-                <div class="white"></div>
-                <div class="white2"></div>
-                <div class="white3"></div>
-                <div class="white4"></div>
-                @if (aantal <= 7)
-                {
-                    foreach (var a in db.Query("SELECT TOP (@2) Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name DESC", roomCode, table, tweede))
-                    {
-                        <div class="chair2">
-                            <img src="~/stoel.png" alt="chair" style="width:75px;height:75px" />
-                            <b>@a.Name</b>
-                        </div>
-                    }
-
-                    foreach (var a in db.Query("SELECT TOP (@0) Name FROM Players WHERE Room_Code = @1 AND Tbl_nr = @2 ORDER BY Name ASC", eerste, roomCode, table))
-                    {
-
-                        <div class="chair">
-                            <img src="~/stoel.png" alt="chair" style="width:75px;height:75px" />
-                            <b>@a.Name</b>
-                        </div>
-                    }
-                }
-                @if (aantal > 7)
-                {       
-                    foreach (var a in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1 ORDER BY Name ASC", roomCode, table))
-                    {
-                        <div class="chair">
-                            <img src="stoel.png" alt="chair" style="width:75px;height:75px" />
-                            <b>@a.Name</b>
-                        </div>
-                    }
-                }
-
-                <div class="table">
-                    <img src="~/tafel.png" name="pokertable" style="height:250px; width:100%" />
-                </div>
-            </div>
         </div>
     </div>
-</div>
-
+    </div>
 <div class="pauseModal modal fade show in" data-target="#myModal" data-toggle="modal" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="v-cell">

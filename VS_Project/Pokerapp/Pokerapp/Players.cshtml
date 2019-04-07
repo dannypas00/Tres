@@ -44,6 +44,7 @@
     //Link for redirecting to the rulespage
     string Url = link[0] + "//" + link[2] + "/" + "RulesPageNL/" + link[4];
 }
+        <link rel="stylesheet" href="~/css/pViewGrid.css" />
 <style>
     .centered {
         position: absolute;
@@ -59,57 +60,56 @@
     </div>
 </div>
 <div class="py-5">
-
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <h1>Tables</h1>
-            </div>
-        </div>
-
-        <div class="col-md-6">
+    <div class="col-md-12 text-center">
+        <h1>Tables</h1>
+    </div>
+    <div class="row text-center">
+        <!--The 2x6 grid-->
+        <div class="bpGrid" style="margin: 0 auto">
             @for (int i = 0; i < amount; i++)
             {
                 int tbl_nr = i + 1;
                 string table = i.ToString();
                 Url = link[0] + "//" + link[2] + "/" + "Tableview.cshtml?roomcode=" + link[4] + "&table=" + tbl_nr;
-
-                <form method="post">
-                    <div class="row">
-                        <div class="col-md-12 clickable" style="background-image: url(/tafel.png);cursor:pointer; width:400px;height:100%; margin-top:15px">
+                <!--This gets put in the 2x6 grid and is a grid for the table and the names-->
+                <div class="pGrid" style="margin-left:30px; text-align:center">
+                    <div class="clickable" style="background: url(../assets/Tableview/Pokertable.png) no-repeat; background-size: 100%; cursor:pointer">
+                        <div class="text-center" style="display:inline-block; margin-top:30px"><h3><b>Table @tbl_nr</b></h3></div>
+                        <!--Table gets put in the grid-->
+                        <form method="post" class="pTable">
                             <div class="row">
-                                <div class="col">
-                                    <div class="text-center" style="justify-content:center; margin-top: 40%"><h3><b>Table @tbl_nr</b></h3></div>
-                                </div>
                                 <div class="col d-flex flex-column align-items-start justify-content-center order-1 order-lg-2" style="padding-top:5px">
-
-
-                                    @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
-                                    {
-                                        <div class="flex-column">
-                                            <p><b>@row.Name </b></p>
-                                        </div>
-                                    }
-
-
-                                    <input type="hidden" name="roomcode" value=@urlcode />
-                                    <a href=@Url></a>
                                 </div>
                             </div>
-                        </div>
+
+                            <input type="hidden" name="roomcode" value=@urlcode />
+                            <a href=@Url></a>
+
+                        </form>
                     </div>
-                </form>
+                    <!--Grid for the names-->
+                    <div class="pNGrid">
+                        @foreach (var row in db.Query("SELECT Name FROM Players WHERE Room_Code = @0 AND Tbl_nr = @1", urlcode, tbl_nr))
+                        {<!--Names get put in the grid-->
+                            <div class="pNames" style="padding-bottom:10px; padding-left:10px">
+                                <p><b>@row.Name </b></p>
+                            </div>
+                        }
+                    </div>
+                </div>
             }
         </div>
     </div>
 </div>
 
 <script>
+    /*Makes Rules page button clickable */
     jQuery(document).ready(function ($) {
         $(".clickable").click(function () {
             window.location = $(this).find("a:first").attr("href");
         });
     });
+    /*Makes the whole table clickable */
     jQuery(document).ready(function ($) {
         $(".clickableBtn").click(function () {
             window.location = $(this).data("href");

@@ -1,15 +1,11 @@
 ﻿.pAdminGrid {
     display: grid;
-    grid-template-columns: 15% 70% 15%;
-    grid-template-rows: 100%
+    grid-template-columns: 1auto 1auto 1auto;
+    grid-template-rows: 1auto 1auto;
+    grid-template-areas: ". . ." ". . .";
 }
 
-.pTable{
-    grid-column:2;
-    grid-row:1;
-}
-
-.pBlinds{
-    grid-column:3;
-    grid-row:1;
+.pTable {
+    grid-column-start: auto;
+    order: inherit;
 }

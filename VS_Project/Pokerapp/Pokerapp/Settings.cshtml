@@ -11,15 +11,15 @@
     Database db = Database.OpenConnectionString(connectionString, provider);
 
     //Retrieving the url code
-    string url = Request.Url.AbsolutePath;
-    string urlcode = url.Substring(url.Length - 7);
-    int code = Convert.ToInt32(urlcode);
+    string preUrl = Request.Url.AbsoluteUri;
+    string[] link = preUrl.Split('/');
+    int code = Convert.ToInt32(link[4]);
 
     #region Validators
     //check if cookie is still valid
     if (Request.Cookies["LoginCookie"] is null || Request.Cookies["LoginCookie"].Value != "true")
     {
-        Response.Redirect("~/Login.cshtml");
+        Response.Redirect("~/default.cshtml");
     }
 
     //Validation for input
@@ -125,7 +125,7 @@
     {
         if (Validation.IsValid())
         {
-            if (Request["Proceed"] == "Proceed")
+            if (Request["Proceed"] == "Proceed" || Request["Proceed"] == "Admin Page")
             {
                 //Checks for roundtime, pausetime and blindtime so it contains no letters
                 //And checks if time has a value of hh:mm:ss by splitting it with ':'
@@ -211,8 +211,16 @@
                 //If all three times are valid (at the time it wil count check + 1) than all settings will be saved and user will be redirected
                 if (check >= 3)
                 {
-                    Save();
-                    Response.Redirect("~/Blinds.cshtml/" + code);
+                    if (Request.QueryString["t"] == null) {
+                        Save();
+                        Response.Redirect("~/Blinds.cshtml/" + code);
+                    }
+                    else
+                    {
+                        Shuffle shuffle = new Shuffle();
+                        shuffle.ShuffleTable(db, code);
+                        Response.Redirect("~/PlayingAdmin.cshtml/" + code);
+                    }
                 }
             }
             else
@@ -221,7 +229,7 @@
             }
         }
     }
-    }
+}
     }
 
 
@@ -290,7 +298,16 @@
                     <div class="form-row">
                         <div class="form-group col-md-6"> <label for="form15">Value chip 5</label> <input type="number" step="1" min="1" max="999999" pattern="[0-9]" inputmode="numeric" class="form-control" id="form15" placeholder="100" name="chip5" value="@chip_worth5" required> </div>
                     </div>
-                    <input class="btn btn-primary" type="submit" name="Proceed" value="Proceed" />
+                    @if (Request.QueryString["t"] == null)
+                    {
+                        <input class="btn btn-primary" type="submit" name="Proceed" value="Proceed" />
+                    }
+                    else
+                    {
+                        <input class="btn btn-primary" type="submit" name="Proceed" value="Admin Page" />
+                    }
+
+
                 </form>
             </div>
         </div>
